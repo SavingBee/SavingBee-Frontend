@@ -36,7 +36,7 @@ export type RangeFilter = {
   filterLabel: string;
   kind: "range";
   minKey: string;
-  maxKey: string; // 필수
+  maxKey: string;
   unit?: string;
   min?: number;
   max?: number;
