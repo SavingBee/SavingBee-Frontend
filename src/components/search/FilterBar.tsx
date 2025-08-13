@@ -69,11 +69,18 @@ export default function FilterBar() {
           />
         ))}
       </div>
-
+      {/* {activeFilter && isAmount(activeFilter) && (
+        <AmountForm
+          aFilter={activeFilter}
+          value={amount}
+          onChange={setAmount}
+          onApply={onApply}
+        />
+      )} */}
       {activeFilter && (
         <FilterDropdown>
           <div className="w-[360px]">
-            <div className="mb-3 font-medium">{activeFilter.filterLabel}</div>
+            {/* <div className="mb-3 font-medium">{activeFilter.filterLabel}</div> */}
 
             {isList(activeFilter) && openOption && (
               <MultiOption
