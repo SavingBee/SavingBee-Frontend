@@ -5,6 +5,7 @@ import Layout from "../layout/Layout";
 import DepositPage from "@/pages/product/DepositPage";
 import SavingPage from "@/pages/product/SavingPage";
 import SearchEntryPage from "@/pages/SearchEntryPage";
+import ProductSearchPage from "@/pages/ProductSearchPage";
 
 const Router = () => {
   return (
@@ -15,6 +16,7 @@ const Router = () => {
         <Route path="/deposit" element={<DepositPage />} />
         <Route path="/saving" element={<SavingPage />} />
         <Route path="/" element={<SearchEntryPage />} />
+        <Route path="/product/search" element={<ProductSearchPage />} />
       </Route>
     </Routes>
   );
