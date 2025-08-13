@@ -23,6 +23,10 @@ export default {
         grayf5: "#f5f5f5",
         grayf9: "#f9f9f9",
       },
+      screens: {
+        'max-xl1240': { max: '1240px' },
+        'max-xl1023': { max: '1023px' },
+      },
     },
   },
   // plugins: [require("daisyui")],
