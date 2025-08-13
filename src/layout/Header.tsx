@@ -1,38 +1,67 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import MobileMenu from "./MobileMenu";
+import { menuItems } from "@/constants/menuData";
+
+import { BiMenu } from "react-icons/bi";
+import { FiSearch } from "react-icons/fi";
+import { GoPeople } from "react-icons/go";
 
 const Header = () => {
+    const [ open, setOpen ] = useState(false);
+
+    // 모바일 메뉴 열릴 때 body 스크롤 X
+    useEffect(() => {
+        document.body.style.overflow = open ? "hidden" : "";
+        return () => { document.body.style.overflow = ''; };
+    }, [open])
+
     return (
-        <header className="fixed top-0 left-0 w-full z-10">
-            <div className="w-full max-w-[1200px] mx-auto flex items-center justify-between pt-[20px] pb-[20px] border-b border-graye5">
+        <header className="fixed top-0 left-0 w-full z-10 max-xl1240:border-b max-xl1240:border-graye5">
+            <div
+                className="w-full max-w-[1200px] mx-auto flex items-center justify-between pt-[20px] pb-[20px] border-b border-graye5
+                            max-xl1240:px-[20px] max-xl1240:border-0
+                            max-xl1023:pt-[15px] max-xl1023:pb-[15px]"
+            >
                 <Link to="/" className="gmarket font-bold">SAVING BEE</Link>
-                <ul className="flex items-center gap-3 font-semibold">
-                    <li><Link to="/">상품검색</Link></li>
-                    <li><Link to="/">상품비교</Link></li>
-                    <li><Link to="/">상품추천</Link></li>
-                    <li><Link to="/">인근 영업점</Link></li>
+                {/* PC 메뉴 */}
+                <ul className="hidden lg:flex items-center gap-3 font-semibold">
+                    {menuItems.map((item) => (
+                        <li key={item.label}>
+                            <Link to={item.path}>{item.label}</Link>
+                        </li>
+                    ))}
                 </ul>
-                <div className="flex items-center gap-[8px]">
+                {/* 우측 유틸 */}
+                <div className="hidden lg:flex items-center gap-[8px]">
                     <Link
                         to="/"
                         className="flex items-center gap-1 text-sm font-medium"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13" fill="none">
-                            <path d="M9.49609 7.92188C10.0039 7.12292 10.3018 6.175 10.3018 5.15599C10.3018 2.30885 7.99635 0 5.1526 0C2.30547 0 0 2.30885 0 5.15599C0 8.00313 2.30547 10.312 5.14922 10.312C6.18177 10.312 7.14323 10.0073 7.94896 9.48594L8.18255 9.32344L11.8591 13L13 11.8388L9.32682 8.16224L9.49609 7.92188ZM8.03698 2.275C8.80547 3.04349 9.22865 4.06589 9.22865 5.1526C9.22865 6.23932 8.80547 7.26172 8.03698 8.03021C7.26849 8.7987 6.24609 9.22188 5.15938 9.22188C4.07266 9.22188 3.05026 8.7987 2.28177 8.03021C1.51328 7.26172 1.0901 6.23932 1.0901 5.1526C1.0901 4.06589 1.51328 3.04349 2.28177 2.275C3.05026 1.50651 4.07266 1.08333 5.15938 1.08333C6.24609 1.08333 7.26849 1.50651 8.03698 2.275Z" fill="#444444"/>
-                        </svg>
-                        검색
+                        <FiSearch color="#444"/>검색
                     </Link>
                     <span className="block w-[2px] h-[2px] rounded-full bg-black6"></span>
                     <Link
                         to="/"
                         className="flex items-center gap-1 text-sm font-medium"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="13" viewBox="0 0 11 13" fill="none">
-                            <path d="M5.50004 6.93334C4.77484 6.93334 4.06593 6.73002 3.46295 6.3491C2.85997 5.96817 2.39001 5.42675 2.11248 4.7933C1.83496 4.15985 1.76235 3.46282 1.90383 2.79036C2.04531 2.11789 2.39452 1.50019 2.90732 1.01536C3.42011 0.530543 4.07345 0.200375 4.78471 0.0666126C5.49598 -0.0671495 6.23322 0.00150204 6.90322 0.263886C7.57321 0.52627 8.14587 0.970601 8.54876 1.54069C8.95166 2.11078 9.16671 2.78103 9.16671 3.46667C9.16671 4.38609 8.7804 5.26785 8.09277 5.91797C7.40513 6.5681 6.4725 6.93334 5.50004 6.93334ZM5.50004 0.866668C4.95614 0.866668 4.42446 1.01916 3.97222 1.30485C3.51999 1.59054 3.16751 1.9966 2.95937 2.47169C2.75123 2.94678 2.69677 3.46955 2.80288 3.9739C2.90899 4.47825 3.1709 4.94153 3.5555 5.30515C3.94009 5.66876 4.4301 5.91639 4.96354 6.01671C5.49699 6.11703 6.04993 6.06554 6.55242 5.86876C7.05492 5.67197 7.48441 5.33872 7.78658 4.91115C8.08876 4.48358 8.25004 3.9809 8.25004 3.46667C8.25004 2.77711 7.96031 2.11579 7.44459 1.62819C6.92886 1.1406 6.22939 0.866668 5.50004 0.866668Z" fill="#444444"/>
-                            <path d="M8.70833 13H2.29167C1.68388 13 1.10098 12.7718 0.671214 12.3654C0.241443 11.9591 0 11.408 0 10.8334V9.10003C1.38727e-05 9.02483 0.0207274 8.95092 0.060104 8.88558C0.0994806 8.82024 0.156164 8.76571 0.224583 8.72736L2.51625 7.42736C2.61965 7.38318 2.7367 7.37683 2.84476 7.40954C2.95282 7.44225 3.04421 7.5117 3.10124 7.60444C3.15827 7.69718 3.17689 7.80662 3.15349 7.91159C3.1301 8.01656 3.06635 8.1096 2.97458 8.17269L0.916667 9.34703V10.8334C0.916667 11.1781 1.06153 11.5088 1.31939 11.7526C1.57726 11.9964 1.92699 12.1334 2.29167 12.1334H8.70833C9.07301 12.1334 9.42274 11.9964 9.68061 11.7526C9.93847 11.5088 10.0833 11.1781 10.0833 10.8334V9.34703L8.01625 8.17269C7.95781 8.14772 7.90556 8.11143 7.86289 8.06618C7.82021 8.02092 7.78806 7.96769 7.7685 7.90995C7.74895 7.8522 7.74243 7.79122 7.74937 7.73094C7.7563 7.67066 7.77654 7.61243 7.80878 7.56001C7.84101 7.5076 7.88452 7.46216 7.93649 7.42663C7.98847 7.39111 8.04775 7.3663 8.1105 7.3538C8.17325 7.34129 8.23808 7.34138 8.3008 7.35405C8.36351 7.36672 8.42272 7.3917 8.47458 7.42736L10.7662 8.72736C10.8364 8.76462 10.8949 8.81867 10.9359 8.88409C10.977 8.94951 10.9991 9.02398 11 9.10003V10.8334C11 11.408 10.7586 11.9591 10.3288 12.3654C9.89902 12.7718 9.31612 13 8.70833 13Z" fill="#444444"/>
-                        </svg>
+                        <GoPeople size={17} color="#444" />
                         로그인/회원가입
                     </Link>
                 </div>
+
+                {/* (모바일)햄버거 버튼 */}
+                <button
+                    type="button"
+                    className={`lg:hidden block`}
+                    aria-expanded={open}
+                    aria-controls="mobile-menu"
+                    onClick={() => setOpen((v) => !v)}
+                >
+                    <BiMenu size={30} />
+                </button>
+                {/* 모바일 메뉴 */}
+                <MobileMenu open={open} onClose={() => setOpen(false)} />
             </div>
         </header>
     )
