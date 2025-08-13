@@ -6,6 +6,7 @@ export default {
       colors: {
         primary: "#1976D3",
         red: "#EA4335",
+        navy: "#144271",
 
         black12: "#121212",
         black2: "#222222",
@@ -28,5 +29,5 @@ export default {
       },
     },
   },
-  plugins: [require("daisyui")],
+  // plugins: [require("daisyui")],
 };
