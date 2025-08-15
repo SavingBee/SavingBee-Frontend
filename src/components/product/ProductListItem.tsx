@@ -10,7 +10,7 @@ export type ProductListItemProps = {
   logoUrl: string;
   productName: string;
   bankName: string;
-  promoRate: number;
+  maxRate: number;
   baseRate: number;
   detail?: string;
   onCompare?: () => void;
@@ -20,9 +20,9 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
   logoUrl,
   productName,
   bankName,
-  promoRate,
+  maxRate,
   baseRate,
-  detail,
+
   onCompare,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -48,7 +48,7 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
           <div className="flex items-center gap-1">
             <p className="text-xs text-[#1976D3]">우대금리</p>
             <p className="text-lg md:text-2xl font-bold text-[#1976D3]">
-              {promoRate.toFixed(2)}%
+              {maxRate.toFixed(2)}%
             </p>
           </div>
           <p className="text-xs text-gray-400">기본 {baseRate}%</p>

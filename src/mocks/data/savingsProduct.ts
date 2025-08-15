@@ -1,0 +1,40 @@
+import { SavingsProduct } from "@/types/product";
+
+export const SAVINGS_PRODUCTS: SavingsProduct[] = [
+  {
+    id: "SVG001",
+    name: "자유적금 플러스",
+    bankCode: "WR",
+    bankName: "우리은행",
+    type: "savings",
+    joinWay: "인터넷/모바일",
+    joinMember: "개인",
+    isActive: true,
+    updatedAt: "2025-08-09T03:00:00Z",
+    notes: "자동이체 우대 가능",
+  },
+  {
+    id: "SVG002",
+    name: "정액적립 적금",
+    bankCode: "KB",
+    bankName: "국민은행",
+    type: "savings",
+    joinWay: "모바일",
+    joinMember: "개인",
+    isActive: true,
+    updatedAt: "2025-08-08T10:30:00Z",
+    notes: "급여이체 실적 우대",
+  },
+  {
+    id: "SVG003",
+    name: "스마트 저축 적금",
+    bankCode: "SH",
+    bankName: "신한은행",
+    type: "savings",
+    joinWay: "인터넷",
+    joinMember: "개인/개인사업자",
+    isActive: true,
+    updatedAt: "2025-08-05T09:10:00Z",
+    notes: "첫거래 우대 제공",
+  },
+];
