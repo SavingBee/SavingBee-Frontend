@@ -3,7 +3,7 @@ import Login from "../pages/Login";
 import SignUp from "../pages/SignUp";
 import Layout from "../layout/Layout";
 import DepositPage from "@/pages/product/DepositPage";
-import SavingPage from "@/pages/product/SavingPage";
+import SavingPage from "@/pages/product/SavingsPage";
 import SearchEntryPage from "@/pages/SearchEntryPage";
 import ProductSearchPage from "@/pages/ProductSearchPage";
 
