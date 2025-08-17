@@ -4,7 +4,7 @@ interface InputFieldProps {
     id?: string;
     name?: string;
     placeholder?: string;
-    value?: string;
+    value?: string | number;
     className?: string; // container 스타일
     labelClassName?: string; // label 스타일
     inputClassName?: string; // 추가 input 스타일
