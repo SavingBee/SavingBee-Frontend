@@ -1,25 +1,23 @@
-import { useState } from "react";
 import Button from "@/components/common/button/Button";
 import InputField1 from "@/components/common/input/InputField1";
 import type { AmountFilter } from "@/types/searchFilter";
+import type { ChangeEvent } from "react";
 
 type AmountFormProps = {
   aFilter: AmountFilter;
   value?: number;
-  onChange: (v: number | undefined) => void;
+  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onApply: () => void;
 };
 
-export default function AmountForm({ aFilter, onApply }: AmountFormProps) {
-  const [display, setDisplay] = useState("");
-
-  const handleChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    const data = e.target.value;
-    setDisplay(data);
-  };
-
+export default function AmountForm({
+  aFilter,
+  value,
+  onChange,
+  onApply,
+}: AmountFormProps) {
   return (
-    <div className="flex items-center gap-2 border p-4 rounded-md">
+    <div className="flex items-center gap-2  border p-4 rounded-md">
       <InputField1
         type="text"
         variant="sm"
@@ -28,18 +26,17 @@ export default function AmountForm({ aFilter, onApply }: AmountFormProps) {
           aFilter.placeholder ??
           (aFilter.unit ? `금액 입력 (${aFilter.unit})` : "금액 입력")
         }
-        value={display}
-        onChange={handleChange}
+        value={value}
+        onChange={onChange}
       />
-
       <Button
         type="button"
         variant="sm"
         styleVariant="bg"
-        className="bg-primary py-6"
+        className="bg-primary h-[34px] px-4 whitespace-nowrap leading-none"
         onClick={onApply}
       >
-        적용
+        <span>적용</span>
       </Button>
     </div>
   );
