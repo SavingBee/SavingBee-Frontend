@@ -1,28 +1,48 @@
 import Button from "@/components/common/button/Button";
 import InputField1 from "@/components/common/input/InputField1";
 import { PiTilde } from "react-icons/pi";
+import type { ChangeEvent } from "react";
 
-export default function RangeForm() {
+interface RangeFormProps {
+  minValue?: number;
+  maxValue?: number;
+  onChangeMin: (e: ChangeEvent<HTMLInputElement>) => void;
+  onChangeMax: (e: ChangeEvent<HTMLInputElement>) => void;
+  onApply?: () => void;
+}
+
+export default function RangeForm({
+  minValue,
+  maxValue,
+  onChangeMin,
+  onChangeMax,
+  onApply,
+}: RangeFormProps) {
   return (
-    <div className="flex border p-4 items-center gap-2 w-[330px] rounded-md">
+    <div className="flex items-center justify-center gap-2 py-3 px-2 w-[330px] rounded-md">
       <InputField1
         type="text"
         variant="sm"
-        inputClassName="border-graye5 rounded-md py-3 outline-none w-24"
         placeholder="최저 값"
+        value={minValue}
+        onChange={onChangeMin}
+        inputClassName="border border-graye5 rounded-md py-2 px-3 outline-none w-24"
       />
       <PiTilde />
       <InputField1
         type="text"
         variant="sm"
-        inputClassName="border-graye5 rounded-md py-3 outline-none w-24"
         placeholder="최고 값"
+        value={maxValue}
+        onChange={onChangeMax}
+        inputClassName="border border-graye5 rounded-md py-2 px-3 outline-none w-24"
       />
       <Button
         type="button"
         styleVariant="bg"
         variant="sm"
-        className="bg-primary py-6"
+        className="bg-primary"
+        onClick={onApply}
       >
         적용
       </Button>
