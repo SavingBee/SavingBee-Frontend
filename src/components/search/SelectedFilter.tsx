@@ -1,16 +1,18 @@
 import SelectedChip from "./SelectedChip";
 
-const BUTTONTEXT = ["금융권", "5,000,000원"];
+interface Chip {
+  key: string;
+  label: string;
+  onRemove: () => void;
+}
 
-export default function SelectedFilter() {
-  const handleDelete = () => {
-    console.log("삭제 기능");
-  };
+export default function SelectedFilter({ chips }: { chips: Chip[] }) {
+  if (chips.length === 0) return null;
 
   return (
-    <div className="flex gap-2 border-t border-[#B9D4E8] bg-[#F6FAFD] p-4 mt-4">
-      {BUTTONTEXT.map((b) => (
-        <SelectedChip key={b} buttonText={b} onClose={handleDelete} />
+    <div className="flex flex-wrap gap-2 border-t border-[#B9D4E8] bg-[#F6FAFD] p-4 mt-4">
+      {chips.map((c) => (
+        <SelectedChip key={c.key} buttonText={c.label} onClose={c.onRemove} />
       ))}
     </div>
   );
