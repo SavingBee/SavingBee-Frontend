@@ -1,0 +1,105 @@
+  {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit"
+    },
+    "eslint.validate": [
+      "javascript",
+      "typescript",
+      "typescriptreact"
+    ],
+    "css.validate": false,
+    "tailwindCSS.experimental.classRegex": [
+      "clsx\\(([^)]*)\\)",
+      "cn\\(([^)]*)\\)"
+    ],
+    "gitmoji.addCustomEmoji": [
+      {
+        "emoji": "✨ feat:",
+        "code": ":sparkles:",
+        "description": "feat: 기능 및 코드 추가"
+      },
+      {
+        "emoji": "🔥 remove:",
+        "code": ":fire:",
+        "description": "remove: 기능 및 코드 제거"
+      },
+      {
+        "emoji": "🎨 styling:",
+        "code": ":art:",
+        "description": "styling: 코드의 구조/형태 개선"
+      },
+     {
+        "emoji": "💄 style:",
+        "code": ":lipstick:",
+        "description": "style: UI 스타일 추가/수정"
+      },
+      {
+        "emoji": "➕ add dep:",
+        "code": ":heavy_plus_sign:",
+        "description": "add dep: 의존성 추가"
+      },
+      {
+        "emoji": "➖ remove dep:",
+        "code": ":heavy_minus_sign:",
+        "description": "remove dep: 의존성 제거"
+      },
+      {
+        "emoji": "🧹 chore:",
+        "code": ":broom:",
+        "description": "chore: 유지보수 및 기타 작업"
+      },
+      {
+        "emoji": "✏️ typo:",
+        "code": ":pencil2:",
+        "description": "typo: 오타 수정"
+      },
+
+      {
+        "emoji": "🏗️ structure:",
+        "code": ":card_file_box:",
+        "description": "structure: 프로젝트 구조 변경"
+      },
+      {
+        "emoji": "🐛 fix:",
+        "code": ":bug:",
+        "description": "fix: 버그 수정"
+      },
+      {
+        "emoji": "♻️ refactor:",
+        "code": ":recycle:",
+        "description": "refactor: 코드 리팩토링"
+      },
+      {
+        "emoji": "📝 doc:",
+        "code": ":memo:",
+        "description": "doc: 문서 추가 및 수정"
+      },
+      {
+        "emoji": "🎉 init:",
+        "code": ":tada:",
+        "description": "init: 프로젝트 시작"
+      },
+      {
+        "emoji": "🚀 deploy:",
+        "code": ":rocket:",
+        "description": "deploy: 프로젝트 배포"
+      },
+      {
+        "emoji": "🔧 config:",
+        "code": ":wrench:",
+        "description": "config: 설정 파일 추가/수정"
+      },
+      {
+        "emoji": "📦 package:",
+        "code": ":package:",
+        "description": "package: 패키지 파일 추가/수정"
+      },
+      {
+        "emoji": "📌 pin:",
+        "code": ":pushpin:",
+        "description": "pin: 의존성 버전 고정"
+      }
+    ],
+    "gitmoji.onlyUseCustomEmoji": true,
+  }
