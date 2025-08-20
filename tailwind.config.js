@@ -5,6 +5,7 @@ export default {
     extend: {
       colors: {
         primary: "#1976D3",
+        lightPrimary: "#F6FAFD",
         red: "#EA4335",
         navy: "#144271",
 
@@ -26,6 +27,7 @@ export default {
       screens: {
         'max-xl1240': { max: '1240px' },
         'max-xl1023': { max: '1023px' },
+        'max-xl767': { max: '767px' },
       },
     },
   },
