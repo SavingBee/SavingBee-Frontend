@@ -4,7 +4,6 @@ import MobileMenu from "./MobileMenu";
 import { menuItems } from "@/constants/menuData";
 
 import { BiMenu } from "react-icons/bi";
-import { FiSearch } from "react-icons/fi";
 import { GoPeople } from "react-icons/go";
 
 const Header = () => {
@@ -21,11 +20,11 @@ const Header = () => {
             <div
                 className="w-full max-w-[1200px] mx-auto flex items-center justify-between pt-[20px] pb-[20px] border-b border-graye5
                             max-xl1240:px-[20px] max-xl1240:border-0
-                            max-xl1023:pt-[15px] max-xl1023:pb-[15px]"
+                            max-xl767:pt-[15px] max-xl767:pb-[15px]"
             >
                 <Link to="/" className="gmarket font-bold">SAVING BEE</Link>
                 {/* PC 메뉴 */}
-                <ul className="hidden lg:flex items-center gap-3 font-semibold">
+                <ul className="hidden md:flex items-center gap-3 font-semibold">
                     {menuItems.map((item) => (
                         <li key={item.label}>
                             <Link to={item.path}>{item.label}</Link>
@@ -33,16 +32,9 @@ const Header = () => {
                     ))}
                 </ul>
                 {/* 우측 유틸 */}
-                <div className="hidden lg:flex items-center gap-[8px]">
+                <div className="hidden md:flex items-center gap-[8px]">
                     <Link
-                        to="/"
-                        className="flex items-center gap-1 text-sm font-medium"
-                    >
-                        <FiSearch color="#444"/>검색
-                    </Link>
-                    <span className="block w-[2px] h-[2px] rounded-full bg-black6"></span>
-                    <Link
-                        to="/"
+                        to="/login"
                         className="flex items-center gap-1 text-sm font-medium"
                     >
                         <GoPeople size={17} color="#444" />
@@ -53,7 +45,7 @@ const Header = () => {
                 {/* (모바일)햄버거 버튼 */}
                 <button
                     type="button"
-                    className={`lg:hidden block`}
+                    className={`md:hidden block`}
                     aria-expanded={open}
                     aria-controls="mobile-menu"
                     onClick={() => setOpen((v) => !v)}

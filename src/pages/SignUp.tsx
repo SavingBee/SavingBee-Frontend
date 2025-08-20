@@ -1,7 +1,9 @@
+import SignupContainer from "@/components/signup/SignupContainer";
+
 const SignUp = () => {
   return (
     <>
-      <p>회원가입 화면</p>
+      <SignupContainer />
     </>
   );
 };
