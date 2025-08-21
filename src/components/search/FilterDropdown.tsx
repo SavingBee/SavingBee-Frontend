@@ -29,15 +29,10 @@ export default function FilterDropdown({
   }, [onClose]);
 
   const style =
-    variant === "input"
-      ? "bg-white  border-none shadow z-30"
-      : "bg-white border border-graye5 p-4 shadow z-30";
+    variant === "input" ? "  border-none shadow z-30" : "p-4 shadow z-30";
 
   return (
-    <div
-      ref={ref}
-      className={`absolute left-0 top-full mt-2  rounded-md ${style}`}
-    >
+    <div className={`absolute left-0 top-full mt-2  rounded-md ${style}`}>
       {children}
     </div>
   );

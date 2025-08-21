@@ -3,22 +3,32 @@ import type { Option } from "@/types/searchFilter";
 
 interface MultiOptionProps {
   options: Option[];
-  values: string[];
-  onChange: (option: string[]) => void;
+  values: (string | number)[];
+  multiple?: boolean;
+  onChange: (vals: (string | number)[]) => void;
 }
 
 export default function MultiOption({
   options,
   values,
+  multiple = true,
   onChange,
 }: MultiOptionProps) {
-  const toggle = (id: string) =>
-    values.includes(id)
-      ? onChange(values.filter((v) => v !== id))
-      : onChange([...values, id]);
+  const toggle = (id: string | number) => {
+    if (multiple) {
+      if (values.includes(id)) {
+        onChange(values.filter((v) => v !== id));
+      } else {
+        onChange([...values, id]);
+      }
+    } else {
+      // 단일 선택: 같은 걸 다시 누르면 해제
+      onChange(values.includes(id) ? [] : [id]);
+    }
+  };
 
   return (
-    <div className="grid grid-cols-2 gap-y-2 w-[330px]">
+    <div className="grid grid-cols-2 gap-y-2 w-[330px] pb-4">
       {options.map((o) => (
         <Checkbox
           key={o.id}
