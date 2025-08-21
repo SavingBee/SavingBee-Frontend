@@ -1,4 +1,4 @@
-import Button from "@/components/common/button/Button";
+// import Button from "@/components/common/button/Button";
 import InputField1 from "@/components/common/input/InputField1";
 import { PiTilde } from "react-icons/pi";
 import type { ChangeEvent } from "react";
@@ -8,7 +8,7 @@ interface RangeFormProps {
   maxValue?: number;
   onChangeMin: (e: ChangeEvent<HTMLInputElement>) => void;
   onChangeMax: (e: ChangeEvent<HTMLInputElement>) => void;
-  onApply?: () => void;
+  // onApply?: () => void;
 }
 
 export default function RangeForm({
@@ -16,10 +16,10 @@ export default function RangeForm({
   maxValue,
   onChangeMin,
   onChangeMax,
-  onApply,
+  // onApply,
 }: RangeFormProps) {
   return (
-    <div className="flex items-center justify-center gap-2 py-3 px-2 w-[330px] rounded-md">
+    <div className="flex items-center gap-2 pb-4  w-[330px] rounded-md">
       <InputField1
         type="text"
         variant="sm"
@@ -37,7 +37,7 @@ export default function RangeForm({
         onChange={onChangeMax}
         inputClassName="border border-graye5 rounded-md py-2 px-3 outline-none w-24"
       />
-      <Button
+      {/* <Button
         type="button"
         styleVariant="bg"
         variant="sm"
@@ -45,7 +45,7 @@ export default function RangeForm({
         onClick={onApply}
       >
         적용
-      </Button>
+      </Button> */}
     </div>
   );
 }
