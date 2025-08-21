@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  font-family:'Pretendard';
+  font-family: "Pretendard";
   line-height: 1.5;
   font-weight: 400;
 
@@ -18,32 +18,35 @@
   -webkit-text-size-adjust: 100%;
 }
 
+/* html,
+body {
+  overflow-x: hidden;
+} */
 * {
   box-sizing: border-box;
 }
 
-
 @font-face {
-  font-family: 'Gmarketsans';
+  font-family: "Gmarketsans";
   font-weight: 400;
   font-display: swap;
-  src: url('/fonts/GmarketSansLight.woff') format('woff');
+  src: url("/fonts/GmarketSansLight.woff") format("woff");
 }
 @font-face {
-  font-family: 'Gmarketsans';
+  font-family: "Gmarketsans";
   font-weight: 500;
   font-display: swap;
-  src: url('/fonts/GmarketSansMedium.woff') format('woff');
+  src: url("/fonts/GmarketSansMedium.woff") format("woff");
 }
 @font-face {
-  font-family: 'Gmarketsans';
+  font-family: "Gmarketsans";
   font-weight: 700;
   font-display: swap;
-  src: url('/fonts/GmarketSansBold.woff') format('woff');
+  src: url("/fonts/GmarketSansBold.woff") format("woff");
 }
 
 .gmarket {
-  font-family:'Gmarketsans';
+  font-family: "Gmarketsans";
 }
 
 /* a {

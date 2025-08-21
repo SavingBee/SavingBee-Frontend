@@ -24,8 +24,8 @@ export default {
         grayf9: "#f9f9f9",
       },
       screens: {
-        'max-xl1240': { max: '1240px' },
-        'max-xl1023': { max: '1023px' },
+        "max-xl1240": { max: "1240px" },
+        "max-xl1023": { max: "1023px" },
       },
     },
   },
