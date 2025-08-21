@@ -4,12 +4,12 @@ import { MdRefresh } from "react-icons/md";
 import Button from "../common/button/Button";
 import FilterButton from "./FilterButton";
 import { filterButtonStyle } from "./FilterButton";
-import MultiOption from "../search/dropdown/MultiOption";
-import AmountForm from "../search/dropdown/AmountForm";
-import RangeForm from "../search/dropdown/RangeForm";
-import Popover from "../common/overlay/Popover";
-import BottomSheet from "../common/overlay/BottomSheet";
-import { FILTERS, OPTION_MAP } from "../search/dropdown/config";
+import MultiOption from "@/components/filter/dropdown/MultiOption";
+import AmountForm from "@/components/filter/dropdown/AmountForm";
+import RangeForm from "@/components/filter/dropdown/RangeForm";
+import Popover from "@/components/common/overlay/Popover";
+import BottomSheet from "@/components/common/overlay/BottomSheet";
+import { FILTERS, OPTION_MAP } from "@/components/filter/dropdown/config";
 import type {
   Filter,
   ListFilter,
@@ -40,6 +40,19 @@ type Props = {
   setMonthlyAmount: React.Dispatch<React.SetStateAction<number | undefined>>;
   totalAmount: RangeState;
   setTotalAmount: React.Dispatch<React.SetStateAction<RangeState>>;
+
+  //최종 queryParam 넘기기 위한 타입정의 부분
+  onConfirm?: (nf: {
+    lists: Record<ListCategory, string[]>;
+    amount?: number;
+    monthlyAmount?: number;
+    baseRateMin?: number;
+    baseRateMax?: number;
+    maxRateMin?: number;
+    maxRateMax?: number;
+    totalAmountMin?: number;
+    totalAmountMax?: number;
+  }) => void;
 };
 
 const parseNum = (e: ChangeEvent<HTMLInputElement>) => {
@@ -143,23 +156,67 @@ export default function FilterBar_hk(props: Props) {
       setOpenId(id);
     };
 
-  // 적용/초기화 로직 (확인/초기화 버튼에서 사용)
+  /**
+   *
+   * draft 상태 -> 최종 확정 상태
+   * 부모상태에 전달
+   * 팝업 닫기
+   */
   const applyById = (id: FilterCategory) => {
     const f = FILTERS.find((x) => x.id === id);
     if (!f) return;
 
+    //  'next 스냅샷'
+    let nextLists: Selected = { ...selected };
+    let nextAmount = amount;
+    let nextMonthly = monthlyAmount;
+    let nextBase: RangeState = { ...baseRate };
+    let nextMax: RangeState = { ...maxRate };
+    let nextTotal: RangeState = { ...totalAmount };
+
+    //바뀐 필드만 draft로 덮어씀 -------  실제 확정 state 커밋
     if (isList(f)) {
       const lid = id as ListCategory;
       const vals = draft.lists[lid] ?? [];
-      setSelected((prev) => ({ ...prev, [lid]: vals })); // 리스트만 selected에 커밋
+      nextLists = { ...selected, [lid]: vals };
+      setSelected(nextLists);
     } else {
-      if (id === "amount") setAmount(draft.amount);
-      if (id === "monthlyAmount") setMonthlyAmount(draft.monthlyAmount);
-      if (id === "baseRate") setBaseRate(draft.baseRate);
-      if (id === "maxRate") setMaxRate(draft.maxRate);
-      if (id === "totalAmount") setTotalAmount(draft.totalAmount);
+      if (id === "amount") {
+        nextAmount = draft.amount;
+        setAmount(nextAmount);
+      }
+      if (id === "monthlyAmount") {
+        nextMonthly = draft.monthlyAmount;
+        setMonthlyAmount(nextMonthly);
+      }
+      if (id === "baseRate") {
+        nextBase = { ...draft.baseRate };
+        setBaseRate(nextBase);
+      }
+      if (id === "maxRate") {
+        nextMax = { ...draft.maxRate };
+        setMaxRate(nextMax);
+      }
+      if (id === "totalAmount") {
+        nextTotal = { ...draft.totalAmount };
+        setTotalAmount(nextTotal);
+      }
     }
 
+    // 확정 스냅샷 상위 전달(쿼리 준비)
+    props.onConfirm?.({
+      lists: nextLists,
+      amount: nextAmount,
+      monthlyAmount: nextMonthly,
+      baseRateMin: nextBase.min,
+      baseRateMax: nextBase.max,
+      maxRateMin: nextMax.min,
+      maxRateMax: nextMax.max,
+      totalAmountMin: nextTotal.min,
+      totalAmountMax: nextTotal.max,
+    });
+
+    // 팝업 닫기
     setOpenId(null);
   };
 
@@ -179,19 +236,35 @@ export default function FilterBar_hk(props: Props) {
   };
 
   const resetAll = () => {
-    setSelected({
+    const emptyLists = {
       bankType: [],
       benefit: [],
       target: [],
       term: [],
       interestType: [],
       rsrvType: [],
-    } as Selected);
+    } as Selected;
+
+    setSelected(emptyLists);
     setAmount(undefined);
     setBaseRate({});
     setMaxRate({});
     setMonthlyAmount(undefined);
     setTotalAmount({});
+
+    // reset 직후 상위에 알림 -------  SavingsPage가 URL 갱신 ----- 리스트 재요청
+    props.onConfirm?.({
+      lists: emptyLists,
+      amount: undefined,
+      monthlyAmount: undefined,
+      baseRateMin: undefined,
+      baseRateMax: undefined,
+      maxRateMin: undefined,
+      maxRateMax: undefined,
+      totalAmountMin: undefined,
+      totalAmountMax: undefined,
+    });
+
     setOpenId(null);
   };
 
@@ -202,7 +275,12 @@ export default function FilterBar_hk(props: Props) {
   );
   const currentLabel = currentFilter?.filterLabel ?? "";
 
-  // 콘텐츠 렌더 (공용: PC/모바일 모두 동일 컴포넌트 사용)
+  /**
+   *
+   * 콘텐츠 타입별로 렌더
+   * MultiOption , AmountForm, RangeForm
+   *
+   */
   function renderContent(f?: Filter) {
     if (!f) return null;
     if (isList(f)) {
@@ -307,7 +385,7 @@ export default function FilterBar_hk(props: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
+    <div className="flex flex-col gap-2 sm:flex-row sm:items-start mb-6">
       {/* 버튼그리드 -> 플렉스 변경*/}
       <div
         ref={rowRef}
@@ -369,7 +447,7 @@ export default function FilterBar_hk(props: Props) {
         </div>
       </Popover>
 
-      {/* Mobile Bottom Sheet: 하단 푸터 고정, 확인/초기화 버튼 필수 */}
+      {/* Mobile Bottom Sheet: 하단 푸터 고정, 확인/초기화 버튼 */}
       <BottomSheet
         open={!desktop && !!openId}
         title={currentLabel}
