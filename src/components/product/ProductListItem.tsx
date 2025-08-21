@@ -14,6 +14,10 @@ export type ProductListItemProps = {
   baseRate: number;
   detail?: string;
   onCompare?: () => void;
+
+  //검색 드롭다운 활용위해 확장
+  disableActions?: boolean; // 드롭다운일때 내부 버튼 비활성화
+  onItemClick?: () => void;
 };
 
 const ProductListItem: React.FC<ProductListItemProps> = ({
@@ -24,12 +28,24 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
   baseRate,
 
   onCompare,
+  disableActions,
+  onItemClick,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
+  function handleClick() {
+    if (disableActions) {
+      // 드롭다운 모드일 때는 바로 외부 콜백만 실행
+      onItemClick?.();
+      return;
+    }
+    // 기본 모드일 때만 버튼 토글 유지
+    setIsOpen((v) => !v);
+  }
+
   return (
     <li
-      onClick={() => setIsOpen((v) => !v)}
+      onClick={handleClick}
       className="w-full rounded-xl border border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm transition-all cursor-pointer"
     >
       <div className="flex items-center gap-4 px-4 h-[100px]">
@@ -55,46 +71,48 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
         </div>
       </div>
 
-      {/* 아코디언 */}
-      <div
-        className="overflow-hidden transition-[max-height] duration-300 ease-in-out bg-[#f9f9f9] text-sm text-gray-700 rounded-xl"
-        style={{ maxHeight: isOpen ? "50px" : "0px" }}
-      >
-        <div className="flex items-center justify-between h-[50px] px-4">
-          {/* 돋보기 버튼 */}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              console.log("상세보기 클릭");
-            }}
-            className="flex items-center gap-1 text-[#1976D3] hover:underline"
-          >
-            <span className="flex items-center justify-center w-5 h-5 rounded-full bg-[#1976D3]">
-              <FaSearch size={10} color="#fff" />
-            </span>
+      {/* 아코디언  --- disableActions 일때, 렌더 막기 */}
+      {!disableActions && (
+        <div
+          className="overflow-hidden transition-[max-height] duration-300 ease-in-out bg-[#f9f9f9] text-sm text-gray-700 rounded-xl"
+          style={{ maxHeight: isOpen ? "50px" : "0px" }}
+        >
+          <div className="flex items-center justify-between h-[50px] px-4">
+            {/* 돋보기 버튼 */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                console.log("상세보기 클릭");
+              }}
+              className="flex items-center gap-1 text-[#1976D3] hover:underline"
+            >
+              <span className="flex items-center justify-center w-5 h-5 rounded-full bg-[#1976D3]">
+                <FaSearch size={10} color="#fff" />
+              </span>
 
-            <span>상세보기</span>
-          </button>
+              <span>상세보기</span>
+            </button>
 
-          {/*  + 버튼 */}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onCompare?.();
-            }}
-            className="flex items-center gap-1 px-4 py-2 font-bold text-[#34A853] transition-colors hover:underline"
-          >
-            <span className="flex items-center justify-center w-5 h-5 rounded-full bg-[#34A853]">
-              <FaPlus size={10} color="#fff" />
-            </span>
+            {/*  + 버튼 */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onCompare?.();
+              }}
+              className="flex items-center gap-1 px-4 py-2 font-bold text-[#34A853] transition-colors hover:underline"
+            >
+              <span className="flex items-center justify-center w-5 h-5 rounded-full bg-[#34A853]">
+                <FaPlus size={10} color="#fff" />
+              </span>
 
-            {/* 텍스트 */}
-            <span>비교함 담기</span>
-          </button>
+              {/* 텍스트 */}
+              <span>비교함 담기</span>
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </li>
   );
 };
