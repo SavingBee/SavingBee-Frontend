@@ -11,16 +11,17 @@ interface InputFieldProps {
     variant? : 'lg' | 'sm';
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void; 
     disabled?: boolean;
+    required?: boolean; // 필수 필드인지
 }
 
-const InputField1 = ({ type="text", label, id, name, placeholder, value, className="", labelClassName="", inputClassName="", variant = "lg", onChange, disabled }: InputFieldProps) => {
+const InputField1 = ({ type="text", label, id, name, placeholder, value, className="", labelClassName="", inputClassName="", variant = "lg", onChange, disabled, required }: InputFieldProps) => {
     const variantClass = variant === "lg"
         ? "h-[50px] p-[15px]" // lg style
         : "h-[34px] p-[12px]"; // sm style 
     
     return (
         <div className={`${className}`}>
-            { label && <label htmlFor={id} className={`${labelClassName}`}>{label}</label> }
+            { label && <label htmlFor={id} className={`${labelClassName}`}>{label}{required && <span className="text-red font-bold">*</span>}</label> }
             <input
                 type={type}
                 id={id}

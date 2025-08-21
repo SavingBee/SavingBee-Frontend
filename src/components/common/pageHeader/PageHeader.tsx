@@ -3,9 +3,10 @@ import Breadcrumb, { BreadcrumbItem } from "./Breadcrumb";
 interface PageHeaderProps {
     title?: string;
     breadcrumb?: BreadcrumbItem[];
+    titleClassName?: string;
 }
 
-const PageHeader = ({ title, breadcrumb = [] }: PageHeaderProps) => {
+const PageHeader = ({ title, breadcrumb = [], titleClassName="" }: PageHeaderProps) => {
     const hasBreadcrumb = breadcrumb.length > 0;
     const hasTitle = Boolean(title);
 
@@ -17,7 +18,7 @@ const PageHeader = ({ title, breadcrumb = [] }: PageHeaderProps) => {
             {hasBreadcrumb && <Breadcrumb items={breadcrumb}/>}
             {/* Title */}
             {hasTitle && (
-                <h2 className="mt-[12px] gmarket text-4xl font-bold">{title}</h2>
+                <h2 className={`mt-[12px] gmarket text-4xl font-bold ${titleClassName}`}>{title}</h2>
             )}
         </div>
     )

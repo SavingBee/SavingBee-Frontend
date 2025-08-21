@@ -6,7 +6,7 @@ interface CheckboxInputProps {
     value?: string;
     label: string;
     checked?: boolean;
-    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onChange?: (checked: boolean) => void;
     inputClassName?: string;
     labelClassName?: string;
 }
@@ -16,9 +16,10 @@ const Checkbox = ({ id, name, value, label, checked: controlledChecked, onChange
     const [internalChecked, setInternalChecked] = useState(controlledChecked || false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setInternalChecked(e.target.checked);
-        onChange?.(e);
-    };
+        const newChecked = e.target.checked;
+        setInternalChecked(newChecked);
+        onChange?.(newChecked);
+      };
 
     const isChecked = controlledChecked !== undefined ? controlledChecked : internalChecked;
 
@@ -42,7 +43,7 @@ const Checkbox = ({ id, name, value, label, checked: controlledChecked, onChange
                 >
                     {isChecked &&
                         <svg xmlns="http://www.w3.org/2000/svg" width="10" height="8" viewBox="0 0 10 8" fill="none">
-                            <path d="M9 1L3.49268 7L1 4.6" stroke="white" stroke-width="1.5" stroke-linecap="round" strokeLinejoin="round"/>
+                            <path d="M9 1L3.49268 7L1 4.6" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                     }
                 </span>
