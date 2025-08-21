@@ -15,9 +15,10 @@ const Router = () => {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/deposit" element={<DepositPage />} />
-        <Route path="/saving" element={<SavingPage />} />
+        <Route path="/savings" element={<SavingPage />} />
         <Route path="/" element={<SearchEntryPage />} />
         <Route path="/product/search" element={<ProductSearchPage />} />
+        <Route path="/filter-test" element={<ProductSearchPage />} />
       </Route>
       <Route element={<LoginLayout />}>
         <Route path="/login" element={<Login />} />
