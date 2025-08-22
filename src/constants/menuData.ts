@@ -1,6 +1,6 @@
 export const menuItems = [
-    { label: "상품검색", path: "/" },
-    { label: "상품비교", path: "/" },
-    { label: "상품추천", path: "/" },
-    { label: "인근 영업점", path: "/" },
+  { label: "예금검색", path: "/deposit" },
+  { label: "적금검색", path: "/savings" },
+  { label: "상품비교", path: "/" },
+  { label: "마이페이지", path: "/" },
 ];
