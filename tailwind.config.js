@@ -8,6 +8,8 @@ export default {
         lightPrimary: "#F6FAFD",
         red: "#EA4335",
         navy: "#144271",
+        purple: "#6E5AED",
+        cyan: "#19B1D4",
 
         black12: "#121212",
         black2: "#222222",
