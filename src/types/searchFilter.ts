@@ -1,5 +1,18 @@
-export type ListCategory = "bankType" | "benefit" | "target" | "term";
-export type NumberCategory = "amount" | "baseRate" | "maxRate";
+export type ListCategory =
+  | "bankType"
+  | "benefit"
+  | "target"
+  | "term"
+  | "rsrvType"
+  | "interestType";
+// | "monthlyAmount" //
+// | "totalAmount"; //
+export type NumberCategory =
+  | "amount"
+  | "baseRate"
+  | "maxRate"
+  | "totalAmount"
+  | "monthlyAmount";
 export type FilterCategory = ListCategory | NumberCategory;
 
 export type Option = {
@@ -18,10 +31,10 @@ export type ListFilter = {
 };
 
 export type AmountFilter = {
-  id: "amount";
+  id: string;
   filterLabel: string;
   kind: "amount";
-  fieldKey: "amount";
+  fieldKey: string;
   unit?: string;
   min?: number;
   max?: number;
@@ -32,7 +45,7 @@ export type AmountFilter = {
 };
 
 export type RangeFilter = {
-  id: "baseRate" | "maxRate";
+  id: string;
   filterLabel: string;
   kind: "range";
   minKey: string;

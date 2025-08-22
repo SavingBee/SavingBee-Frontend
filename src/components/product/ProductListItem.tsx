@@ -17,6 +17,9 @@ export type ProductListItemProps = {
   onCompare?: () => void;
   variant?: "search" | "compare";
   selected?: boolean;
+  //검색 드롭다운 활용위해 확장
+  disableActions?: boolean; // 드롭다운일때 내부 버튼 비활성화
+  onItemClick?: () => void;
 };
 
 const ProductListItem: React.FC<ProductListItemProps> = ({
@@ -29,24 +32,39 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
   onCompare,
   selected = false,
   variant = "search",
+  disableActions,
+  onItemClick,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const isCompare = variant === "compare";
 
+  function handleClick() {
+     if (isCompare) {
+      onCompare?.();
+      return;
+    }
+    if (disableActions) {
+      // 드롭다운 모드일 때는 바로 외부 콜백만 실행
+      onItemClick?.();
+      return;
+    }
+    // 기본 모드일 때만 버튼 토글 유지
+    setIsOpen((v) => !v);
+  }
+
+  const containerClass = [
+    "w-full rounded-xl bg-white transition-all cursor-pointer",
+    "border",
+    isCompare
+      ? (selected ? "border-primary ring-1 ring-primary"
+                  : "border-gray-200 hover:border-primary/60")
+      : "border-gray-200 hover:border-gray-300 hover:shadow-sm",
+  ].join(" ");
+  
   return (
     <li
-      onClick={() => {
-        if (isCompare) onCompare?.();
-        else setIsOpen((v) => !v);
-      }}
-      className={[
-        "w-full rounded-xl border bg-white transition-all cursor-pointer",
-        isCompare
-          ? selected
-            ? "border-primary ring-1 ring-primary"
-            : "border-gray-200 hover:border-primary/60"
-          : "border-gray-200 hover:border-gray-300",
-      ].join(" ")}
+      onClick={handleClick}
+      className={containerClass}
     >
       <div className="flex items-center gap-4 px-4 h-[100px]">
         {isCompare && (
@@ -84,8 +102,8 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
         </div>
       </div>
 
-      {/* 아코디언 */}
-      {!isCompare && (
+      {/* 아코디언  --- disableActions 일때, 렌더 막기 */}
+      {variant === "search" &&!disableActions && (
         <div
           className="overflow-hidden transition-[max-height] duration-300 ease-in-out bg-[#f9f9f9] text-sm text-gray-700 rounded-xl"
           style={{ maxHeight: isOpen ? "50px" : "0px" }}
