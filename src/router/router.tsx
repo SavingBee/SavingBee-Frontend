@@ -6,6 +6,7 @@ import DepositPage from "@/pages/product/DepositPage";
 import SavingPage from "@/pages/product/SavingsPage";
 import SearchEntryPage from "@/pages/SearchEntryPage";
 import ProductSearchPage from "@/pages/ProductSearchPage";
+import ProductComparePage from "@/pages/ProductComparePage";
 
 const Router = () => {
   return (
@@ -17,6 +18,7 @@ const Router = () => {
         <Route path="/saving" element={<SavingPage />} />
         <Route path="/" element={<SearchEntryPage />} />
         <Route path="/product/search" element={<ProductSearchPage />} />
+        <Route path="/product/compare" element={<ProductComparePage />} />
       </Route>
     </Routes>
   );
