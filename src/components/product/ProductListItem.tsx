@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FaSearch, FaPlus } from "react-icons/fa";
+import Checkbox from "../common/input/Checkbox";
 
 /**
  * #34A853, #1976D3
@@ -14,7 +15,8 @@ export type ProductListItemProps = {
   baseRate: number;
   detail?: string;
   onCompare?: () => void;
-
+  variant?: "search" | "compare";
+  selected?: boolean;
   //검색 드롭다운 활용위해 확장
   disableActions?: boolean; // 드롭다운일때 내부 버튼 비활성화
   onItemClick?: () => void;
@@ -28,12 +30,19 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
   baseRate,
 
   onCompare,
+  selected = false,
+  variant = "search",
   disableActions,
   onItemClick,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const isCompare = variant === "compare";
 
   function handleClick() {
+     if (isCompare) {
+      onCompare?.();
+      return;
+    }
     if (disableActions) {
       // 드롭다운 모드일 때는 바로 외부 콜백만 실행
       onItemClick?.();
@@ -43,12 +52,34 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
     setIsOpen((v) => !v);
   }
 
+  const containerClass = [
+    "w-full rounded-xl bg-white transition-all cursor-pointer",
+    "border",
+    isCompare
+      ? (selected ? "border-primary ring-1 ring-primary"
+                  : "border-gray-200 hover:border-primary/60")
+      : "border-gray-200 hover:border-gray-300 hover:shadow-sm",
+  ].join(" ");
+  
   return (
     <li
       onClick={handleClick}
-      className="w-full rounded-xl border border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm transition-all cursor-pointer"
+      className={containerClass}
     >
       <div className="flex items-center gap-4 px-4 h-[100px]">
+        {isCompare && (
+          <Checkbox
+            id={`compare-${productName}`}
+            name="compare"
+            label=""
+            checked={selected}
+            onChange={(e) => {
+              e.stopPropagation();
+              onCompare?.();
+            }}
+          />
+        )}
+
         <img
           src={logoUrl}
           alt={`${bankName} 로고`}
@@ -72,7 +103,7 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
       </div>
 
       {/* 아코디언  --- disableActions 일때, 렌더 막기 */}
-      {!disableActions && (
+      {variant === "search" &&!disableActions && (
         <div
           className="overflow-hidden transition-[max-height] duration-300 ease-in-out bg-[#f9f9f9] text-sm text-gray-700 rounded-xl"
           style={{ maxHeight: isOpen ? "50px" : "0px" }}
