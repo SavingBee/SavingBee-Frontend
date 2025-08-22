@@ -7,6 +7,8 @@ export default {
         primary: "#1976D3",
         red: "#EA4335",
         navy: "#144271",
+        purple: "#6E5AED",
+        cyan: "#19B1D4",
 
         black12: "#121212",
         black2: "#222222",
@@ -24,8 +26,8 @@ export default {
         grayf9: "#f9f9f9",
       },
       screens: {
-        'max-xl1240': { max: '1240px' },
-        'max-xl1023': { max: '1023px' },
+        "max-xl1240": { max: "1240px" },
+        "max-xl1023": { max: "1023px" },
       },
     },
   },
