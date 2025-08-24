@@ -1,6 +1,6 @@
 // import Button from "@/components/common/button/Button";
 import InputField1 from "@/components/common/input/InputField1";
-import type { AmountFilter } from "@/types/searchFilter";
+import type { AmountFilter } from "@/types/uiFilter";
 import type { ChangeEvent } from "react";
 
 type AmountFormProps = {

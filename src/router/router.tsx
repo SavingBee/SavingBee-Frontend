@@ -4,6 +4,7 @@ import SignUp from "../pages/SignUp";
 import Layout from "../layout/Layout";
 import DepositPage from "@/pages/product/DepositPage";
 import SavingPage from "@/pages/product/SavingsPage";
+import ProductDetail from "@/pages/product/ProductDetail";
 import SearchEntryPage from "@/pages/SearchEntryPage";
 import ProductComparePage from "@/pages/ProductComparePage";
 // import ProductSearchPage from "@/pages/ProductSearchPage";
@@ -12,14 +13,15 @@ import FindId from "@/pages/FindId";
 import FindPassword from "@/pages/FindPassword";
 import SearchBox from "@/components/search/SearchBox";
 
-
 const Router = () => {
   return (
     <Routes>
       <Route element={<Layout />}>
         <Route path="/deposit" element={<DepositPage />} />
         <Route path="/savings" element={<SavingPage />} />
-        <Route path="/" element={<SearchEntryPage />} />  
+        <Route path="/detail" element={<ProductDetail />} />
+        {/* <Route path="/products/:id" element={<ProductDetail />} /> */}
+        <Route path="/" element={<SearchEntryPage />} />
         <Route path="/product/compare" element={<ProductComparePage />} />
         {/* <Route path="/product/search" element={<ProductSearchPage />} /> */}
         <Route path="/search-test" element={<SearchBox />} />
