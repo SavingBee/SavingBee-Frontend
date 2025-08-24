@@ -7,13 +7,14 @@ import Checkbox from "../common/input/Checkbox";
  */
 
 export type ProductListItemProps = {
-  id?: string; // wrapper에서 key로 씀
-  logoUrl: string;
-  productName: string;
-  bankName: string;
-  maxRate: number;
-  baseRate: number;
-  detail?: string;
+  fin_prdt_cd: string; // key
+  fin_prdt_nm: string; // 상품명
+  kor_co_nm: string; // 은행명
+  max_intr_rate: number;
+  base_intr_rate: number;
+  product_type?: "deposit" | "savings"; // 필요시 분기 처리
+  logo_url?: string; //  TODO: API에 추가 가능한지 확인
+
   onCompare?: () => void;
   variant?: "search" | "compare";
   selected?: boolean;
@@ -23,11 +24,13 @@ export type ProductListItemProps = {
 };
 
 const ProductListItem: React.FC<ProductListItemProps> = ({
-  logoUrl,
-  productName,
-  bankName,
-  maxRate,
-  baseRate,
+  logo_url,
+  fin_prdt_cd,
+  fin_prdt_nm,
+  kor_co_nm,
+  max_intr_rate,
+  base_intr_rate,
+  product_type,
 
   onCompare,
   selected = false,
@@ -39,7 +42,7 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
   const isCompare = variant === "compare";
 
   function handleClick() {
-     if (isCompare) {
+    if (isCompare) {
       onCompare?.();
       return;
     }
@@ -56,20 +59,18 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
     "w-full rounded-xl bg-white transition-all cursor-pointer",
     "border",
     isCompare
-      ? (selected ? "border-primary ring-1 ring-primary"
-                  : "border-gray-200 hover:border-primary/60")
+      ? selected
+        ? "border-primary ring-1 ring-primary"
+        : "border-gray-200 hover:border-primary/60"
       : "border-gray-200 hover:border-gray-300 hover:shadow-sm",
   ].join(" ");
-  
+
   return (
-    <li
-      onClick={handleClick}
-      className={containerClass}
-    >
+    <li onClick={handleClick} className={containerClass}>
       <div className="flex items-center gap-4 px-4 h-[100px]">
         {isCompare && (
           <Checkbox
-            id={`compare-${productName}`}
+            id={`compare-${fin_prdt_nm}`}
             name="compare"
             label=""
             checked={selected}
@@ -81,29 +82,29 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
         )}
 
         <img
-          src={logoUrl}
-          alt={`${bankName} 로고`}
+          src={logo_url}
+          alt={`${kor_co_nm} 로고`}
           className="h-10 w-10 rounded-full object-cover ring-1 ring-gray-200"
         />
         <div className="flex-1 min-w-0 text-left">
           <h3 className="truncate text-base md:text-lg font-semibold">
-            {productName}
+            {fin_prdt_nm}
           </h3>
-          <p className="text-sm">{bankName}</p>
+          <p className="text-sm">{kor_co_nm}</p>
         </div>
         <div className="text-right">
           <div className="flex items-center gap-1">
-            <p className="text-xs text-[#1976D3]">우대금리</p>
+            {/* <p className="text-xs text-[#1976D3]">우대금리</p> */}
             <p className="text-lg md:text-2xl font-bold text-[#1976D3]">
-              {maxRate.toFixed(2)}%
+              {max_intr_rate}%
             </p>
           </div>
-          <p className="text-xs text-gray-400">기본 {baseRate}%</p>
+          <p className="text-xs text-gray-400">기본 {base_intr_rate}%</p>
         </div>
       </div>
 
       {/* 아코디언  --- disableActions 일때, 렌더 막기 */}
-      {variant === "search" &&!disableActions && (
+      {variant === "search" && !disableActions && (
         <div
           className="overflow-hidden transition-[max-height] duration-300 ease-in-out bg-[#f9f9f9] text-sm text-gray-700 rounded-xl"
           style={{ maxHeight: isOpen ? "50px" : "0px" }}

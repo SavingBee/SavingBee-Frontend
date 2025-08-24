@@ -1,3 +1,11 @@
+/**
+ * 필터 UI 스키마
+ * ListFilter - 옵션선택
+ * AmountFilter - 단일금액
+ * RangeFilter - 범위 입력
+ *
+ * apiFilter.ts 타입을 추가    -------fieldKey
+ */
 export type ListCategory =
   | "bankType"
   | "benefit"
@@ -34,7 +42,6 @@ export type AmountFilter = {
   id: string;
   filterLabel: string;
   kind: "amount";
-  fieldKey: string;
   unit?: string;
   min?: number;
   max?: number;
@@ -42,14 +49,14 @@ export type AmountFilter = {
   formatter?: (v: number) => string;
   parser?: (s: string) => number;
   placeholder?: string;
+
+  fieldKey: string; // API key
 };
 
 export type RangeFilter = {
   id: string;
   filterLabel: string;
   kind: "range";
-  minKey: string;
-  maxKey: string;
   unit?: string;
   min?: number;
   max?: number;
@@ -57,6 +64,9 @@ export type RangeFilter = {
   formatter?: (v: number) => string;
   parser?: (s: string) => number;
   placeholders?: { min?: string; max?: string };
+
+  minKey: string; // API key
+  maxKey: string; // API key
 };
 
 export type Filter = ListFilter | AmountFilter | RangeFilter;
