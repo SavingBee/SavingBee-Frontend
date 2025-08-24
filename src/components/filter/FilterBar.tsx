@@ -9,7 +9,7 @@ import AmountForm from "@/components/filter/dropdown/AmountForm";
 import RangeForm from "@/components/filter/dropdown/RangeForm";
 import Popover from "@/components/common/overlay/Popover";
 import BottomSheet from "@/components/common/overlay/BottomSheet";
-import { FILTERS, OPTION_MAP } from "@/components/filter/dropdown/config";
+import { OPTION_MAP } from "@/components/filter/dropdown/config";
 import type {
   Filter,
   ListFilter,
@@ -17,7 +17,7 @@ import type {
   ListCategory,
   FilterCategory,
   RangeFilter,
-} from "@/types/searchFilter";
+} from "@/types/uiFilter";
 
 const isList = (f?: Filter): f is ListFilter =>
   !!f && (f.kind === "multi" || f.kind === "single");
@@ -28,18 +28,24 @@ type Selected = Record<ListCategory, string[]>;
 type RangeState = { min?: number; max?: number };
 
 type Props = {
-  selected: Selected;
-  setSelected: React.Dispatch<React.SetStateAction<Selected>>;
-  amount?: number;
-  setAmount: React.Dispatch<React.SetStateAction<number | undefined>>;
-  baseRate: RangeState;
-  setBaseRate: React.Dispatch<React.SetStateAction<RangeState>>;
-  maxRate: RangeState;
-  setMaxRate: React.Dispatch<React.SetStateAction<RangeState>>;
-  monthlyAmount?: number;
-  setMonthlyAmount: React.Dispatch<React.SetStateAction<number | undefined>>;
-  totalAmount: RangeState;
-  setTotalAmount: React.Dispatch<React.SetStateAction<RangeState>>;
+  //page 타입별 Filter 변경
+  filters: readonly Filter[];
+  state: {
+    selected: Selected;
+    amount?: number;
+    monthlyAmount?: number;
+    baseRate: RangeState;
+    maxRate: RangeState;
+    totalAmount: RangeState;
+  };
+  actions: {
+    setSelected: React.Dispatch<React.SetStateAction<Selected>>;
+    setAmount: React.Dispatch<React.SetStateAction<number | undefined>>;
+    setMonthlyAmount: React.Dispatch<React.SetStateAction<number | undefined>>;
+    setBaseRate: React.Dispatch<React.SetStateAction<RangeState>>;
+    setMaxRate: React.Dispatch<React.SetStateAction<RangeState>>;
+    setTotalAmount: React.Dispatch<React.SetStateAction<RangeState>>;
+  };
 
   //최종 queryParam 넘기기 위한 타입정의 부분
   onConfirm?: (nf: {
@@ -72,21 +78,22 @@ type DraftState = {
 const isDesktop = () =>
   typeof window !== "undefined" && window.innerWidth >= 640;
 
-export default function FilterBar_hk(props: Props) {
+export default function FilterBar({
+  filters,
+  state,
+  actions,
+  onConfirm,
+}: Props) {
+  const { selected, amount, monthlyAmount, baseRate, maxRate, totalAmount } =
+    state;
   const {
-    selected,
     setSelected,
-    amount,
     setAmount,
-    baseRate,
-    setBaseRate,
-    maxRate,
-    setMaxRate,
-    monthlyAmount,
     setMonthlyAmount,
-    totalAmount,
+    setBaseRate,
+    setMaxRate,
     setTotalAmount,
-  } = props;
+  } = actions;
 
   // 열림 상태
   const [openId, setOpenId] = useState<FilterCategory | null>(null);
@@ -163,7 +170,7 @@ export default function FilterBar_hk(props: Props) {
    * 팝업 닫기
    */
   const applyById = (id: FilterCategory) => {
-    const f = FILTERS.find((x) => x.id === id);
+    const f = filters.find((x) => x.id === id);
     if (!f) return;
 
     //  'next 스냅샷'
@@ -204,7 +211,7 @@ export default function FilterBar_hk(props: Props) {
     }
 
     // 확정 스냅샷 상위 전달(쿼리 준비)
-    props.onConfirm?.({
+    onConfirm?.({
       lists: nextLists,
       amount: nextAmount,
       monthlyAmount: nextMonthly,
@@ -222,7 +229,7 @@ export default function FilterBar_hk(props: Props) {
 
   //하나만 초기화 할 경우 -> 해당 필터의 draft만 기본 값, 팝업은 여전히 Open 상태
   const resetOne = (id: FilterCategory) => {
-    const f = FILTERS.find((x) => x.id === id);
+    const f = filters.find((x) => x.id === id);
     if (!f) return;
     if (isList(f)) {
       const lid = id as ListCategory;
@@ -253,7 +260,7 @@ export default function FilterBar_hk(props: Props) {
     setTotalAmount({});
 
     // reset 직후 상위에 알림 -------  SavingsPage가 URL 갱신 ----- 리스트 재요청
-    props.onConfirm?.({
+    onConfirm?.({
       lists: emptyLists,
       amount: undefined,
       monthlyAmount: undefined,
@@ -270,7 +277,7 @@ export default function FilterBar_hk(props: Props) {
 
   // 현재 열린 필터 객체/라벨
   const currentFilter = useMemo(
-    () => FILTERS.find((f) => f.id === openId),
+    () => filters.find((f) => f.id === openId),
     [openId],
   );
   const currentLabel = currentFilter?.filterLabel ?? "";
@@ -391,7 +398,7 @@ export default function FilterBar_hk(props: Props) {
         ref={rowRef}
         className="flex flex-wrap items-center gap-2 sm:gap-3 flex-1 min-w-0"
       >
-        {FILTERS.map((f) => {
+        {filters.map((f) => {
           const isActive = openId === f.id;
           return (
             <div key={f.id} className="relative">

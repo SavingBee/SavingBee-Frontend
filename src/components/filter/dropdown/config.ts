@@ -1,5 +1,10 @@
-import { Filter, ListCategory, Option } from "@/types/searchFilter";
+import { Filter, ListCategory, Option } from "@/types/uiFilter";
 
+/**
+ * 리스트형 팝업의 데이터
+ * 공통필터, 적금필터, 예금필터
+ */
+// 1) 공통옵션
 export const BANK_OPTIONS: Option[] = [
   { id: "bank", text: "은행", category: "bankType" },
   { id: "savingsBank", text: "저축은행", category: "bankType" },
@@ -48,8 +53,8 @@ export const OPTION_MAP: Record<ListCategory, Option[]> = {
   // monthlyAmount, totalAmount → 숫자 입력/범위라서 옵션 없음
 };
 
-//TODO: filter가 타입추론 못함
-export const FILTERS = [
+// 2) 공통 필터(두 페이지 모두 노출되는 것)
+export const COMMON_FILTERS = [
   {
     id: "bankType",
     filterLabel: "금융권역",
@@ -74,27 +79,18 @@ export const FILTERS = [
     kind: "multi",
     optionCategory: "term",
   },
-
   {
-    id: "amount",
-    filterLabel: "저축금",
-    kind: "amount",
-    fieldKey: "amount",
-    unit: "원",
-    min: 0,
-    max: 10_000_000_000,
-    step: 10_000,
-    placeholder: "금액 입력",
-    formatter: (v) => v.toLocaleString(),
-    parser: (s) => Number(String(s).replace(/[^\d]/g, "")),
+    id: "interestType",
+    filterLabel: "이자계산방식",
+    kind: "single",
+    optionCategory: "interestType",
   },
-
   {
     id: "baseRate",
     filterLabel: "기본 금리",
     kind: "range",
-    minKey: "baseRateMin",
-    maxKey: "baseRateMax",
+    minKey: "intrRateMin", // API key (string으로 유지)
+    maxKey: "intrRateMax",
     unit: "%",
     min: 0,
     max: 20,
@@ -103,13 +99,12 @@ export const FILTERS = [
     formatter: (v) => String(v),
     parser: (s) => Number(s),
   },
-
   {
     id: "maxRate",
     filterLabel: "최고 금리",
     kind: "range",
-    minKey: "maxRateMin",
-    maxKey: "maxRateMax",
+    minKey: "intrRate2Min",
+    maxKey: "intrRate2Max",
     unit: "%",
     min: 0,
     max: 20,
@@ -118,29 +113,22 @@ export const FILTERS = [
     formatter: (v) => String(v),
     parser: (s) => Number(s),
   },
+] as const satisfies Filter[];
 
-  // 추가 ① 이자계산방식 (단리/복리)
-  {
-    id: "interestType",
-    filterLabel: "이자계산방식",
-    kind: "single", // 단일 선택
-    optionCategory: "interestType",
-  },
-
-  // 추가 ② 적립방식 (정액/자유)
+// 3-1) 적금 전용 필터 ---------- 공통 + 적금 특이사항
+export const SAVING_FILTERS: Filter[] = [
+  ...COMMON_FILTERS,
   {
     id: "rsrvType",
     filterLabel: "적립방식",
     kind: "single",
     optionCategory: "rsrvType",
   },
-
-  // 추가 ③ 월저축금 (금액 입력)
   {
     id: "monthlyAmount",
     filterLabel: "월저축금",
     kind: "amount",
-    fieldKey: "monthlyAmount",
+    fieldKey: "monthlyMaxLimit", // 적금전용 API key
     unit: "원",
     min: 0,
     max: 10_000_000,
@@ -149,14 +137,12 @@ export const FILTERS = [
     formatter: (v) => v.toLocaleString(),
     parser: (s) => Number(String(s).replace(/[^\d]/g, "")),
   },
-
-  // 추가 ④ 총저축금 (범위)  --- range
   {
     id: "totalAmount",
     filterLabel: "총저축금",
     kind: "range",
-    minKey: "totalAmountMin",
-    maxKey: "totalAmountMax",
+    minKey: "totalMaxLimit",
+    maxKey: "totalMaxLimit", // 서버가 단일 한도 ? ---  amount
     unit: "원",
     min: 0,
     max: 1_000_000_000,
@@ -165,4 +151,142 @@ export const FILTERS = [
     formatter: (v) => v.toLocaleString(),
     parser: (s) => Number(String(s).replace(/[^\d]/g, "")),
   },
-] as const satisfies Filter[];
+];
+
+// 3-2) 예금 전용 필터 ------  공통 + 예금 특이사항
+export const DEPOSIT_FILTERS: Filter[] = [
+  ...COMMON_FILTERS,
+  {
+    id: "amount",
+    filterLabel: "가입한도",
+    kind: "range",
+    minKey: "maxLimitMin", // 예금 전용 API key
+    maxKey: "maxLimitMax",
+    unit: "원",
+    min: 0,
+    max: 1_000_000_000,
+    step: 10_000,
+    placeholders: { min: "최소 금액", max: "최대 금액" },
+    formatter: (v) => v.toLocaleString(),
+    parser: (s) => Number(String(s).replace(/[^\d]/g, "")),
+  },
+];
+
+// //TODO: filter가 타입추론 못함
+// export const FILTERS = [
+//   {
+//     id: "bankType",
+//     filterLabel: "금융권역",
+//     kind: "multi",
+//     optionCategory: "bankType",
+//   },
+//   {
+//     id: "benefit",
+//     filterLabel: "우대조건",
+//     kind: "multi",
+//     optionCategory: "benefit",
+//   },
+//   {
+//     id: "target",
+//     filterLabel: "가입대상",
+//     kind: "multi",
+//     optionCategory: "target",
+//   },
+//   {
+//     id: "term",
+//     filterLabel: "저축기간",
+//     kind: "multi",
+//     optionCategory: "term",
+//   },
+
+//   {
+//     id: "amount",
+//     filterLabel: "저축금",
+//     kind: "amount",
+//     fieldKey: "amount",
+//     unit: "원",
+//     min: 0,
+//     max: 10_000_000_000,
+//     step: 10_000,
+//     placeholder: "금액 입력",
+//     formatter: (v) => v.toLocaleString(),
+//     parser: (s) => Number(String(s).replace(/[^\d]/g, "")),
+//   },
+
+//   {
+//     id: "baseRate",
+//     filterLabel: "기본 금리",
+//     kind: "range",
+//     minKey: "baseRateMin",
+//     maxKey: "baseRateMax",
+//     unit: "%",
+//     min: 0,
+//     max: 20,
+//     step: 0.01,
+//     placeholders: { min: "최저 값", max: "최고 값" },
+//     formatter: (v) => String(v),
+//     parser: (s) => Number(s),
+//   },
+
+//   {
+//     id: "maxRate",
+//     filterLabel: "최고 금리",
+//     kind: "range",
+//     minKey: "maxRateMin",
+//     maxKey: "maxRateMax",
+//     unit: "%",
+//     min: 0,
+//     max: 20,
+//     step: 0.01,
+//     placeholders: { min: "최저 값", max: "최고 값" },
+//     formatter: (v) => String(v),
+//     parser: (s) => Number(s),
+//   },
+
+//   // 추가 ① 이자계산방식 (단리/복리)
+//   {
+//     id: "interestType",
+//     filterLabel: "이자계산방식",
+//     kind: "single", // 단일 선택
+//     optionCategory: "interestType",
+//   },
+
+//   // 추가 ② 적립방식 (정액/자유)
+//   {
+//     id: "rsrvType",
+//     filterLabel: "적립방식",
+//     kind: "single",
+//     optionCategory: "rsrvType",
+//   },
+
+//   // 추가 ③ 월저축금 (금액 입력)
+//   {
+//     id: "monthlyAmount",
+//     filterLabel: "월저축금",
+//     kind: "amount",
+//     fieldKey: "monthlyAmount",
+//     unit: "원",
+//     min: 0,
+//     max: 10_000_000,
+//     step: 10_000,
+//     placeholder: "금액 입력",
+//     formatter: (v) => v.toLocaleString(),
+//     parser: (s) => Number(String(s).replace(/[^\d]/g, "")),
+//   },
+
+//   // 추가 ④ 총저축금 (범위)  --- range
+//   {
+//     id: "totalAmount",
+//     filterLabel: "총저축금",
+//     kind: "range",
+//     minKey: "totalAmountMin",
+//     maxKey: "totalAmountMax",
+//     unit: "원",
+//     min: 0,
+//     max: 1_000_000_000,
+//     step: 10_000,
+//     placeholders: { min: "최소 금액", max: "최대 금액" },
+//     formatter: (v) => v.toLocaleString(),
+//     parser: (s) => Number(String(s).replace(/[^\d]/g, "")),
+//   },
+// ] as const satisfies Filter[];
