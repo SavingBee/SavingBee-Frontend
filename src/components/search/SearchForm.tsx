@@ -41,7 +41,7 @@ export default function SearchForm({
         onChange={(e) => onChange(e.target.value)}
       />
       <Button
-        type="button"
+        type="submit"
         variant="sm"
         styleVariant="border"
         className="text-primary border-none my-3"

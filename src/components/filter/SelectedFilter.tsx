@@ -1,13 +1,9 @@
 import SelectedChip from "./SelectedChip";
 
-interface Chip {
-  key: string;
-  label: string;
-  onRemove: () => void;
-}
+type UiChip = { key: string; label: string; onRemove: () => void };
 
-export default function SelectedFilter({ chips }: { chips: Chip[] }) {
-  if (chips.length === 0) return null;
+export default function SelectedFilter({ chips }: { chips: UiChip[] }) {
+  if (!chips || chips.length === 0) return null;
 
   return (
     <div className="flex flex-wrap gap-2 border-t border-[#B9D4E8] bg-[#F6FAFD] p-4">

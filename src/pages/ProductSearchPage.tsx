@@ -4,12 +4,12 @@
 import { useState } from "react";
 // import { MdRefresh } from "react-icons/md";
 import Button from "@/components/common/button/Button";
-import FilterBar from "@/components/search/FilterBar";
-import FilterBar_hk from "@/components/filter/FilterBar_hk";
-import SelectedFilter from "@/components/search/SelectedFilter";
-import { FaSearch } from "react-icons/fa";
-import { OPTION_MAP } from "@/components/search/dropdown/config";
-import type { ListCategory } from "@/types/searchFilter";
+// import FilterBar from "@/components/filter/FilterBar";
+
+// import SelectedFilter from "@/components/search/SelectedFilter";
+// import { FaSearch } from "react-icons/fa";
+// import { OPTION_MAP } from "@/components/search/dropdown/config";
+// import type { ListCategory } from "@/types/searchFilter";
 // import { filterButtonStyle } from "@/components/search/FilterButton";
 
 type Selected = Record<ListCategory, string[]>;
