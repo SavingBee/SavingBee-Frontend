@@ -5,6 +5,10 @@ import SearchForm from "./SearchForm";
 //drowpdown은 productList를 import하여 사용
 import ProductList from "@/components/product/ProductList";
 import type { ProductListItemProps } from "../product/ProductListItem";
+//검색관련
+import { useSearchQuery } from "@/hooks/filter/useSearchQuery";
+import type { SearchResponse } from "@/types/search";
+import { searchProducts } from "@/api/search";
 
 // type ProductListItemProps = {
 //   id: string | number;
@@ -16,42 +20,49 @@ import type { ProductListItemProps } from "../product/ProductListItem";
 //   logoUrl?: string;
 // };
 
+//검색 훅
+
 const MOCK: ProductListItemProps[] = [
   {
-    id: "1",
-    logoUrl: "/banks/sh.png",
-    productName: "Sh첫만남우대예금 KB",
-    bankName: "SH수협은행",
-    maxRate: 2.9,
-    baseRate: 1.85,
-    detail: "신규 우대",
+    fin_prdt_cd: "WR0001A",
+    fin_prdt_nm: "sh kb 우리웰리치 주거래예금",
+    kor_co_nm: "우리은행",
+    product_type: "deposit",
+    max_intr_rate: 2.25,
+    base_intr_rate: 2.0,
+    //logo_url: "/images/banks/woori.png",
   },
   {
-    id: "2",
-    logoUrl: "/banks/kb.png",
-    productName: "KB Star 정기적금 SH",
-    bankName: "KB국민은행",
-    maxRate: 3.2,
-    baseRate: 2.0,
-    detail: "비대면 가입",
+    fin_prdt_cd: "SH0001S",
+    fin_prdt_nm: "sh kb 신한 청년적금",
+    kor_co_nm: "신한은행",
+    product_type: "savings",
+    max_intr_rate: 2.9,
+    base_intr_rate: 2.5,
   },
 ];
 
 function mockFilter(list: ProductListItemProps[], q: string) {
   const s = q.trim().toLowerCase();
   if (!s) return [];
-  return list.filter((it) => it.productName.toLowerCase().includes(s));
+  return list.filter((it) => it.fin_prdt_nm.toLowerCase().includes(s));
 }
 
 export default function SearchBox() {
-  const [query, setQuery] = useState("");
+  const { q, applySearch } = useSearchQuery(); // 검색 쿼리 전달 훅
+  const [keyword, setKeyword] = useState(""); // 검색 입력
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<ProductListItemProps[]>([]);
+  const [hasSubmitted, setHasSubmitted] = useState(false); // 제출 플래그
   const wrapRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  // 외부 클릭으로 닫기
+  //새로고침 - url 리셋
+  useEffect(() => {
+    if (location.search) navigate({ search: "" }, { replace: true });
+  }, []);
+  // 바깥 클릭 닫기
   useEffect(() => {
     function onDocClick(e: MouseEvent) {
       if (!wrapRef.current) return;
@@ -61,60 +72,91 @@ export default function SearchBox() {
     return () => document.removeEventListener("mousedown", onDocClick);
   }, []);
 
-  // 제출(엔터/버튼)
-  async function handleSubmit() {
-    if (query.trim().length < 1) {
+  // q 변경(= applySearch 성공) 시 서버 호출 → 결과 세팅 → 드롭다운 열기
+  useEffect(() => {
+    const run = async () => {
+      if (!q || !hasSubmitted) {
+        // URL에 q가 있어도 "사용자 제출"이 아니면 열지 않음
+        setOpen(false);
+        return;
+      }
+      setLoading(true);
+
+      // 실제 API로 교체
+      // const res: SearchResponse = await searchProducts(q);
+      // const list = res.products?.length ? res.products
+      //            : ("popularProducts" in res ? res.popularProducts : []);
+      // 임시: 목업 필터
+      const list = mockFilter(MOCK, q);
+
+      setResults(list);
+      setLoading(false);
+      setOpen(true); // 결과가 0이어도 패널은 열고 빈 상태 노출
+    };
+    run();
+  }, [q, hasSubmitted]);
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === "Escape") setOpen(false);
+  }
+  function handleSubmit() {
+    const s = keyword.trim();
+    if (!s) {
+      setHasSubmitted(false);
       setResults([]);
       setOpen(false);
       return;
     }
-    setLoading(true);
-
-    // 지금은 UI 확인용 목업 필터
-    const data = mockFilter(MOCK, query);
-
-    setResults(data);
-    setLoading(false);
-    setOpen(true);
+    setHasSubmitted(true); // 제출 플래그
+    applySearch(s); // 서버로 쿼리 전달(URL q 갱신)
   }
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Escape") setOpen(false);
-  }
+  const searchMain = "max-h-96 overflow-auto ";
+
   return (
     <div ref={wrapRef} className="relative" onKeyDown={handleKeyDown}>
       <SearchForm
-        value={query}
+        value={keyword}
         onChange={(v) => {
-          setQuery(v);
-          // 입력 중에도 패널 열기
-          if (v.trim()) setOpen(true);
+          setKeyword(v);
+          setHasSubmitted(false); // 입력 변경 시 제출 상태 해제
+          setOpen(false); // 입력 중에는 닫힘
         }}
-        //API호출
-        onSubmit={() => handleSubmit()}
+        onSubmit={handleSubmit}
         className="mb-2"
         placeholder="상품명을 입력해주세요"
       />
-
       {/* 드롭다운 wrap 박스 ---- 그 내부에서 ProductList 호출 */}
       {open && (
         <div
-          className=" absolute left-0 right-0 top-full mt-2 rounded-2xl border border-blue-200 bg-white shadow-xl z-50 max-h-96 overflow-auto p-2 "
+          className="absolute left-0 right-0 top-full mt-2 rounded-2xl border border-blue-200 bg-white shadow-xl z-50 overflow-hidden p-2"
           role="listbox"
           aria-label="검색 결과"
         >
-          <ProductList
-            open={open}
-            loading={loading}
-            items={results}
-            disableItemActions // ← 드롭다운 모드 활성화
-            onSelect={(item: ProductListItemProps) => {
-              setOpen(false);
-              navigate(`/products/${item.id}`);
-              console.log("clicked item");
-            }}
-            onClose={() => setOpen(false)}
-            // 필요 시 검색어 하이라이트, 빈상태 텍스트 등 옵션도 전달
-          />
+          {loading ? (
+            // 로딩 상태: 간단한 스켈레톤/로딩 텍스트
+            <div className="py-6 text-center text-sm text-gray-500">
+              검색 중…
+            </div>
+          ) : results.length > 0 ? (
+            // 결과 있음
+            <ProductList
+              open={open}
+              loading={loading}
+              listClassName={searchMain}
+              items={results}
+              disableItemActions
+              onSelect={(item: ProductListItemProps) => {
+                setOpen(false);
+                navigate(`/products/${item.fin_prdt_cd}`);
+              }}
+              onClose={() => setOpen(false)}
+            />
+          ) : (
+            // 결과 없음: 제출된 상태에서만 노출
+            <div className="py-10 px-4 text-center text-sm text-gray-500">
+              검색 결과가 없습니다
+            </div>
+          )}
         </div>
       )}
     </div>
