@@ -6,7 +6,7 @@ export type Product = {
   product_type: "deposit" | "savings";
   max_intr_rate: number;
   base_intr_rate: number;
-  logo_url?: string; // TODO: 추가여부확인
+  //logo_url?: string; // TODO: 추가여부확인
 };
 
 export type SearchSuccess = {
@@ -18,7 +18,7 @@ export type SearchSuccess = {
 export type SearchWithPopular = {
   products: [];
   popularProducts: Product[];
-  totalCount: 0;
+  totalCount: number; //0
   searchTerm: string;
   message?: string;
 };
