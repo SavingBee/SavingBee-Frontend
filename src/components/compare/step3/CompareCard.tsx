@@ -1,18 +1,20 @@
 import Button from "@/components/common/button/Button";
-import { ProductListItemProps } from "@/components/product/ProductListItem";
+import { CompareListItem } from "@/mocks/data/compareProduct";
 import type { ProductType } from "@/types/product";
 import { PiNotePencil } from "react-icons/pi";
 
-type Item = ProductListItemProps & { id: string };
+type Item = CompareListItem;
 
 export default function CompareCard({
   cardNum,
   item,
   productType,
+  rateType,
 }: {
   cardNum: number;
   item?: Item;
   productType: ProductType;
+  rateType?: "단리" | "복리";
 }) {
   const border = cardNum === 0 ? "border-purple" : "border-cyan";
   const header = cardNum === 0 ? "bg-purple" : "bg-cyan";
@@ -65,11 +67,6 @@ export default function CompareCard({
               <Row label="이자" value="-" />
               <Row label="실수령액" value="-" highlight />
             </Section>
-
-            <Section title="이자 계산방식">
-              <Row label="거치방식" value="거치식" />
-              <Row label="복리" value="복리" dim />
-            </Section>
           </>
         ) : (
           <>
@@ -88,8 +85,7 @@ export default function CompareCard({
             </Section>
 
             <Section title="이자 계산방식">
-              <Row label="계산방식" value="단리/복리" />
-              <Row label="기본방식" value="기본식" dim />
+              <Row label="계산방식" value={rateType ?? "-"} />
             </Section>
           </>
         )}

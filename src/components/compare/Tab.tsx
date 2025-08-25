@@ -8,12 +8,12 @@ type TabProps = {
 
 export default function Tab({ value, onChange }: TabProps) {
   const tabs: { key: ProductType; label: string }[] = [
-    { key: "savings", label: "적금" },
     { key: "deposit", label: "예금" },
+    { key: "savings", label: "적금" },
   ];
 
   return (
-    <div className="flex justify-center items-center  gap-2 mb-2">
+    <div className="flex justify-center items-center mb-2">
       {tabs.map((t) => {
         const active = value === t.key;
         return (
@@ -22,8 +22,8 @@ export default function Tab({ value, onChange }: TabProps) {
             type="button"
             onClick={() => onChange(t.key)}
             styleVariant="border"
-            className={`min-w-[72px] p-2 hover:bg-graye5/30 text-base border-none font-semibold
-              ${active ? "text-black" : "text-gray9"}`}
+            className={`min-w-[72px] p-2 text-base border border-graycc font-semibold !rounded-none
+              ${active ? "text-white bg-primary" : " text-gray8"}`}
           >
             {t.label}
           </Button>
