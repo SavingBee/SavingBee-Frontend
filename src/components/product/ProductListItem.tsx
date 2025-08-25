@@ -13,18 +13,18 @@ export type ProductListItemProps = {
   max_intr_rate: number;
   base_intr_rate: number;
   product_type?: "deposit" | "savings"; // 필요시 분기 처리
-  logo_url?: string; //  TODO: API에 추가 가능한지 확인
+  //logo_url?: string; //  TODO: API에 추가 가능한지 확인
 
   onCompare?: () => void;
   variant?: "search" | "compare";
   selected?: boolean;
   //검색 드롭다운 활용위해 확장
-  disableActions?: boolean; // 드롭다운일때 내부 버튼 비활성화
+  disableActions?: boolean;
   onItemClick?: () => void;
 };
 
 const ProductListItem: React.FC<ProductListItemProps> = ({
-  logo_url,
+  // logo_url,
   fin_prdt_cd,
   fin_prdt_nm,
   kor_co_nm,
@@ -56,8 +56,8 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
   }
 
   const containerClass = [
-    "w-full rounded-xl bg-white transition-all cursor-pointer",
-    "border",
+    "w-full bg-white transition-all cursor-pointer",
+    disableActions ? "border-b border-gray-200" : "border rounded-xl",
     isCompare
       ? selected
         ? "border-primary ring-1 ring-primary"
@@ -82,7 +82,7 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
         )}
 
         <img
-          src={logo_url}
+          src=""
           alt={`${kor_co_nm} 로고`}
           className="h-10 w-10 rounded-full object-cover ring-1 ring-gray-200"
         />
