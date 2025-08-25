@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ProductType } from "@/types/product";
 import PageHeader from "@/components/common/pageHeader/PageHeader";
 import CompareLayout from "@/components/compare/CompareLayout";
@@ -47,15 +47,9 @@ export default function ProductComparePage() {
     setPlanFilter({});
     setSelected([]);
     setCompareItems([]);
-    setVisibleItems(v === "savings" ? savingsCompareData : depositCompareData);
+    setVisibleItems([]);
     setOpenSections({ 2: false, 3: false });
   };
-
-  useEffect(() => {
-    setVisibleItems(
-      kind === "savings" ? savingsCompareData : depositCompareData,
-    );
-  }, []);
 
   const toggleSelect = (id: string) => {
     setSelected((prev) => {
@@ -94,6 +88,7 @@ export default function ProductComparePage() {
         sectionTitle="저축계획을 입력해주세요."
         canApply={planValid}
         onApply={() => {
+          if (!planValid) return;
           setVisibleItems(
             kind === "savings" ? savingsCompareData : depositCompareData,
           );
