@@ -1,18 +1,19 @@
 import Button from "@/components/common/button/Button";
 import CompareCard from "./CompareCard";
-import { ProductListItemProps } from "@/components/product/ProductListItem";
 import { ProductType } from "@/types/product";
+import { CompareListItem } from "@/mocks/data/compareProduct";
 
-type Item = (ProductListItemProps & { id: string }) | undefined;
-
+type Item = CompareListItem;
 export default function CompareSection({
   items,
   onReset,
   productType,
+  rateType,
 }: {
   items: Item[];
   onReset: () => void;
   productType: ProductType;
+  rateType?: "단리" | "복리";
 }) {
   const left = items[0];
   const right = items[1];
@@ -20,8 +21,18 @@ export default function CompareSection({
   return (
     <div>
       <div className="flex gap-6">
-        <CompareCard cardNum={0} item={left} productType={productType} />
-        <CompareCard cardNum={1} item={right} productType={productType} />
+        <CompareCard
+          cardNum={0}
+          item={left}
+          productType={productType}
+          rateType={rateType}
+        />
+        <CompareCard
+          cardNum={1}
+          item={right}
+          productType={productType}
+          rateType={rateType}
+        />
       </div>
       <div className="flex justify-center leading-none">
         <Button

@@ -1,11 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ProductType } from "@/types/product";
 import PageHeader from "@/components/common/pageHeader/PageHeader";
 import CompareLayout from "@/components/compare/CompareLayout";
 import Tab from "@/components/compare/Tab";
-
-import type { ProductListItemProps } from "@/components/product/ProductListItem";
 import {
+  CompareListItem,
   depositCompareData,
   savingsCompareData,
 } from "@/mocks/data/compareProduct";
@@ -17,12 +16,13 @@ import ListSection from "@/components/compare/step2/ListSection";
 import CardSection from "@/components/compare/step2/CardSection";
 import CompareSection from "@/components/compare/step3/CompareSection";
 
-type Item = ProductListItemProps & { id: string };
+type Item = CompareListItem;
 
 export default function ProductComparePage() {
-  const [kind, setKind] = useState<ProductType>("savings");
+  const [kind, setKind] = useState<ProductType>("deposit");
   const [planValid, setPlanValid] = useState(false);
   const [, setPlanFilter] = useState<SavingsFilter | DepositFilter>({});
+  const [plan, setPlan] = useState<SavingsFilter | DepositFilter>({});
 
   const [visibleItems, setVisibleItems] = useState<Item[]>([]);
   const [selected, setSelected] = useState<Item[]>([]);
@@ -30,19 +30,26 @@ export default function ProductComparePage() {
 
   const [compareItems, setCompareItems] = useState<Item[]>([]);
 
+  const [openSections, setOpenSections] = useState<{ 2: boolean; 3: boolean }>({
+    2: false,
+    3: false,
+  });
+
+  const planRateType = (plan as SavingsFilter).rateType;
+  const normalizedRateType: "단리" | "복리" | undefined =
+    planRateType === "단리" || planRateType === "복리"
+      ? planRateType
+      : undefined;
+
   const handleTabChange = (v: ProductType) => {
     setKind(v);
     setPlanValid(false);
     setPlanFilter({});
     setSelected([]);
     setCompareItems([]);
-    setVisibleItems(v === "savings" ? savingsCompareData : depositCompareData);
+    setVisibleItems([]);
+    setOpenSections({ 2: false, 3: false });
   };
-  useEffect(() => {
-    setVisibleItems(
-      kind === "savings" ? savingsCompareData : depositCompareData,
-    );
-  }, []);
 
   const toggleSelect = (id: string) => {
     setSelected((prev) => {
@@ -56,11 +63,11 @@ export default function ProductComparePage() {
 
   const removeSelected = (id: string) =>
     setSelected((prev) => prev.filter((x) => x.id !== id));
-
   const resetSelected = () => setSelected([]);
 
   const submitCompare = () => {
     setCompareItems(selected);
+    setOpenSections((s) => ({ ...s, 3: true }));
     document
       .getElementById("compare-anchor")
       ?.scrollIntoView({ behavior: "smooth" });
@@ -74,7 +81,6 @@ export default function ProductComparePage() {
         title="상품비교"
         breadcrumb={[{ label: "홈", to: "/" }, { label: "상품비교" }]}
       />
-
       <Tab value={kind} onChange={handleTabChange} />
 
       <CompareLayout
@@ -82,21 +88,29 @@ export default function ProductComparePage() {
         sectionTitle="저축계획을 입력해주세요."
         canApply={planValid}
         onApply={() => {
+          if (!planValid) return;
           setVisibleItems(
             kind === "savings" ? savingsCompareData : depositCompareData,
           );
+          setOpenSections((s) => ({ ...s, 2: true }));
         }}
       >
         <PlanFilter
           kind={kind}
           onChange={(f, valid) => {
+            setPlan(f);
             setPlanFilter(f);
             setPlanValid(valid);
           }}
         />
       </CompareLayout>
 
-      <CompareLayout no={2} sectionTitle="상품을 선택해주세요.">
+      <CompareLayout
+        no={2}
+        sectionTitle="상품을 선택해주세요."
+        open={openSections[2]}
+        onToggle={(next) => setOpenSections((s) => ({ ...s, 2: next }))}
+      >
         <ListSection
           items={visibleItems}
           selectedIds={selectedIds}
@@ -111,10 +125,16 @@ export default function ProductComparePage() {
       </CompareLayout>
 
       <div id="compare-anchor">
-        <CompareLayout no={3} sectionTitle="선택한 상품을 비교해보세요!">
+        <CompareLayout
+          no={3}
+          sectionTitle="선택한 상품을 비교해보세요!"
+          open={openSections[3]}
+          onToggle={(next) => setOpenSections((s) => ({ ...s, 3: next }))}
+        >
           <CompareSection
             items={compareItems}
             productType={kind}
+            rateType={kind === "savings" ? normalizedRateType : undefined}
             onReset={() => {
               resetCompare();
               resetSelected();
