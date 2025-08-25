@@ -26,7 +26,7 @@ import { useSavingsFilterState } from "@/hooks/filter/useSavingsFilterState";
 import { SAVING_FILTERS } from "@/components/filter/dropdown/config";
 
 const SavingsPage = () => {
-  const sampleProducts = [
+  const sampleProducts: Product[] = [
     {
       fin_prdt_cd: "WR0001A",
       fin_prdt_nm: "우리웰리치 주거래예금",
@@ -34,7 +34,58 @@ const SavingsPage = () => {
       product_type: "deposit",
       max_intr_rate: 2.25,
       base_intr_rate: 2.0,
-      logo_url: "/images/banks/woori.png",
+      // logo_url: "/images/banks/woori.png",
+    },
+    {
+      fin_prdt_cd: "SH0001S",
+      fin_prdt_nm: "신한 청년적금",
+      kor_co_nm: "신한은행",
+      product_type: "savings",
+      max_intr_rate: 2.9,
+      base_intr_rate: 2.5,
+    },
+    {
+      fin_prdt_cd: "WR0001A",
+      fin_prdt_nm: "우리웰리치 주거래예금",
+      kor_co_nm: "우리은행",
+      product_type: "deposit",
+      max_intr_rate: 2.25,
+      base_intr_rate: 2.0,
+      // logo_url: "/images/banks/woori.png",
+    },
+    {
+      fin_prdt_cd: "SH0001S",
+      fin_prdt_nm: "신한 청년적금",
+      kor_co_nm: "신한은행",
+      product_type: "savings",
+      max_intr_rate: 2.9,
+      base_intr_rate: 2.5,
+    },
+    {
+      fin_prdt_cd: "WR0001A",
+      fin_prdt_nm: "우리웰리치 주거래예금",
+      kor_co_nm: "우리은행",
+      product_type: "deposit",
+      max_intr_rate: 2.25,
+      base_intr_rate: 2.0,
+      // logo_url: "/images/banks/woori.png",
+    },
+    {
+      fin_prdt_cd: "SH0001S",
+      fin_prdt_nm: "신한 청년적금",
+      kor_co_nm: "신한은행",
+      product_type: "savings",
+      max_intr_rate: 2.9,
+      base_intr_rate: 2.5,
+    },
+    {
+      fin_prdt_cd: "WR0001A",
+      fin_prdt_nm: "우리웰리치 주거래예금",
+      kor_co_nm: "우리은행",
+      product_type: "deposit",
+      max_intr_rate: 2.25,
+      base_intr_rate: 2.0,
+      // logo_url: "/images/banks/woori.png",
     },
     {
       fin_prdt_cd: "SH0001S",
@@ -45,7 +96,7 @@ const SavingsPage = () => {
       base_intr_rate: 2.5,
     },
   ];
-  const samplePopularProducts = [
+  const samplePopularProducts: Product[] = [
     {
       fin_prdt_cd: "KB0001A",
       fin_prdt_nm: "KB Star 정기예금",
@@ -245,7 +296,7 @@ const SavingsPage = () => {
         value={keyword}
         onChange={setKeyword}
         onSubmit={applySearch}
-        placeholder="상품명을 검색하세요?!!!!"
+        placeholder="상품명을 입력해주세요"
       />
 
       <FilterBar
