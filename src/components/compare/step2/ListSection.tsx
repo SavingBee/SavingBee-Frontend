@@ -23,18 +23,27 @@ export default function ListSection({
   selectedIds: string[];
   onToggleSelect: (id: string) => void;
 }) {
-  const viewItems = items.map(toViewItem);
+  const hasItems = items?.length > 0;
+  const viewItems = hasItems ? items.map(toViewItem) : [];
+
   return (
     <div className="w-full h-2/4">
       <div className="text-black4 font-bold text-base">추천 상품</div>
+
       <div className="relative mt-2 h-[520px] overflow-y-auto overscroll-contain pr-2">
-        <ProductList
-          items={viewItems}
-          variant="compare"
-          listClassName="m-2"
-          selectedIds={selectedIds}
-          onCompare={onToggleSelect}
-        />
+        {hasItems ? (
+          <ProductList
+            items={viewItems}
+            variant="compare"
+            listClassName="m-2"
+            selectedIds={selectedIds}
+            onCompare={onToggleSelect}
+          />
+        ) : (
+          <div className="h-full flex items-center justify-center text-gray4 text-lg">
+            먼저 위에서 조건을 입력해주세요.
+          </div>
+        )}
       </div>
     </div>
   );
