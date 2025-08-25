@@ -12,6 +12,7 @@ import LoginLayout from "@/layout/LoginLayout";
 import FindId from "@/pages/FindId";
 import FindPassword from "@/pages/FindPassword";
 import SearchBox from "@/components/search/SearchBox";
+import Mypage from "@/pages/Mypage";
 
 const Router = () => {
   return (
@@ -25,6 +26,7 @@ const Router = () => {
         <Route path="/product/compare" element={<ProductComparePage />} />
         {/* <Route path="/product/search" element={<ProductSearchPage />} /> */}
         <Route path="/search-test" element={<SearchBox />} />
+        <Route path="/mypage" element={<Mypage />} />
       </Route>
       <Route element={<LoginLayout />}>
         <Route path="/login" element={<Login />} />
