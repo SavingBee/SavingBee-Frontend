@@ -1,9 +1,9 @@
+import { CompareListItem } from "@/mocks/data/compareProduct";
 import EmptyCard from "./EmptyCard";
 import SelectedCard from "./SelectedCard";
 import Button from "@/components/common/button/Button";
-import { ProductListItemProps } from "@/components/product/ProductListItem";
 
-type Item = ProductListItemProps & { id: string };
+type Item = CompareListItem;
 
 export default function CardSection({
   selected,
