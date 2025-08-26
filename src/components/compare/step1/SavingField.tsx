@@ -4,10 +4,10 @@ import type { SavingsFilter } from "./PlanFilter";
 
 const MIN_SAVINGS_AMOUNT = 10_000;
 const MAX_SAVINGS_AMOUNT = 3_000_000;
-const MIN_SAVINGS_MONTHS = 1;
-const MAX_SAVINGS_MONTHS = 60;
 const MIN_SAVINGS_RATE = 0.1;
 const MAX_SAVINGS_RATE = 5;
+
+const ALLOWED_MONTHS = [6, 12, 24, 36] as const;
 
 interface SavingFieldProps {
   onChange?: (f: SavingsFilter, valid: boolean) => void;
@@ -20,7 +20,7 @@ export function SavingField({ onChange }: SavingFieldProps) {
   const [minRate, setMinRate] = useState<number | "">("");
   const [maxRate, setMaxRate] = useState<number | "">("");
 
-  const [rateType, setRateType] = useState<"단리" | "복리" | "">("");
+  const [rateType, setRateType] = useState<"단리" | "복리" | "any">();
 
   const [touched, setTouched] = useState({
     amount: false,
@@ -37,9 +37,7 @@ export function SavingField({ onChange }: SavingFieldProps) {
 
   const validMonths =
     typeof months === "number" &&
-    Number.isInteger(months) &&
-    months >= MIN_SAVINGS_MONTHS &&
-    months <= MAX_SAVINGS_MONTHS;
+    ALLOWED_MONTHS.includes(months as (typeof ALLOWED_MONTHS)[number]);
 
   const validMinRate =
     typeof minRate === "number" &&
@@ -58,7 +56,8 @@ export function SavingField({ onChange }: SavingFieldProps) {
 
   const validRates = validMinRate && validMaxRate && validRateOrder;
 
-  const validRateType = rateType === "단리" || rateType === "복리";
+  const validRateType =
+    rateType === "단리" || rateType === "복리" || rateType === "any";
 
   const valid = validAmount && validMonths && validRates && validRateType;
 
@@ -84,13 +83,14 @@ export function SavingField({ onChange }: SavingFieldProps) {
     <div className="w-full rounded-md border border-graye5 bg-grayf9">
       <div className="grid grid-cols-4 divide-x divide-graye5">
         <div className="p-6">
-          <div className="text-base text-gray6">매월 저축금액</div>
+          <div className="text-base text-gray6">저축금액</div>
+          <span className="text-primary font-bold">매월</span>
           {showAmountErr && (
             <p className="mt-1 text-base text-red">
               만원 이상 300만원 이하로 입력하세요.
             </p>
           )}
-          <div className="mt-2">
+          <div className="flex flex-col mt-2 items-start">
             <EditableValue
               value={amount}
               onChange={(v) => {
@@ -112,24 +112,30 @@ export function SavingField({ onChange }: SavingFieldProps) {
           <div className="text-base text-gray6">저축기간</div>
           {showMonthsErr && (
             <p className="mt-1 text-base text-red">
-              {MIN_SAVINGS_MONTHS} ~ {MAX_SAVINGS_MONTHS} 사이의 개월로
-              입력하세요.
+              {ALLOWED_MONTHS.join(" / ")} 개월 중에서 선택하세요.
             </p>
           )}
-          <div className="mt-3">
-            <EditableValue
-              value={months}
-              onChange={(v) => {
-                setMonths(typeof v === "number" ? Math.trunc(v) : "");
+          <div className="mt-2 h-[64px] flex items-end">
+            <select
+              className={`mt-3 w-full bg-transparent border-b-2 pb-1 text-[28px] font-bold outline-none ${
+                showMonthsErr
+                  ? "border-red-400 text-red"
+                  : "border-primary text-primary"
+              }`}
+              value={months === "" ? "" : String(months)}
+              onChange={(e) => {
+                const v = e.target.value;
+                setMonths(v === "" ? "" : Number(v));
                 setTouched((t) => ({ ...t, months: true }));
               }}
-              placeholder="0"
-              suffix="개월"
-              className="text-[28px] font-bold text-primary"
-              inputClassName="text-[28px] font-bold text-primary w-24"
-              inputMode="numeric"
-              invalid={showMonthsErr}
-            />
+            >
+              <option value="">선택</option>
+              {ALLOWED_MONTHS.map((m) => (
+                <option key={m} value={m}>
+                  {m}개월
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
@@ -150,7 +156,7 @@ export function SavingField({ onChange }: SavingFieldProps) {
               )}
             </div>
           )}
-          <div className="flex items-center gap-2 mt-3">
+          <div className="mt-2 h-[64px] flex items-end gap-2">
             <EditableValue
               value={minRate}
               onChange={(v) => {
@@ -161,7 +167,7 @@ export function SavingField({ onChange }: SavingFieldProps) {
               suffix="%"
               format="percent"
               className="text-[28px] font-bold text-primary"
-              inputClassName="text-[28px] font-bold text-primary w-24"
+              inputClassName="text-[28px] font-bold text-primary w-20"
               inputMode="decimal"
               invalid={showRatesErr}
             />
@@ -176,7 +182,7 @@ export function SavingField({ onChange }: SavingFieldProps) {
               suffix="%"
               format="percent"
               className="text-[28px] font-bold text-primary"
-              inputClassName="text-[28px] font-bold text-primary w-24"
+              inputClassName="text-[28px] font-bold text-primary w-20"
               inputMode="decimal"
               invalid={showRatesErr}
             />
@@ -188,24 +194,25 @@ export function SavingField({ onChange }: SavingFieldProps) {
           {showRateTypeErr && (
             <p className="mt-1 text-base text-red">금리방식을 선택하세요.</p>
           )}
-          <select
-            className={`mt-3 w-full bg-transparent border-b-2 pb-1 text-[22px] font-bold outline-none ${
-              showRateTypeErr
-                ? "border-red-400 text-red"
-                : "border-primary text-primary"
-            }`}
-            value={rateType}
-            onChange={(e) => {
-              setRateType(e.target.value as "단리" | "복리" | "");
-              setTouched((t) => ({ ...t, rateType: true }));
-            }}
-          >
-            <option value="" disabled>
-              선택
-            </option>
-            <option value="복리">복리</option>
-            <option value="단리">단리</option>
-          </select>
+          <div className="mt-2 h-[64px] flex items-end">
+            <select
+              className={`mt-3 w-full bg-transparent border-b-2 pb-1 text-[28px] font-bold outline-none ${
+                showRateTypeErr
+                  ? "border-red-400 text-red"
+                  : "border-primary text-primary"
+              }`}
+              value={rateType}
+              onChange={(e) => {
+                setRateType(e.target.value as "단리" | "복리" | "any");
+                setTouched((t) => ({ ...t, rateType: true }));
+              }}
+            >
+              <option value="">선택</option>
+              <option value="단리">단리</option>
+              <option value="복리">복리</option>
+              <option value="any">상관없음</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>

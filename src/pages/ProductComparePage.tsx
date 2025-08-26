@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ProductType } from "@/types/product";
 import PageHeader from "@/components/common/pageHeader/PageHeader";
 import CompareLayout from "@/components/compare/CompareLayout";
@@ -75,6 +75,13 @@ export default function ProductComparePage() {
 
   const resetCompare = () => setCompareItems([]);
 
+  useEffect(() => {
+    if (selected.length < 2) {
+      setCompareItems([]);
+      setOpenSections((s) => ({ ...s, 3: false }));
+    }
+  }, [selected]);
+
   return (
     <div>
       <PageHeader
@@ -109,7 +116,6 @@ export default function ProductComparePage() {
         no={2}
         sectionTitle="상품을 선택해주세요."
         open={openSections[2]}
-        onToggle={(next) => setOpenSections((s) => ({ ...s, 2: next }))}
       >
         <ListSection
           items={visibleItems}
@@ -129,7 +135,6 @@ export default function ProductComparePage() {
           no={3}
           sectionTitle="선택한 상품을 비교해보세요!"
           open={openSections[3]}
-          onToggle={(next) => setOpenSections((s) => ({ ...s, 3: next }))}
         >
           <CompareSection
             items={compareItems}

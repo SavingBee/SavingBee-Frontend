@@ -47,29 +47,28 @@ export default function CompareLayout({
           </span>
         </div>
 
-        {canApply ? (
+        {alwaysOpen ? (
           <div onClick={(e) => e.stopPropagation()}>
             <Button
               type="button"
               variant="sm"
               styleVariant="bg"
-              className="bg-primary"
+              className={`${canApply ? "bg-primary" : "bg-gray9"}`}
+              disabled={!canApply}
               onClick={onApply}
             >
               적용하기
             </Button>
           </div>
         ) : (
-          !alwaysOpen && (
-            <Button
-              type="button"
-              variant="sm"
-              styleVariant="border"
-              className="text-black6 border-none"
-            >
-              {isOpen ? <IoChevronUp size={18} /> : <IoChevronDown size={18} />}
-            </Button>
-          )
+          <Button
+            type="button"
+            variant="sm"
+            styleVariant="border"
+            className="text-black6 border-none"
+          >
+            {isOpen ? <IoChevronUp size={18} /> : <IoChevronDown size={18} />}
+          </Button>
         )}
       </div>
 
