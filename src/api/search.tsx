@@ -13,6 +13,7 @@ export async function searchProducts(q: string): Promise<SearchResponse> {
   const keyword = (q ?? "").trim();
   if (keyword.length < 2) {
     throw new Error("검색어는 2자 이상 입력해주세요");
+    //ui처리 필요
   }
   const res = await api.get<SearchResponse>(API_SEARCH, {
     params: { q: keyword },
