@@ -10,6 +10,7 @@ export default {
         navy: "#144271",
         purple: "#6E5AED",
         cyan: "#19B1D4",
+        green: "#34A853",
 
         black12: "#121212",
         black2: "#222222",
