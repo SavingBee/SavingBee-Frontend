@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router";
 import SearchForm from "./SearchForm";
 
@@ -22,31 +22,31 @@ import { searchProducts } from "@/api/search";
 
 //검색 훅
 
-const MOCK: ProductListItemProps[] = [
-  {
-    fin_prdt_cd: "WR0001A",
-    fin_prdt_nm: "sh kb 우리웰리치 주거래예금",
-    kor_co_nm: "우리은행",
-    product_type: "deposit",
-    max_intr_rate: 2.25,
-    base_intr_rate: 2.0,
-    //logo_url: "/images/banks/woori.png",
-  },
-  {
-    fin_prdt_cd: "SH0001S",
-    fin_prdt_nm: "sh kb 신한 청년적금",
-    kor_co_nm: "신한은행",
-    product_type: "savings",
-    max_intr_rate: 2.9,
-    base_intr_rate: 2.5,
-  },
-];
+// const MOCK: ProductListItemProps[] = [
+//   {
+//     fin_prdt_cd: "WR0001A",
+//     fin_prdt_nm: "sh kb 우리웰리치 주거래예금",
+//     kor_co_nm: "우리은행",
+//     product_type: "deposit",
+//     max_intr_rate: 2.25,
+//     base_intr_rate: 2.0,
+//     //logo_url: "/images/banks/woori.png",
+//   },
+//   {
+//     fin_prdt_cd: "SH0001S",
+//     fin_prdt_nm: "sh kb 신한 청년적금",
+//     kor_co_nm: "신한은행",
+//     product_type: "savings",
+//     max_intr_rate: 2.9,
+//     base_intr_rate: 2.5,
+//   },
+// ];
 
-function mockFilter(list: ProductListItemProps[], q: string) {
-  const s = q.trim().toLowerCase();
-  if (!s) return [];
-  return list.filter((it) => it.fin_prdt_nm.toLowerCase().includes(s));
-}
+// function mockFilter(list: ProductListItemProps[], q: string) {
+//   const s = q.trim().toLowerCase();
+//   if (!s) return [];
+//   return list.filter((it) => it.fin_prdt_nm.toLowerCase().includes(s));
+// }
 
 export default function SearchBox() {
   const { q, applySearch } = useSearchQuery(); // 검색 쿼리 전달 훅
@@ -55,6 +55,10 @@ export default function SearchBox() {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<ProductListItemProps[]>([]);
   const [hasSubmitted, setHasSubmitted] = useState(false); // 제출 플래그
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  //추천상품 관련
+  const [isPopular, setIsPopular] = useState(false);
+  const [bannerMsg, setBannerMsg] = useState<string | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
@@ -72,28 +76,63 @@ export default function SearchBox() {
     return () => document.removeEventListener("mousedown", onDocClick);
   }, []);
 
-  // q 변경(= applySearch 성공) 시 서버 호출 → 결과 세팅 → 드롭다운 열기
+  /*******************
+   * q 변경(= applySearch 성공) 시 서버 호출 -> 결과 세팅 -> 드롭다운 열기
+   *
+   *
+   *******************/
   useEffect(() => {
-    const run = async () => {
+    const controller = new AbortController();
+
+    async function run() {
+      // 제출이전 - 실행 종료
       if (!q || !hasSubmitted) {
-        // URL에 q가 있어도 "사용자 제출"이 아니면 열지 않음
         setOpen(false);
+        setResults([]);
+        setErrorMsg(null);
         return;
       }
+
       setLoading(true);
+      setErrorMsg(null);
 
-      // 실제 API로 교체
-      // const res: SearchResponse = await searchProducts(q);
-      // const list = res.products?.length ? res.products
-      //            : ("popularProducts" in res ? res.popularProducts : []);
-      // 임시: 목업 필터
-      const list = mockFilter(MOCK, q);
+      try {
+        const res: SearchResponse = await searchProducts(q);
+        const has = "products" in res && res.products.length > 0;
+        const list = has
+          ? res.products
+          : "popularProducts" in res
+            ? res.popularProducts
+            : [];
 
-      setResults(list);
-      setLoading(false);
-      setOpen(true); // 결과가 0이어도 패널은 열고 빈 상태 노출
-    };
+        // ProductListItemProps와 필드가 동일하므로 바로 세팅
+        setResults(list as unknown as ProductListItemProps[]);
+        setIsPopular(!has);
+        // 응답에 message가 있으면 사용, 없으면 디폴트 문구
+        if (!has) {
+          const msg =
+            "message" in res && res.message
+              ? res.message
+              : `‘${q}’에 대한 검색 결과가 없습니다. 인기 상품을 추천합니다.`;
+          setBannerMsg(msg);
+        } else {
+          setBannerMsg(null);
+        }
+
+        setOpen(true);
+      } catch (e: any) {
+        // 400 등 에러 처리
+        setResults([]);
+        setOpen(true); // 에러 메시지를 드롭다운에서 보여주기 -> 열어둠
+        setErrorMsg(e?.message ?? "검색 중 오류가 발생했습니다");
+      } finally {
+        setLoading(false);
+      }
+    }
+
     run();
+
+    return () => controller.abort();
   }, [q, hasSubmitted]);
 
   function handleKeyDown(e: React.KeyboardEvent) {
@@ -104,23 +143,42 @@ export default function SearchBox() {
     if (!s) {
       setHasSubmitted(false);
       setResults([]);
-      setOpen(false);
+      setErrorMsg(null);
+      return;
+    }
+    // 검색어 2자 이하 ->  에러 처리
+    if (s.length < 2) {
+      setHasSubmitted(false);
+      setResults([]);
+      setOpen(true); // 드롭다운에 에러를 보여주기 -> open
+      setErrorMsg("검색어는 2자 이상 입력해주세요");
       return;
     }
     setHasSubmitted(true); // 제출 플래그
+    setErrorMsg(null);
     applySearch(s); // 서버로 쿼리 전달(URL q 갱신)
   }
+
+  const resetOnTyping = () => {
+    setHasSubmitted(false);
+    setOpen(false);
+    setErrorMsg(null);
+    setIsPopular(false);
+    setBannerMsg(null);
+  };
+
+  const handleChange = useCallback((v: string) => {
+    setKeyword(v);
+    resetOnTyping();
+  }, []);
+
   const searchMain = "max-h-96 overflow-auto ";
 
   return (
     <div ref={wrapRef} className="relative" onKeyDown={handleKeyDown}>
       <SearchForm
         value={keyword}
-        onChange={(v) => {
-          setKeyword(v);
-          setHasSubmitted(false); // 입력 변경 시 제출 상태 해제
-          setOpen(false); // 입력 중에는 닫힘
-        }}
+        onChange={handleChange}
         onSubmit={handleSubmit}
         className="mb-2"
         placeholder="상품명을 입력해주세요"
@@ -133,26 +191,39 @@ export default function SearchBox() {
           aria-label="검색 결과"
         >
           {loading ? (
-            // 로딩 상태: 간단한 스켈레톤/로딩 텍스트
             <div className="py-6 text-center text-sm text-gray-500">
               검색 중…
             </div>
+          ) : errorMsg ? (
+            <div
+              className="py-10 px-4 text-center text-sm text-red-600"
+              aria-live="assertive"
+            >
+              {errorMsg}
+            </div>
           ) : results.length > 0 ? (
-            // 결과 있음
-            <ProductList
-              open={open}
-              loading={loading}
-              listClassName={searchMain}
-              items={results}
-              disableItemActions
-              onSelect={(item: ProductListItemProps) => {
-                setOpen(false);
-                navigate(`/products/${item.fin_prdt_cd}`);
-              }}
-              onClose={() => setOpen(false)}
-            />
+            <>
+              {isPopular && (
+                <div className="mb-2 rounded-lg bg-blue-50 border border-blue-200 px-3 py-2 text-xs text-blue-700">
+                  {" "}
+                  {bannerMsg ??
+                    `‘${q}’에 대한 검색 결과가 없습니다. 인기 상품을 추천합니다.`}{" "}
+                </div>
+              )}
+              <ProductList
+                open={open}
+                loading={loading}
+                listClassName={searchMain}
+                items={results}
+                disableItemActions
+                onSelect={(item: ProductListItemProps) => {
+                  setOpen(false);
+                  navigate(`/products/${item.fin_prdt_cd}`);
+                }}
+                onClose={() => setOpen(false)}
+              />
+            </>
           ) : (
-            // 결과 없음: 제출된 상태에서만 노출
             <div className="py-10 px-4 text-center text-sm text-gray-500">
               검색 결과가 없습니다
             </div>

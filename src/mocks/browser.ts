@@ -1,4 +1,6 @@
 import { setupWorker } from "msw/browser";
-import { handlers } from "./handlers";
+// import { handlers } from "./handlers";
+import { searchHandler } from "./handlers/search";
 
-export const worker = setupWorker(...handlers);
+//handler 추가
+export const worker = setupWorker(searchHandler);
