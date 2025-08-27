@@ -19,7 +19,7 @@ interface SelectFieldProps {
     onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }
 
-const Select = ({ label, id, name, value, placeholder, options, className="", selectClassName="", labelClassName="", variant="lg", disabled, onChange }: SelectFieldProps) => {
+const Select = ({ label, id, name, value, placeholder, options, className = "", selectClassName = "", labelClassName = "", variant = "lg", disabled, onChange }: SelectFieldProps) => {
     const variantClass = variant === "lg"
         ? "h-[50px] p-[15px]" // lg style
         : "h-[34px] pr-[10px] pl-[10px]"; // sm style 
@@ -41,7 +41,7 @@ const Select = ({ label, id, name, value, placeholder, options, className="", se
                     className={`text-sm border border-graye5 rounded-md appearance-none min-h-0 ${variantClass} ${selectClassName}`}
                 >
                     {placeholder && (
-                        <option value="" disabled hidden>
+                        <option value="" hidden>
                             {placeholder}
                         </option>
                     )}
@@ -52,7 +52,7 @@ const Select = ({ label, id, name, value, placeholder, options, className="", se
                     ))}
                 </select>
                 <svg className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2" xmlns="http://www.w3.org/2000/svg" width="9" height="6" viewBox="0 0 9 6" fill="none">
-                    <path d="M9 0.928583L8.57811 0.5L4.5 4.64283L0.421888 0.5L0 0.928583L4.5 5.5L9 0.928583Z" fill="#444444"/>
+                    <path d="M9 0.928583L8.57811 0.5L4.5 4.64283L0.421888 0.5L0 0.928583L4.5 5.5L9 0.928583Z" fill="#444444" />
                 </svg>
             </div>
         </div>

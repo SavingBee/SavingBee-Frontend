@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { FaSearch, FaPlus } from "react-icons/fa";
 import Checkbox from "../common/input/Checkbox";
+import IcnButton from "../common/button/IcnButton";
+import { LuDot } from "react-icons/lu";
 
 /**
  * #34A853, #1976D3
@@ -16,11 +18,17 @@ export type ProductListItemProps = {
   //logo_url?: string; //  TODO: API에 추가 가능한지 확인
 
   onCompare?: () => void;
-  variant?: "search" | "compare";
+  variant?: "search" | "compare" | "mylist" | "recommend";
   selected?: boolean;
   //검색 드롭다운 활용위해 확장
   disableActions?: boolean;
   onItemClick?: () => void;
+
+  // 추천상품 리스트
+  recommendReason?: string;
+  ownedProductName?: string;
+  expectedInterest?: number;
+  interestDiff?: number;
 };
 
 const ProductListItem: React.FC<ProductListItemProps> = ({
@@ -37,6 +45,11 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
   variant = "search",
   disableActions,
   onItemClick,
+
+  recommendReason,
+  ownedProductName,
+  expectedInterest,
+  interestDiff,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const isCompare = variant === "compare";
@@ -67,7 +80,7 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
 
   return (
     <li onClick={handleClick} className={containerClass}>
-      <div className="flex items-center gap-4 px-4 h-[100px]">
+      <div className="flex items-center gap-4 px-6 h-[100px]">
         {isCompare && (
           <Checkbox
             id={`compare-${fin_prdt_nm}`}
@@ -80,16 +93,24 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
             }}
           />
         )}
-
-        <img
-          src=""
-          alt={`${kor_co_nm} 로고`}
-          className="h-10 w-10 rounded-full object-cover ring-1 ring-gray-200"
-        />
+        {/* 은행 로고 */}
+        <div className="h-10 w-10 rounded-full overflow-hidden border border-graye5">
+          <img
+            src=""
+            alt={`${kor_co_nm} 로고`}
+            className="object-cover ring-1 ring-gray-200"
+          />
+        </div>
         <div className="flex-1 min-w-0 text-left">
-          <h3 className="truncate text-base md:text-lg font-semibold">
+          {/* 추천 상품 리스트 일 때 */}
+          {variant === "recommend" && (
+            <span className="font-bold text-xs text-primary">{recommendReason}</span>
+          )}
+          {/* 상품명 */}
+          <h3 className="truncate text-base md:text-lg font-bold">
             {fin_prdt_nm}
           </h3>
+          {/* 은행명 */}
           <p className="text-sm">{kor_co_nm}</p>
         </div>
         <div className="text-right">
@@ -103,15 +124,152 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
         </div>
       </div>
 
+      {/* 추천 상품 리스트 일 때 */}
+      {variant === "recommend" && (
+        <div className="flex items-center flex-wrap gap-1 border-t border-graye5 mx-6 py-3">
+          <div className="flex gap-2 text-sm">
+            <span>보유 상품</span>
+            <strong className="font-semibold">{ownedProductName}</strong>
+          </div>
+          <span><LuDot color="#999" /></span>
+          {expectedInterest !== undefined && (
+            <div className="flex gap-2 text-sm">
+              <span>예상 추가 이자(연간)</span>
+              <strong className="font-semibold">{expectedInterest.toLocaleString()}원</strong>
+            </div>
+          )}
+          <span><LuDot color="#999" /></span>
+          {interestDiff !== undefined && (
+            <div className="flex gap-2 text-sm">
+              <span>상품 대비 금리 차이</span>
+              <strong className="font-semibold">{interestDiff}%</strong>
+            </div>
+          )}
+        </div>
+      )}
+
+
+
+
+      {["search", "mylist", "recommend"].includes(variant) && !disableActions && (
+        <div
+          className="overflow-hidden transition-[max-height] duration-300 ease-in-out bg-[#f9f9f9] text-sm text-gray-700 rounded-xl rounded-t-none"
+          style={{ maxHeight: isOpen ? "50px" : "0px" }}
+        >
+          <div className="flex items-center justify-between h-[50px] px-4">
+            {variant === "search" && (
+              <>
+                {/* 돋보기 버튼 */}
+                <IcnButton
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    console.log("상세보기 클릭");
+                  }}
+                  icon={<FaSearch size={10} color="#fff" />}
+                  className="text-primary"
+                  iconClassName="bg-primary"
+                >
+                  상세보기
+                </IcnButton>
+
+                {/* 비교함 담기 버튼 */}
+                <IcnButton
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onCompare?.();
+                  }}
+                  icon={<FaPlus size={10} color="#fff" />}
+                  className="text-green"
+                  iconClassName="bg-green"
+                >
+                  비교함 담기
+                </IcnButton>
+              </>
+            )}
+
+            {/* 마이페이지 내 상품 리스트 일 때 */}
+            {variant === "mylist" && (
+              <>
+                <IcnButton
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    console.log("상세보기 클릭");
+                  }}
+                  icon={<FaSearch size={10} color="#fff" />}
+                  className="text-primary"
+                  iconClassName="bg-primary"
+                >
+                  상세보기
+                </IcnButton>
+                <div className="flex items-center justify-between gap-3">
+                  <IcnButton
+                    type="button"
+                    className="text-green"
+                    iconClassName="bg-green"
+                    icon={<FaSearch size={10} color="#fff" />}
+                  >
+                    수정
+                  </IcnButton>
+                  <IcnButton
+                    type="button"
+                    className="text-red"
+                    iconClassName="bg-red"
+                    icon={<FaSearch size={10} color="#fff" />}
+                  >
+                    삭제
+                  </IcnButton>
+                </div>
+              </>
+            )}
+
+            {/* 추천 상품 리스트일 때 */}
+            {variant === "recommend" && (
+              <>
+                {/* 돋보기 버튼 */}
+                <IcnButton
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    console.log("상세보기 클릭");
+                  }}
+                  icon={<FaSearch size={10} color="#fff" />}
+                  className="text-primary"
+                  iconClassName="bg-primary"
+                >
+                  상세보기
+                </IcnButton>
+
+                {/* 비교함 담기 버튼 */}
+                <IcnButton
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onCompare?.();
+                  }}
+                  icon={<FaPlus size={10} color="#fff" />}
+                  className="text-green"
+                  iconClassName="bg-green"
+                >
+                  비교함 담기
+                </IcnButton>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* 아코디언  --- disableActions 일때, 렌더 막기 */}
-      {variant === "search" && !disableActions && (
+      {/* {variant === "search" && !disableActions && (
         <div
           className="overflow-hidden transition-[max-height] duration-300 ease-in-out bg-[#f9f9f9] text-sm text-gray-700 rounded-xl"
           style={{ maxHeight: isOpen ? "50px" : "0px" }}
         >
-          <div className="flex items-center justify-between h-[50px] px-4">
-            {/* 돋보기 버튼 */}
-            <button
+          <div className="flex items-center justify-between h-[50px] px-4"> */}
+      {/* 돋보기 버튼 */}
+      {/* <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
@@ -124,10 +282,10 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
               </span>
 
               <span>상세보기</span>
-            </button>
+            </button> */}
 
-            {/*  + 버튼 */}
-            <button
+      {/*  + 버튼 */}
+      {/* <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
@@ -139,12 +297,15 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
                 <FaPlus size={10} color="#fff" />
               </span>
 
-              {/* 텍스트 */}
               <span>비교함 담기</span>
-            </button>
+            </button> */}
+
+      {/* 
           </div>
         </div>
-      )}
+      )} */}
+
+
     </li>
   );
 };
