@@ -10,7 +10,7 @@ import SearchForm from "@/components/search/SearchForm";
 //검색, 필터 -> api
 // import type { Product, SearchResponse } from "@/types/search";
 // import { searchProducts } from "@/api/search";
-import type { SavingsListResponse, SavingsListParams } from "@/api/savings";
+// import type { SavingsListResponse, SavingsListParams } from "@/api/savings";
 import { fetchSavingsList } from "@/api/savings";
 
 // 필터관련
@@ -51,6 +51,7 @@ const SavingsPage = () => {
   const [page, setPage] = useState(1);
 
   const [totalPages, setTotalPages] = useState(1);
+  const [totalData, setTotalData] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -83,8 +84,10 @@ const SavingsPage = () => {
 
     fetchSavingsList(params as any)
       .then((data) => {
-        setItems(data.items ?? []);
+        console.log("[API raw]", data);
+        setItems(data.content ?? []);
         setTotalPages(data.totalPages ?? 1);
+        setTotalData(data.totalElements ?? "");
       })
       .catch((e: any) => {
         setItems([]);
@@ -93,6 +96,9 @@ const SavingsPage = () => {
       })
       .finally(() => setLoading(false));
   }, [location.search]);
+  useEffect(() => {
+    console.log("[items changed]", items);
+  }, [items]);
 
   //검색 API 호출
   // useEffect(() => {
@@ -244,6 +250,9 @@ const SavingsPage = () => {
 
       {/* 제품이 있는경우, 없는 경우 분리 */}
 
+      <p className="mb-2 mt-6">
+        총 <span className="text-primary font-bold">{totalData}</span>건
+      </p>
       {/* API 이후 테스트 */}
       <main>
         {items.length > 0 ? (
@@ -288,9 +297,9 @@ const SavingsPage = () => {
           </>
         )}
       </main> */}
-      <h5>현재 페이지: {page}</h5>
+      {/* <h5>현재 페이지: {page}</h5> */}
       <Pagination
-        totalPages={100}
+        totalPages={totalPages}
         currentPage={page}
         onChange={(next) => {
           setPage(next);

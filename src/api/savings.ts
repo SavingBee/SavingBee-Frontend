@@ -5,8 +5,9 @@ import type { SavingFilter } from "@/types/apiFilter";
 
 // 리스트 응답 타입
 export type SavingsListResponse = {
-  items: Product[];
+  content: Product[];
   totalPages: number;
+  totalElements: number;
 };
 
 // 기존
