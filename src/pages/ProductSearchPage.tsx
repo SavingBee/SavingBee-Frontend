@@ -9,7 +9,7 @@ import Button from "@/components/common/button/Button";
 // import SelectedFilter from "@/components/search/SelectedFilter";
 // import { FaSearch } from "react-icons/fa";
 // import { OPTION_MAP } from "@/components/search/dropdown/config";
-// import type { ListCategory } from "@/types/searchFilter";
+import type { ListCategory } from "@/types/uiFilter";
 // import { filterButtonStyle } from "@/components/search/FilterButton";
 
 type Selected = Record<ListCategory, string[]>;
