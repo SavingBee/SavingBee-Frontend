@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 //컴포넌트
 import ProductList from "@/components/product/ProductList";
@@ -7,9 +7,11 @@ import Pagination from "@/components/common/Pagination";
 import PageHeader from "@/components/common/pageHeader/PageHeader";
 import SearchForm from "@/components/search/SearchForm";
 
-//검색관련
-import type { Product, SearchResponse } from "@/types/search";
-import { searchProducts } from "@/api/search";
+//검색, 필터 -> api
+// import type { Product, SearchResponse } from "@/types/search";
+// import { searchProducts } from "@/api/search";
+import type { SavingsListResponse, SavingsListParams } from "@/api/savings";
+import { fetchSavingsList } from "@/api/savings";
 
 // 필터관련
 import FilterBar from "@/components/filter/FilterBar";
@@ -26,103 +28,6 @@ import { useSavingsFilterState } from "@/hooks/filter/useSavingsFilterState";
 import { SAVING_FILTERS } from "@/components/filter/dropdown/config";
 
 const SavingsPage = () => {
-  const sampleProducts: Product[] = [
-    {
-      fin_prdt_cd: "WR0001A",
-      fin_prdt_nm: "우리웰리치 주거래예금",
-      kor_co_nm: "우리은행",
-      product_type: "deposit",
-      max_intr_rate: 2.25,
-      base_intr_rate: 2.0,
-      // logo_url: "/images/banks/woori.png",
-    },
-    {
-      fin_prdt_cd: "SH0001S",
-      fin_prdt_nm: "신한 청년적금",
-      kor_co_nm: "신한은행",
-      product_type: "savings",
-      max_intr_rate: 2.9,
-      base_intr_rate: 2.5,
-    },
-    {
-      fin_prdt_cd: "WR0001A",
-      fin_prdt_nm: "우리웰리치 주거래예금",
-      kor_co_nm: "우리은행",
-      product_type: "deposit",
-      max_intr_rate: 2.25,
-      base_intr_rate: 2.0,
-      // logo_url: "/images/banks/woori.png",
-    },
-    {
-      fin_prdt_cd: "SH0001S",
-      fin_prdt_nm: "신한 청년적금",
-      kor_co_nm: "신한은행",
-      product_type: "savings",
-      max_intr_rate: 2.9,
-      base_intr_rate: 2.5,
-    },
-    {
-      fin_prdt_cd: "WR0001A",
-      fin_prdt_nm: "우리웰리치 주거래예금",
-      kor_co_nm: "우리은행",
-      product_type: "deposit",
-      max_intr_rate: 2.25,
-      base_intr_rate: 2.0,
-      // logo_url: "/images/banks/woori.png",
-    },
-    {
-      fin_prdt_cd: "SH0001S",
-      fin_prdt_nm: "신한 청년적금",
-      kor_co_nm: "신한은행",
-      product_type: "savings",
-      max_intr_rate: 2.9,
-      base_intr_rate: 2.5,
-    },
-    {
-      fin_prdt_cd: "WR0001A",
-      fin_prdt_nm: "우리웰리치 주거래예금",
-      kor_co_nm: "우리은행",
-      product_type: "deposit",
-      max_intr_rate: 2.25,
-      base_intr_rate: 2.0,
-      // logo_url: "/images/banks/woori.png",
-    },
-    {
-      fin_prdt_cd: "SH0001S",
-      fin_prdt_nm: "신한 청년적금",
-      kor_co_nm: "신한은행",
-      product_type: "savings",
-      max_intr_rate: 2.9,
-      base_intr_rate: 2.5,
-    },
-  ];
-  const samplePopularProducts: Product[] = [
-    {
-      fin_prdt_cd: "KB0001A",
-      fin_prdt_nm: "KB Star 정기예금",
-      kor_co_nm: "KB국민은행",
-      product_type: "deposit",
-      max_intr_rate: 3.1,
-      base_intr_rate: 2.8,
-    },
-    {
-      fin_prdt_cd: "SH0001S",
-      fin_prdt_nm: "신한 청년적금",
-      kor_co_nm: "신한은행",
-      product_type: "savings",
-      max_intr_rate: 2.9,
-      base_intr_rate: 2.6,
-    },
-    {
-      fin_prdt_cd: "NH0001D",
-      fin_prdt_nm: "NH올원 예금",
-      kor_co_nm: "농협은행",
-      product_type: "deposit",
-      max_intr_rate: 2.8,
-      base_intr_rate: 2.5,
-    },
-  ];
-
   // 페이지 로드 시 API 호출 (MSW)
   // useEffect(() => {
   //   fetch("/api/savings")
@@ -145,9 +50,9 @@ const SavingsPage = () => {
   const [isPopular, setIsPopular] = useState(false);
   const [page, setPage] = useState(1);
 
-  // UI 상태
-  // const [loading, setLoading] = useState(false);
-  // const [error, setError] = useState<string>("");
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   //새로고침 - url 리셋
   useEffect(() => {
@@ -155,31 +60,59 @@ const SavingsPage = () => {
   }, []);
   /***********************************************
    *
-   * 검색어 있을때 API 요청
+   * 필터 API 요청  (fetchSavingsList)-> 검색어, 필터 입력시 동일 API 호출
    * 만족 값 없으면 --> popularProducts (추천상품)
    *
    *
    ************************************************/
 
-  //검색 API 호출
+  const location = useLocation();
   useEffect(() => {
-    setKeyword(q);
-    if (!q) {
-      setItems([]);
-      setIsPopular(false);
-      return;
-    }
-    searchProducts(q).then((res: SearchResponse) => {
-      const list =
-        res.products && res.products.length > 0
-          ? res.products
-          : "popularProducts" in res
-            ? res.popularProducts
-            : [];
-      setItems(list);
-      setIsPopular(!(res.products && res.products.length > 0));
-    });
-  }, [q]);
+    const sp = new URLSearchParams(location.search);
+    if (!sp.get("page")) sp.set("page", "1");
+    if (!sp.get("pageSize")) sp.set("pageSize", "10");
+
+    const params = Object.fromEntries(sp.entries()); // 전부 문자열
+
+    //파라미터 테스트
+    console.log("[URL qs]", sp.toString());
+    console.log("[API params]", params);
+
+    setLoading(true);
+    setError("");
+
+    fetchSavingsList(params as any)
+      .then((data) => {
+        setItems(data.items ?? []);
+        setTotalPages(data.totalPages ?? 1);
+      })
+      .catch((e: any) => {
+        setItems([]);
+        setTotalPages(1);
+        setError(e?.response?.data?.message || e?.message || "목록 조회 실패");
+      })
+      .finally(() => setLoading(false));
+  }, [location.search]);
+
+  //검색 API 호출
+  // useEffect(() => {
+  //   setKeyword(q);
+  //   if (!q) {
+  //     setItems([]);
+  //     setIsPopular(false);
+  //     return;
+  //   }
+  //   fetchSavingsList(q).then((res: SavingsListResponse) => {
+  //     const list =
+  //       res.products && res.products.length > 0
+  //         ? res.products
+  //         : "popularProducts" in res
+  //           ? res.popularProducts
+  //           : [];
+  //     setItems(list);
+  //     setIsPopular(!(res.products && res.products.length > 0));
+  //   });
+  // }, [q]);
 
   /**
    * 적금 전용 --- 필터 이름 맵핑
@@ -254,7 +187,7 @@ const SavingsPage = () => {
    * hook > filter > useFilterChips.tsx
    */
   const { chips } = useFilterChips({
-    mode: "saving",
+    mode: "savings",
     selected,
     setSelected,
     amount,
@@ -312,7 +245,7 @@ const SavingsPage = () => {
       {/* 제품이 있는경우, 없는 경우 분리 */}
 
       {/* API 이후 테스트 */}
-      {/* <main>
+      <main>
         {items.length > 0 ? (
           <>
             {isPopular && (
@@ -320,7 +253,7 @@ const SavingsPage = () => {
                 {" "}
                 <h3 className="mt-2 text-lg font-semibold">추천상품</h3>{" "}
                 <p className="text-sm text-gray-500">
-                  검색 결과가 없어 인기 상품을 추천합니다{" "}
+                  검색 결과가 없어 인기 상품을 추천합니다
                 </p>
               </div>
             )}
@@ -332,11 +265,12 @@ const SavingsPage = () => {
         ) : (
           q && <p className="text-sm text-gray-500">검색 결과가 없습니다.</p>
         )}{" "}
-      </main> */}
-      <main>
+      </main>
+      {/* <main>
         {sampleProducts.length > 0 ? (
           <ProductList
-            items={sampleProducts}
+            // items={sampleProducts}
+            items={items}
             onCompare={(id) => console.log("비교함 담기:", id)}
           />
         ) : (
@@ -353,14 +287,17 @@ const SavingsPage = () => {
             />{" "}
           </>
         )}
-      </main>
+      </main> */}
       <h5>현재 페이지: {page}</h5>
       <Pagination
         totalPages={100}
         currentPage={page}
         onChange={(next) => {
           setPage(next);
+          const sp = new URLSearchParams(location.search);
           // ?page=next 로 URL 업데이트 + API 호출
+          sp.set("page", String(next));
+          navigate({ search: "?" + sp.toString() }, { replace: false });
         }}
         //디자인 추가 변경 가능
         className="my-8"

@@ -6,23 +6,23 @@ import { Filter, ListCategory, Option } from "@/types/uiFilter";
  */
 // 1) 공통옵션
 export const BANK_OPTIONS: Option[] = [
-  { id: "bank", text: "은행", category: "bankType" },
-  { id: "savingsBank", text: "저축은행", category: "bankType" },
-  { id: "coop", text: "신협조합", category: "bankType" },
+  { id: "은행", text: "은행", category: "bankType" },
+  { id: "저축은행", text: "저축은행", category: "bankType" },
+  { id: "신협", text: "신협", category: "bankType" },
 ];
 
 export const BENEFIT_OPTIONS: Option[] = [
-  { id: "online", text: "비대면 가입", category: "benefit" },
-  { id: "redeposit", text: "재예치", category: "benefit" },
-  { id: "firstDeal", text: "첫 거래", category: "benefit" },
-  { id: "age", text: "연령", category: "benefit" },
-  { id: "performance", text: "실적", category: "benefit" },
+  { id: "비대면가입", text: "비대면 가입", category: "benefit" },
+  { id: "재예치", text: "재예치", category: "benefit" },
+  { id: "첫거래", text: "첫 거래", category: "benefit" },
+  { id: "연령", text: "연령", category: "benefit" },
+  { id: "실적", text: "실적", category: "benefit" },
 ];
 
 export const TARGET_OPTIONS: Option[] = [
-  { id: "none", text: "제한없음", category: "target" },
-  { id: "lowIncome", text: "서민전용", category: "target" },
-  { id: "limited", text: "일부제한", category: "target" },
+  { id: "제한없음", text: "제한없음", category: "target" },
+  { id: "서민전용", text: "서민전용", category: "target" },
+  { id: "일부제한", text: "일부제한", category: "target" },
 ];
 
 export const TERM_OPTIONS: Option[] = [
@@ -33,14 +33,14 @@ export const TERM_OPTIONS: Option[] = [
 ];
 
 export const INTEREST_TYPE_OPTIONS: Option[] = [
-  { id: "simple", text: "단리", category: "interestType" },
-  { id: "compound", text: "복리", category: "interestType" },
+  { id: "단리", text: "단리", category: "interestType" },
+  { id: "복리", text: "복리", category: "interestType" },
 ];
 
 // 적립방식
 export const RSRV_TYPE_OPTIONS: Option[] = [
-  { id: "fixed", text: "정액적립식", category: "rsrvType" },
-  { id: "free", text: "자유적립식", category: "rsrvType" },
+  { id: "정액적립식", text: "정액적립식", category: "rsrvType" },
+  { id: "자유적립식", text: "자유적립식", category: "rsrvType" },
 ];
 
 export const OPTION_MAP: Record<ListCategory, Option[]> = {
