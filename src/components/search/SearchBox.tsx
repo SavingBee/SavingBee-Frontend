@@ -8,6 +8,8 @@ import type { ProductListItemProps } from "../product/ProductListItem";
 //검색관련
 import { useSearchQuery } from "@/hooks/filter/useSearchQuery";
 import type { SearchResponse } from "@/types/search";
+
+//api
 import { searchProducts } from "@/api/search";
 
 // type ProductListItemProps = {
