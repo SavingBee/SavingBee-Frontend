@@ -1,7 +1,9 @@
 import axios from "axios";
 import type { SearchResponse } from "@/types/search";
 
-const API_BASE_URL = "";
+//.env
+// const API_BASE_URL = "http://34.64.73.53:8080";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 export const API_SEARCH = "/products/search";
 
 const api = axios.create({

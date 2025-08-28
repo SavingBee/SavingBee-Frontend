@@ -2,7 +2,7 @@ export type Product = {
   fin_prdt_cd: string;
   fin_prdt_nm: string;
   kor_co_nm: string;
-  product_type: "deposit" | "saving";
+  product_type: "deposit" | "savings";
   max_intr_rate: number;
   base_intr_rate: number;
 };
@@ -20,7 +20,7 @@ export const products: Product[] = [
     fin_prdt_cd: "SH0001S",
     fin_prdt_nm: "신한 청년적금",
     kor_co_nm: "신한은행",
-    product_type: "saving",
+    product_type: "savings",
     max_intr_rate: 2.9,
     base_intr_rate: 2.5,
   },
@@ -63,7 +63,7 @@ export const popularProducts: Product[] = [
     fin_prdt_cd: "SH0001S",
     fin_prdt_nm: "신한 청년적금",
     kor_co_nm: "신한은행",
-    product_type: "saving",
+    product_type: "savings",
     max_intr_rate: 2.9,
     base_intr_rate: 2.6,
   },
