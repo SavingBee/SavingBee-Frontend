@@ -15,7 +15,7 @@ type UiChip = { key: string; label: string; onRemove: () => void };
  * mode: 'savings' | 'deposit'
  */
 export function useFilterChips(params: {
-  mode: "saving" | "deposit";
+  mode: "savings" | "deposit";
 
   selected: Selected;
   setSelected: Dispatch<SetStateAction<Selected>>;
