@@ -6,7 +6,7 @@ if (import.meta.env.VITE_USE_MOCK !== "0") {
   await worker.start({
     serviceWorker: { url: "/mockServiceWorker.js" }, // public 내에 위치
     //정의 안 된 API 처리 -> 실제 네트워크로
-    // onUnhandledRequest: 'bypass',
+    onUnhandledRequest: 'bypass',
   });
 }
 
