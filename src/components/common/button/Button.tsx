@@ -10,7 +10,7 @@ interface ButtonProps {
 }
 
 const Button = ({
-  type = "button",
+  type,
   children,
   disabled,
   onClick,
@@ -34,7 +34,7 @@ const Button = ({
 
   return (
     <button
-      type="button"
+      type={type}
       onClick={onClick}
       disabled={disabled}
       onSubmit={type === "submit" ? handleSubmit : undefined}
