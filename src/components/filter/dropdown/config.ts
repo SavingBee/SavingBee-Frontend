@@ -118,15 +118,15 @@ export const COMMON_FILTERS = [
 // 3-1) 적금 전용 필터 ---------- 공통 + 적금 특이사항
 export const SAVING_FILTERS: Filter[] = [
   ...COMMON_FILTERS,
-  {
-    id: "rsrvType",
-    filterLabel: "적립방식",
-    kind: "single",
-    optionCategory: "rsrvType",
-  },
+  // {
+  //   id: "rsrvType",
+  //   filterLabel: "적립방식",
+  //   kind: "single",
+  //   optionCategory: "rsrvType",
+  // },
   {
     id: "monthlyAmount",
-    filterLabel: "월저축금",
+    filterLabel: "월 저축금",
     kind: "amount",
     fieldKey: "monthlyMaxLimit", // 적금전용 API key
     unit: "원",
@@ -139,15 +139,16 @@ export const SAVING_FILTERS: Filter[] = [
   },
   {
     id: "totalAmount",
-    filterLabel: "총저축금",
-    kind: "range",
-    minKey: "totalMaxLimit",
-    maxKey: "totalMaxLimit", // 서버가 단일 한도 ? ---  amount
+    filterLabel: "총 저축금",
+    kind: "amount",
+    // minKey: "totalMaxLimit",
+    // maxKey: "totalMaxLimit",
+    fieldKey: "totalMaxLimit",
     unit: "원",
     min: 0,
     max: 1_000_000_000,
     step: 10_000,
-    placeholders: { min: "최소 금액", max: "최대 금액" },
+    placeholder: "금액 입력",
     formatter: (v) => v.toLocaleString(),
     parser: (s) => Number(String(s).replace(/[^\d]/g, "")),
   },
@@ -157,13 +158,15 @@ export const SAVING_FILTERS: Filter[] = [
 export const DEPOSIT_FILTERS: Filter[] = [
   ...COMMON_FILTERS,
   {
-    id: "amount",
+    // id:"amount"
+    id: "maxLimit",
     filterLabel: "가입한도",
     kind: "range",
-    minKey: "maxLimitMin", // 예금 전용 API key
+    // 전용 API key
+    minKey: "maxLimitMin", // 예금
     maxKey: "maxLimitMax",
     unit: "원",
-    min: 0,
+    min: 10_000_000,
     max: 1_000_000_000,
     step: 10_000,
     placeholders: { min: "최소 금액", max: "최대 금액" },

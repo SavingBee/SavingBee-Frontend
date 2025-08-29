@@ -70,11 +70,11 @@ const parseNum = (e: ChangeEvent<HTMLInputElement>) => {
 
 type DraftState = {
   amount?: number;
-  baseRate: RangeState;
-  maxRate: RangeState;
+  baseRate?: RangeState;
+  maxRate?: RangeState;
   monthlyAmount?: number;
-  totalAmount: RangeState;
-  lists: Partial<Record<ListCategory, string[]>>; //체크박스 -- 임시 저장
+  totalAmount?: RangeState;
+  lists?: Partial<Record<ListCategory, string[]>>; //체크박스 -- 임시 저장
 };
 const isDesktop = () =>
   typeof window !== "undefined" && window.innerWidth >= 640;
@@ -185,29 +185,29 @@ export default function FilterBar({
     //바뀐 필드만 draft로 덮어씀 -------  실제 확정 state 커밋
     if (isList(f)) {
       const lid = id as ListCategory;
-      const vals = draft.lists[lid] ?? [];
+      const vals = (draft.lists?.[lid] ?? []) as string[];
       nextLists = { ...selected, [lid]: vals };
       setSelected(nextLists);
     } else {
       if (id === "amount") {
-        nextAmount = draft.amount;
-        setAmount(nextAmount);
+        const nextAmount = draft.amount ?? undefined;
+        setAmount?.(nextAmount);
       }
       if (id === "monthlyAmount") {
-        nextMonthly = draft.monthlyAmount;
-        setMonthlyAmount(nextMonthly);
+        nextMonthly = draft.monthlyAmount ?? undefined;
+        setMonthlyAmount?.(nextMonthly);
       }
       if (id === "baseRate") {
-        nextBase = { ...draft.baseRate };
-        setBaseRate(nextBase);
+        nextBase = { ...(draft.baseRate ?? {}) };
+        setBaseRate?.(nextBase);
       }
       if (id === "maxRate") {
-        nextMax = { ...draft.maxRate };
-        setMaxRate(nextMax);
+        nextMax = { ...(draft.maxRate ?? {}) };
+        setMaxRate?.(nextMax);
       }
       if (id === "totalAmount") {
-        nextTotal = { ...draft.totalAmount };
-        setTotalAmount(nextTotal);
+        nextTotal = { ...(draft.totalAmount ?? {}) };
+        setTotalAmount?.(nextTotal);
       }
     }
 
@@ -250,15 +250,15 @@ export default function FilterBar({
       target: [],
       term: [],
       interestType: [],
-      rsrvType: [],
+      // rsrvType: [],
     } as Selected;
 
     setSelected(emptyLists);
-    setAmount(undefined);
-    setBaseRate({});
-    setMaxRate({});
-    setMonthlyAmount(undefined);
-    setTotalAmount({});
+    setAmount?.(undefined);
+    setBaseRate?.({});
+    setMaxRate?.({});
+    setMonthlyAmount?.(undefined);
+    setTotalAmount?.({});
 
     // reset 직후 상위에 알림 -------  SavingsPage가 URL 갱신 ----- 리스트 재요청
     onConfirm?.({
@@ -293,7 +293,7 @@ export default function FilterBar({
     if (!f) return null;
     if (isList(f)) {
       const lid = f.id as ListCategory;
-      const vals = draft.lists[lid] ?? [];
+      const vals = (draft.lists?.[lid] ?? []) as string[];
       return (
         <MultiOption
           options={OPTION_MAP[f.optionCategory]!}
@@ -329,8 +329,8 @@ export default function FilterBar({
     if (isRange(f) && f.id === "baseRate") {
       return (
         <RangeForm
-          minValue={draft.baseRate.min}
-          maxValue={draft.baseRate.max}
+          minValue={draft.baseRate?.min}
+          maxValue={draft.baseRate?.max}
           onChangeMin={(e) =>
             setDraft((d) => ({
               ...d,
@@ -350,8 +350,8 @@ export default function FilterBar({
     if (isRange(f) && f.id === "maxRate") {
       return (
         <RangeForm
-          minValue={draft.maxRate.min}
-          maxValue={draft.maxRate.max}
+          minValue={draft.maxRate?.min}
+          maxValue={draft.maxRate?.max}
           onChangeMin={(e) =>
             setDraft((d) => ({
               ...d,
@@ -371,8 +371,8 @@ export default function FilterBar({
     if (isRange(f) && f.id === "totalAmount") {
       return (
         <RangeForm
-          minValue={draft.totalAmount.min}
-          maxValue={draft.totalAmount.max}
+          minValue={draft.totalAmount?.min}
+          maxValue={draft.totalAmount?.max}
           onChangeMin={(e) =>
             setDraft((d) => ({
               ...d,
@@ -406,7 +406,7 @@ export default function FilterBar({
               <FilterButton
                 filterText={f.filterLabel}
                 isActive={isActive}
-                clickFilter={onToggle(f.id)}
+                clickFilter={onToggle(f.id as FilterCategory)}
               />
             </div>
           );
@@ -440,13 +440,17 @@ export default function FilterBar({
             <div className="flex justify-end gap-2 mt-3">
               <button
                 className="px-3 py-1 rounded-lg border border-black3/20"
-                onClick={() => currentFilter && resetOne(currentFilter.id)}
+                onClick={() =>
+                  currentFilter && resetOne(currentFilter.id as FilterCategory)
+                }
               >
                 초기화
               </button>
               <button
                 className="px-3 py-1 rounded-lg bg-primary text-white"
-                onClick={() => currentFilter && applyById(currentFilter.id)}
+                onClick={() =>
+                  currentFilter && applyById(currentFilter.id as FilterCategory)
+                }
               >
                 확인
               </button>
@@ -460,8 +464,12 @@ export default function FilterBar({
         open={!desktop && !!openId}
         title={currentLabel}
         onClose={() => setOpenId(null)}
-        onReset={() => currentFilter && resetOne(currentFilter.id)}
-        onApply={() => currentFilter && applyById(currentFilter.id)}
+        onReset={() =>
+          currentFilter && resetOne(currentFilter.id as FilterCategory)
+        }
+        onApply={() =>
+          currentFilter && applyById(currentFilter.id as FilterCategory)
+        }
       >
         <div className="w-full">{renderContent(currentFilter)}</div>
       </BottomSheet>

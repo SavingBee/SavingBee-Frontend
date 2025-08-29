@@ -12,7 +12,7 @@ export type Selected = {
   target: string[];
   term: string[];
   interestType: string[];
-  rsrvType?: string[]; // saving 전용은 optional로
+  //rsrvType?: string[]; // saving 전용은 optional로
 };
 
 export type ListCategory =
@@ -20,7 +20,6 @@ export type ListCategory =
   | "benefit"
   | "target"
   | "term"
-  | "rsrvType"
   | "interestType";
 // | "monthlyAmount" //
 // | "totalAmount"; //
@@ -29,7 +28,8 @@ export type NumberCategory =
   | "baseRate"
   | "maxRate"
   | "totalAmount"
-  | "monthlyAmount";
+  | "monthlyAmount"
+  | "maxLimit";
 export type FilterCategory = ListCategory | NumberCategory;
 
 export type Option = {
