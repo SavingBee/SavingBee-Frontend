@@ -2,38 +2,37 @@ import { useMemo, Dispatch, SetStateAction } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { OPTION_MAP } from "@/components/filter/dropdown/config";
 import { LIST_KEY_MAP } from "@/utils/listKeyMap";
-import type { ListCategory } from "@/types/uiFilter";
+import type { ListCategory, Selected } from "@/types/uiFilter";
 
 type RangeState = { min?: number; max?: number };
-type Selected = Record<ListCategory, string[]>;
+
 type UiChip = { key: string; label: string; onRemove: () => void };
 
 /**
  *
  * 칩 생성
  * onRemove에서 상태 초기화 + URLSearchParams 동기화 처리
- * mode: 'savings' | 'deposit'
+ * mode: 'saving' | 'deposit'
  */
 export function useFilterChips(params: {
   mode: "savings" | "deposit";
-
   selected: Selected;
   setSelected: Dispatch<SetStateAction<Selected>>;
 
   amount?: number;
-  setAmount: Dispatch<SetStateAction<number | undefined>>;
+  setAmount?: Dispatch<SetStateAction<number | undefined>>;
 
   monthlyAmount?: number;
-  setMonthlyAmount: Dispatch<SetStateAction<number | undefined>>;
+  setMonthlyAmount?: Dispatch<SetStateAction<number | undefined>>;
 
-  baseRate: RangeState;
-  setBaseRate: Dispatch<SetStateAction<RangeState>>;
+  baseRate?: RangeState;
+  setBaseRate?: Dispatch<SetStateAction<RangeState>>;
 
-  maxRate: RangeState;
-  setMaxRate: Dispatch<SetStateAction<RangeState>>;
+  maxRate?: RangeState;
+  setMaxRate?: Dispatch<SetStateAction<RangeState>>;
 
-  totalAmount: RangeState; // saving: 총저축금, deposit: 가입한도(min/max)
-  setTotalAmount: Dispatch<SetStateAction<RangeState>>;
+  totalAmount?: RangeState; // saving: 총저축금, deposit: 가입한도(min/max)
+  setTotalAmount?: Dispatch<SetStateAction<RangeState>>;
 }) {
   const {
     mode,
@@ -146,7 +145,7 @@ export function useFilterChips(params: {
     }
 
     // 저축, 예금 분리
-    if (mode === "saving") {
+    if (mode === "savings") {
       if (typeof monthlyAmount === "number") {
         acc.push({
           key: "monthlyAmount",

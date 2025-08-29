@@ -1,34 +1,28 @@
 import { useState } from "react";
 import type { Selected } from "@/types/uiFilter";
+
 type RangeState = { min?: number; max?: number };
 
-export function useSavingsFilterState() {
-  // 리스트형
+export function useDepositFilterState() {
   const [selected, setSelected] = useState<Selected>({
-    bankType: [],
-    benefit: [],
-    target: [],
-    term: [],
-    interestType: [],
-    rsrvType: [],
+    bankType: [] as string[],
+    benefit: [] as string[],
+    target: [] as string[],
+    term: [] as string[],
+    interestType: [] as string[],
   });
 
-  // 숫자/범위형
   const [amount, setAmount] = useState<number | undefined>(undefined);
-  const [monthlyAmount, setMonthlyAmount] = useState<number | undefined>(
-    undefined,
-  );
   const [baseRate, setBaseRate] = useState<RangeState>({});
   const [maxRate, setMaxRate] = useState<RangeState>({});
   const [totalAmount, setTotalAmount] = useState<RangeState>({});
+  // monthlyAmount, totalAmount 없음
 
   return {
     selected,
     setSelected,
     amount,
     setAmount,
-    monthlyAmount,
-    setMonthlyAmount,
     baseRate,
     setBaseRate,
     maxRate,

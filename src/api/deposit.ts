@@ -1,23 +1,23 @@
 import axios from "axios";
 import qs from "qs";
 import type { Product } from "@/types/search";
-import type { SavingFilter } from "@/types/apiFilter";
+import type { DepositFilter } from "@/types/apiFilter";
 
 // 리스트 응답 타입
-export type SavingsListResponse = {
+export type DepositListResponse = {
   content: Product[];
   totalPages: number;
   totalElements: number;
 };
 
 // 기존
-export type SavingsListParams = SavingFilter & {
+export type DepositListParams = DepositFilter & {
   q?: string;
   pageSize?: number;
 };
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-export const API_SAVINGS = "/products/filter/saving"; // 엔드포인트
+export const API_DEPOSIT = "/products/filter/deposit"; // 엔드포인트
 
 export const api = axios.create({
   baseURL: API_BASE_URL || "",
@@ -29,10 +29,10 @@ export const api = axios.create({
 });
 
 // 필터 API(메인 리스트)
-export async function fetchSavingsList(
-  params: SavingsListParams,
-): Promise<SavingsListResponse> {
-  const next: SavingsListParams = { ...params };
+export async function fetchDepositList(
+  params: DepositListParams,
+): Promise<DepositListResponse> {
+  const next: DepositListParams = { ...params };
 
   // q가 있을 때만 길이 체크
   const keyword = (next.q ?? "").trim();
@@ -43,6 +43,6 @@ export async function fetchSavingsList(
   if (keyword) next.q = keyword;
   else delete next.q;
 
-  const res = await api.get<SavingsListResponse>(API_SAVINGS, { params: next });
+  const res = await api.get<DepositListResponse>(API_DEPOSIT, { params: next });
   return res.data;
 }

@@ -3,9 +3,6 @@ import { useEffect, useRef } from "react";
 const MY_KAKAO_KEY = "e7b21a9532a9fd0e67c3bc322a333b75";
 const KAKAO_SDK_URL = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${MY_KAKAO_KEY}&autoload=false&libraries=services`;
 
-// const KAKAO_SDK_URL =
-//   "https://dapi.kakao.com/v2/maps/sdk.js?appkey=여기에_JavaScript_KEY&autoload=false";
-
 export default function MapOnly() {
   const mapRef = useRef(null);
 
@@ -46,7 +43,7 @@ export default function MapOnly() {
 }
 
 function getCurrentPositionOrFallback(): Promise<{ lat: number; lng: number }> {
-  const FALLBACK = { lat: 37.5665, lng: 126.978 }; // 기본위치 -- 서울시청
+  const FALLBACK = { lat: 37.561, lng: 126.981 }; // 한국은행 본관
   return new Promise((resolve) => {
     if (!navigator.geolocation) return resolve(FALLBACK);
     navigator.geolocation.getCurrentPosition(

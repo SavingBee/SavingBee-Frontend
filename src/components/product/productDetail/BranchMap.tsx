@@ -1,4 +1,3 @@
-import React from "react";
 import MapOnly from "./MapOnly";
 type Props = { title?: string };
 

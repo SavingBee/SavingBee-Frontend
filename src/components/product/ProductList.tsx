@@ -9,6 +9,7 @@ type ProductListProps = {
   selectedIds?: string[]; // fin_prdt_cd
   disableItemActions?: boolean;
   onSelect?: (item: Item) => void;
+  onClose?: () => void;
 };
 
 const ProductList: React.FC<ProductListProps> = ({

@@ -11,6 +11,7 @@ import Popover from "@/components/common/overlay/Popover";
 import BottomSheet from "@/components/common/overlay/BottomSheet";
 import { OPTION_MAP } from "@/components/filter/dropdown/config";
 import type {
+  Selected,
   Filter,
   ListFilter,
   AmountFilter,
@@ -24,7 +25,7 @@ const isList = (f?: Filter): f is ListFilter =>
 const isAmount = (f?: Filter): f is AmountFilter => !!f && f.kind === "amount";
 const isRange = (f?: Filter): f is RangeFilter => !!f && f.kind === "range";
 
-type Selected = Record<ListCategory, string[]>;
+// type Selected = Record<ListCategory, string[]>;
 type RangeState = { min?: number; max?: number };
 
 type Props = {
@@ -34,17 +35,17 @@ type Props = {
     selected: Selected;
     amount?: number;
     monthlyAmount?: number;
-    baseRate: RangeState;
-    maxRate: RangeState;
-    totalAmount: RangeState;
+    baseRate?: RangeState;
+    maxRate?: RangeState;
+    totalAmount?: RangeState;
   };
   actions: {
     setSelected: React.Dispatch<React.SetStateAction<Selected>>;
-    setAmount: React.Dispatch<React.SetStateAction<number | undefined>>;
-    setMonthlyAmount: React.Dispatch<React.SetStateAction<number | undefined>>;
-    setBaseRate: React.Dispatch<React.SetStateAction<RangeState>>;
-    setMaxRate: React.Dispatch<React.SetStateAction<RangeState>>;
-    setTotalAmount: React.Dispatch<React.SetStateAction<RangeState>>;
+    setAmount?: React.Dispatch<React.SetStateAction<number | undefined>>;
+    setMonthlyAmount?: React.Dispatch<React.SetStateAction<number | undefined>>;
+    setBaseRate?: React.Dispatch<React.SetStateAction<RangeState>>;
+    setMaxRate?: React.Dispatch<React.SetStateAction<RangeState>>;
+    setTotalAmount?: React.Dispatch<React.SetStateAction<RangeState>>;
   };
 
   //최종 queryParam 넘기기 위한 타입정의 부분
