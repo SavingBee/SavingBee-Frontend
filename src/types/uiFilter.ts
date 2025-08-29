@@ -6,6 +6,15 @@
  *
  * apiFilter.ts 타입을 추가    -------fieldKey
  */
+export type Selected = {
+  bankType: string[];
+  benefit: string[];
+  target: string[];
+  term: string[];
+  interestType: string[];
+  rsrvType?: string[]; // saving 전용은 optional로
+};
+
 export type ListCategory =
   | "bankType"
   | "benefit"

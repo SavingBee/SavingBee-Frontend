@@ -7,10 +7,10 @@ import ProductList from "@/components/product/ProductList";
 import type { ProductListItemProps } from "../product/ProductListItem";
 //검색관련
 import { useSearchQuery } from "@/hooks/filter/useSearchQuery";
-import type { SearchResponse } from "@/types/search";
 
 //api
 import { searchProducts } from "@/api/search";
+import type { SearchResponse } from "@/types/search";
 
 // type ProductListItemProps = {
 //   id: string | number;
@@ -212,18 +212,17 @@ export default function SearchBox() {
                     `‘${q}’에 대한 검색 결과가 없습니다. 인기 상품을 추천합니다.`}{" "}
                 </div>
               )}
-              <ProductList
-                open={open}
-                loading={loading}
-                listClassName={searchMain}
-                items={results}
-                disableItemActions
-                onSelect={(item: ProductListItemProps) => {
-                  setOpen(false);
-                  navigate(`/products/${item.fin_prdt_cd}`);
-                }}
-                onClose={() => setOpen(false)}
-              />
+              {open && (
+                <ProductList
+                  listClassName={searchMain}
+                  items={results}
+                  disableItemActions
+                  onSelect={(item: ProductListItemProps) => {
+                    navigate(`/products/${item.fin_prdt_cd}`);
+                  }}
+                  onClose={() => setOpen(false)}
+                />
+              )}
             </>
           ) : (
             <div className="py-10 px-4 text-center text-sm text-gray-500">

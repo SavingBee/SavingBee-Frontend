@@ -1,16 +1,33 @@
-type ProductDetail = {
-  id: string;
-  bankName: string;
-  productName: string;
-  baseRate: number;
-  maxRate: number;
-};
+import type { ProductDetail } from "@/types/productDetail";
+// type ProductDetail = {
+//   id: string;
+//   bankName: string;
+//   productName: string;
+//   baseRate: number;
+//   maxRate: number;
+// };
 type ProductDetailHeroProps = {
   product: ProductDetail;
 };
 
+//api의  interest_rates []  이부분 변환 필요
+//기본금리, 최고금리
+function pickTopRates(product: ProductDetail) {
+  const rates = product.interest_rates ?? [];
+  if (!rates.length) return { baseRate: 0, maxRate: 0 };
+
+  const baseRate = Math.max(...rates.map((r) => r.intr_rate));
+  const maxRate = Math.max(...rates.map((r) => r.intr_rate2));
+  return {
+    baseRate: Number.isFinite(baseRate) ? baseRate : 0,
+    maxRate: Number.isFinite(maxRate) ? maxRate : 0,
+  };
+}
+
 export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
-  const { id, bankName, productName, baseRate, maxRate } = product;
+  const bankName = product.kor_co_nm;
+  const productName = product.fin_prdt_nm;
+  const { baseRate, maxRate } = pickTopRates(product);
   return (
     <header className="rounded-2xl bg-primary text-white shadow-md p-6 ">
       <div className="flex items-center justify-between gap-4">

@@ -7,11 +7,10 @@ import SavingPage from "@/pages/product/SavingsPage";
 import ProductDetail from "@/pages/product/ProductDetail";
 import SearchEntryPage from "@/pages/SearchEntryPage";
 import ProductComparePage from "@/pages/ProductComparePage";
-// import ProductSearchPage from "@/pages/ProductSearchPage";
 import LoginLayout from "@/layout/LoginLayout";
 import FindId from "@/pages/FindId";
 import FindPassword from "@/pages/FindPassword";
-import SearchBox from "@/components/search/SearchBox";
+// import SearchBox from "@/components/search/SearchBox";
 import Mypage from "@/pages/Mypage";
 
 const Router = () => {
@@ -20,12 +19,10 @@ const Router = () => {
       <Route element={<Layout />}>
         <Route path="/deposit" element={<DepositPage />} />
         <Route path="/savings" element={<SavingPage />} />
-        <Route path="/detail" element={<ProductDetail />} />
-        {/* <Route path="/products/:id" element={<ProductDetail />} /> */}
+        <Route path="/products/:productId" element={<ProductDetail />} />
         <Route path="/" element={<SearchEntryPage />} />
         <Route path="/product/compare" element={<ProductComparePage />} />
-        {/* <Route path="/product/search" element={<ProductSearchPage />} /> */}
-        <Route path="/search-test" element={<SearchBox />} />
+        {/* <Route path="/search-test" element={<SearchBox />} /> */}
         <Route path="/mypage" element={<Mypage />} />
       </Route>
       <Route element={<LoginLayout />}>
