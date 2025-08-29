@@ -1,21 +1,22 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { FaSearch, FaPlus } from "react-icons/fa";
-import Checkbox from "../common/input/Checkbox";
-import IcnButton from "../common/button/IcnButton";
+import Checkbox from "@/components/common/input/Checkbox";
+import IcnButton from "@/components/common/button/IcnButton";
 import { LuDot } from "react-icons/lu";
+import BankLogo from "@/components/product/BankLogo";
 
 /**
  * #34A853, #1976D3
  */
 
 export type ProductListItemProps = {
-  fin_prdt_cd: string; // key
-  fin_prdt_nm: string; // 상품명
-  kor_co_nm: string; // 은행명
+  fin_prdt_cd: string; // id
+  fin_prdt_nm: string;
+  kor_co_nm: string;
   max_intr_rate: number;
   base_intr_rate: number;
   product_type?: "deposit" | "savings"; // 필요시 분기 처리
-  //logo_url?: string; //  TODO: API에 추가 가능한지 확인
 
   onCompare?: () => void;
   variant?: "search" | "compare" | "mylist" | "recommend";
@@ -51,6 +52,7 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
   expectedInterest,
   interestDiff,
 }) => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const isCompare = variant === "compare";
 
@@ -64,8 +66,10 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
       onItemClick?.();
       return;
     }
-    // 기본 모드일 때만 버튼 토글 유지
+    // 기본 모드일 때만 버튼 토글 유지 , 상세페이지 이동
     setIsOpen((v) => !v);
+    navigate(`/products/${encodeURIComponent(fin_prdt_cd)}`);
+    // console.log(fin_prdt_cd);
   }
 
   const containerClass = [
@@ -95,16 +99,18 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
         )}
         {/* 은행 로고 */}
         <div className="h-10 w-10 rounded-full overflow-hidden border border-graye5">
-          <img
-            src=""
-            alt={`${kor_co_nm} 로고`}
-            className="object-cover ring-1 ring-gray-200"
+          <BankLogo
+            korCoName={kor_co_nm}
+            className="object-cover ring-1 ring-gray-200 w-10 h-10 rounded"
+            variant="random" // hash
           />
         </div>
         <div className="flex-1 min-w-0 text-left">
           {/* 추천 상품 리스트 일 때 */}
           {variant === "recommend" && (
-            <span className="font-bold text-xs text-primary">{recommendReason}</span>
+            <span className="font-bold text-xs text-primary">
+              {recommendReason}
+            </span>
           )}
           {/* 상품명 */}
           <h3 className="truncate text-base md:text-lg font-bold">
@@ -131,14 +137,20 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
             <span>보유 상품</span>
             <strong className="font-semibold">{ownedProductName}</strong>
           </div>
-          <span><LuDot color="#999" /></span>
+          <span>
+            <LuDot color="#999" />
+          </span>
           {expectedInterest !== undefined && (
             <div className="flex gap-2 text-sm">
               <span>예상 추가 이자(연간)</span>
-              <strong className="font-semibold">{expectedInterest.toLocaleString()}원</strong>
+              <strong className="font-semibold">
+                {expectedInterest.toLocaleString()}원
+              </strong>
             </div>
           )}
-          <span><LuDot color="#999" /></span>
+          <span>
+            <LuDot color="#999" />
+          </span>
           {interestDiff !== undefined && (
             <div className="flex gap-2 text-sm">
               <span>상품 대비 금리 차이</span>
@@ -148,118 +160,116 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
         </div>
       )}
 
-
-
-
-      {["search", "mylist", "recommend"].includes(variant) && !disableActions && (
-        <div
-          className="overflow-hidden transition-[max-height] duration-300 ease-in-out bg-[#f9f9f9] text-sm text-gray-700 rounded-xl rounded-t-none"
-          style={{ maxHeight: isOpen ? "50px" : "0px" }}
-        >
-          <div className="flex items-center justify-between h-[50px] px-4">
-            {variant === "search" && (
-              <>
-                {/* 돋보기 버튼 */}
-                <IcnButton
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    console.log("상세보기 클릭");
-                  }}
-                  icon={<FaSearch size={10} color="#fff" />}
-                  className="text-primary"
-                  iconClassName="bg-primary"
-                >
-                  상세보기
-                </IcnButton>
-
-                {/* 비교함 담기 버튼 */}
-                <IcnButton
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onCompare?.();
-                  }}
-                  icon={<FaPlus size={10} color="#fff" />}
-                  className="text-green"
-                  iconClassName="bg-green"
-                >
-                  비교함 담기
-                </IcnButton>
-              </>
-            )}
-
-            {/* 마이페이지 내 상품 리스트 일 때 */}
-            {variant === "mylist" && (
-              <>
-                <IcnButton
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    console.log("상세보기 클릭");
-                  }}
-                  icon={<FaSearch size={10} color="#fff" />}
-                  className="text-primary"
-                  iconClassName="bg-primary"
-                >
-                  상세보기
-                </IcnButton>
-                <div className="flex items-center justify-between gap-3">
+      {["search", "mylist", "recommend"].includes(variant) &&
+        !disableActions && (
+          <div
+            className="overflow-hidden transition-[max-height] duration-300 ease-in-out bg-[#f9f9f9] text-sm text-gray-700 rounded-xl rounded-t-none"
+            style={{ maxHeight: isOpen ? "50px" : "0px" }}
+          >
+            <div className="flex items-center justify-between h-[50px] px-4">
+              {variant === "search" && (
+                <>
+                  {/* 돋보기 버튼 */}
                   <IcnButton
                     type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      console.log("상세보기 클릭");
+                    }}
+                    icon={<FaSearch size={10} color="#fff" />}
+                    className="text-primary"
+                    iconClassName="bg-primary"
+                  >
+                    상세보기
+                  </IcnButton>
+
+                  {/* 비교함 담기 버튼 */}
+                  <IcnButton
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onCompare?.();
+                    }}
+                    icon={<FaPlus size={10} color="#fff" />}
                     className="text-green"
                     iconClassName="bg-green"
-                    icon={<FaSearch size={10} color="#fff" />}
                   >
-                    수정
+                    비교함 담기
                   </IcnButton>
+                </>
+              )}
+
+              {/* 마이페이지 내 상품 리스트 일 때 */}
+              {variant === "mylist" && (
+                <>
                   <IcnButton
                     type="button"
-                    className="text-red"
-                    iconClassName="bg-red"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      console.log("상세보기 클릭");
+                    }}
                     icon={<FaSearch size={10} color="#fff" />}
+                    className="text-primary"
+                    iconClassName="bg-primary"
                   >
-                    삭제
+                    상세보기
                   </IcnButton>
-                </div>
-              </>
-            )}
+                  <div className="flex items-center justify-between gap-3">
+                    <IcnButton
+                      type="button"
+                      className="text-green"
+                      iconClassName="bg-green"
+                      icon={<FaSearch size={10} color="#fff" />}
+                    >
+                      수정
+                    </IcnButton>
+                    <IcnButton
+                      type="button"
+                      className="text-red"
+                      iconClassName="bg-red"
+                      icon={<FaSearch size={10} color="#fff" />}
+                    >
+                      삭제
+                    </IcnButton>
+                  </div>
+                </>
+              )}
 
-            {/* 추천 상품 리스트일 때 */}
-            {variant === "recommend" && (
-              <>
-                {/* 돋보기 버튼 */}
-                <IcnButton
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    console.log("상세보기 클릭");
-                  }}
-                  icon={<FaSearch size={10} color="#fff" />}
-                  className="text-primary"
-                  iconClassName="bg-primary"
-                >
-                  상세보기
-                </IcnButton>
+              {/* 추천 상품 리스트일 때 */}
+              {variant === "recommend" && (
+                <>
+                  {/* 돋보기 버튼 */}
+                  <IcnButton
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      console.log("상세보기 클릭");
+                    }}
+                    icon={<FaSearch size={10} color="#fff" />}
+                    className="text-primary"
+                    iconClassName="bg-primary"
+                  >
+                    상세보기
+                  </IcnButton>
 
-                {/* 비교함 담기 버튼 */}
-                <IcnButton
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onCompare?.();
-                  }}
-                  icon={<FaPlus size={10} color="#fff" />}
-                  className="text-green"
-                  iconClassName="bg-green"
-                >
-                  비교함 담기
-                </IcnButton>
-              </>
-            )}
+                  {/* 비교함 담기 버튼 */}
+                  <IcnButton
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onCompare?.();
+                    }}
+                    icon={<FaPlus size={10} color="#fff" />}
+                    className="text-green"
+                    iconClassName="bg-green"
+                  >
+                    비교함 담기
+                  </IcnButton>
+                </>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* 아코디언  --- disableActions 일때, 렌더 막기 */}
       {/* {variant === "search" && !disableActions && (
@@ -304,8 +314,6 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
           </div>
         </div>
       )} */}
-
-
     </li>
   );
 };

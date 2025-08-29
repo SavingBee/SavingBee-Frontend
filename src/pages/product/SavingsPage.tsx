@@ -38,8 +38,6 @@ const SavingsPage = () => {
   //     .catch((err) => console.error("API Error:", err));
   // }, []);
 
-  // const [filter, setFilter] = useState<SavingsFilter>(initial);
-
   const navigate = useNavigate();
   const { q, applySearch } = useSearchQuery(); //검색 훅
   const { apply } = useQueryParams(["q"]); //필터 훅
@@ -47,13 +45,13 @@ const SavingsPage = () => {
   // 화면 상태
   const [keyword, setKeyword] = useState("");
   const [items, setItems] = useState<any[]>([]);
-  const [isPopular, setIsPopular] = useState(false);
+  const [isPopular, _setIsPopular] = useState(false);
   const [page, setPage] = useState(1);
 
   const [totalPages, setTotalPages] = useState(1);
   const [totalData, setTotalData] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [_loading, setLoading] = useState(false);
+  const [_error, setError] = useState("");
 
   //새로고침 - url 리셋
   useEffect(() => {
@@ -70,8 +68,6 @@ const SavingsPage = () => {
   const location = useLocation();
   useEffect(() => {
     const sp = new URLSearchParams(location.search);
-    if (!sp.get("page")) sp.set("page", "1");
-    if (!sp.get("pageSize")) sp.set("pageSize", "10");
 
     const params = Object.fromEntries(sp.entries()); // 전부 문자열
 
@@ -84,7 +80,7 @@ const SavingsPage = () => {
 
     fetchSavingsList(params as any)
       .then((data) => {
-        console.log("[API raw]", data);
+        // console.log("[API raw]", data);
         setItems(data.content ?? []);
         setTotalPages(data.totalPages ?? 1);
         setTotalData(data.totalElements ?? "");
@@ -139,13 +135,13 @@ const SavingsPage = () => {
     if (typeof snapshot.maxRateMax === "number")
       flat.intrRate2Max = snapshot.maxRateMax;
 
-    // 적금 전용(단일 값)
+    // 적금 전용(단일 값  -- 월 저축금, 총 저축금)
     if (typeof snapshot.monthlyAmount === "number")
       flat.monthlyMaxLimit = snapshot.monthlyAmount;
     if (typeof snapshot.totalAmountMax === "number")
       flat.totalMaxLimit = snapshot.totalAmountMax;
 
-    // 예금 전용(가입한도 범위)
+    // 예금 전용(가입한도 범위-최소,최대)
     // if (typeof snapshot.totalAmountMin === "number")
     //   flat.maxLimitMin = snapshot.totalAmountMin;
     // if (typeof snapshot.totalAmountMax === "number")
@@ -259,7 +255,6 @@ const SavingsPage = () => {
           <>
             {isPopular && (
               <div className="pb-3">
-                {" "}
                 <h3 className="mt-2 text-lg font-semibold">추천상품</h3>{" "}
                 <p className="text-sm text-gray-500">
                   검색 결과가 없어 인기 상품을 추천합니다
@@ -273,7 +268,7 @@ const SavingsPage = () => {
           </>
         ) : (
           q && <p className="text-sm text-gray-500">검색 결과가 없습니다.</p>
-        )}{" "}
+        )}
       </main>
       {/* <main>
         {sampleProducts.length > 0 ? (
