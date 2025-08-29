@@ -4,6 +4,8 @@ export const LIST_KEY_MAP: Record<string, string> = {
   target: "joinDeny",
   term: "saveTrm",
   interestType: "intrRateType",
+  //적금 - 총 저축금
+  totalAmount: "totalMaxLimit",
   //rsrvType
 };
 
