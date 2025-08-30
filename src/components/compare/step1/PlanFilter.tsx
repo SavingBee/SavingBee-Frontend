@@ -1,18 +1,7 @@
 import { ProductType } from "@/types/product";
 import { DepositField } from "./DepositField";
 import { SavingField } from "./SavingField";
-
-export type SavingsFilter = {
-  amount?: number;
-  months?: number;
-  rate?: number;
-  rateType?: "단리" | "복리" | "";
-};
-
-export type DepositFilter = {
-  principal?: number;
-  rate?: number;
-};
+import { DepositFilter, SavingsFilter } from "@/types/compare";
 
 type PlanFilterProps = {
   kind: ProductType;
