@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import EditableValue from "./EditableValue";
-import type { SavingsFilter } from "./PlanFilter";
+import { SavingsFilter } from "@/types/compare";
 
 const MIN_SAVINGS_AMOUNT = 10_000;
 const MAX_SAVINGS_AMOUNT = 3_000_000;
@@ -16,17 +16,13 @@ interface SavingFieldProps {
 export function SavingField({ onChange }: SavingFieldProps) {
   const [amount, setAmount] = useState<number | "">("");
   const [months, setMonths] = useState<number | "">("");
-
   const [minRate, setMinRate] = useState<number | "">("");
-  const [maxRate, setMaxRate] = useState<number | "">("");
-
-  const [rateType, setRateType] = useState<"단리" | "복리" | "any">();
+  const [rateType, setRateType] = useState<"단리" | "복리">();
 
   const [touched, setTouched] = useState({
     amount: false,
     months: false,
     minRate: false,
-    maxRate: false,
     rateType: false,
   });
 
@@ -45,43 +41,37 @@ export function SavingField({ onChange }: SavingFieldProps) {
     minRate <= MAX_SAVINGS_RATE;
 
   const validMaxRate =
-    typeof maxRate === "number" &&
-    maxRate >= MIN_SAVINGS_RATE &&
-    maxRate <= MAX_SAVINGS_RATE;
-
-  const validRateOrder =
     typeof minRate === "number" &&
-    typeof maxRate === "number" &&
-    minRate <= maxRate;
+    minRate >= MIN_SAVINGS_RATE &&
+    minRate <= MAX_SAVINGS_RATE;
 
-  const validRates = validMinRate && validMaxRate && validRateOrder;
+  const validRates = validMinRate && validMaxRate;
 
-  const validRateType =
-    rateType === "단리" || rateType === "복리" || rateType === "any";
+  const validRateType = rateType === "단리" || rateType === "복리";
 
   const valid = validAmount && validMonths && validRates && validRateType;
-
   useEffect(() => {
     onChange?.(
       {
+        kind: "savings",
         amount: typeof amount === "number" ? amount : undefined,
-        months: typeof months === "number" ? months : undefined,
+        months:
+          typeof months === "number" ? (months as 6 | 12 | 24 | 36) : undefined,
         minRate: typeof minRate === "number" ? minRate : undefined,
-        maxRate: typeof maxRate === "number" ? maxRate : undefined,
         rateType,
-      } as unknown as SavingsFilter,
+      },
       valid,
     );
-  }, [amount, months, minRate, maxRate, rateType, valid, onChange]);
+  }, [amount, months, minRate, rateType, valid, onChange]);
 
   const showAmountErr = touched.amount && !validAmount;
   const showMonthsErr = touched.months && !validMonths;
-  const showRatesErr = (touched.minRate || touched.maxRate) && !validRates;
+  const showRatesErr = touched.minRate && !validRates;
   const showRateTypeErr = touched.rateType && !validRateType;
 
   return (
     <div className="w-full rounded-md border border-graye5 bg-grayf9">
-      <div className="grid grid-cols-4 divide-x divide-graye5">
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 divide-x divide-graye5">
         <div className="p-6">
           <div className="text-base text-gray6">저축금액</div>
           <span className="text-primary font-bold">매월</span>
@@ -102,7 +92,7 @@ export function SavingField({ onChange }: SavingFieldProps) {
               format="currency"
               inputMode="numeric"
               className="text-[28px] font-bold text-primary"
-              inputClassName="text-[28px] font-bold text-primary w-40"
+              inputClassName="text-[28px] font-bold text-primary w-40 "
               invalid={showAmountErr}
             />
           </div>
@@ -117,7 +107,7 @@ export function SavingField({ onChange }: SavingFieldProps) {
           )}
           <div className="mt-2 h-[64px] flex items-end">
             <select
-              className={`mt-3 w-full bg-transparent border-b-2 pb-1 text-[28px] font-bold outline-none ${
+              className={`mt-3 w-40 bg-transparent border-b-2 pb-1 text-[28px] font-bold outline-none ${
                 showMonthsErr
                   ? "border-red-400 text-red"
                   : "border-primary text-primary"
@@ -140,18 +130,13 @@ export function SavingField({ onChange }: SavingFieldProps) {
         </div>
 
         <div className="p-6">
-          <div className="text-base text-gray6">연 이자율</div>
+          <div className="text-base text-gray6">최소 이자율</div>
           {showRatesErr && (
             <div className="mt-1 space-y-1">
               {(!validMinRate || !validMaxRate) && (
                 <p className="text-base text-red">
                   이자율은 {MIN_SAVINGS_RATE}% ~ {MAX_SAVINGS_RATE}% 사이로
                   입력하세요.
-                </p>
-              )}
-              {validMinRate && validMaxRate && !validRateOrder && (
-                <p className="text-base text-red">
-                  최소 이자율이 최대 이자율보다 클 수 없어요.
                 </p>
               )}
             </div>
@@ -171,21 +156,6 @@ export function SavingField({ onChange }: SavingFieldProps) {
               inputMode="decimal"
               invalid={showRatesErr}
             />
-            <span className="px-2 text-gray-500 text-[20px]">~</span>
-            <EditableValue
-              value={maxRate}
-              onChange={(v) => {
-                setMaxRate(typeof v === "number" ? v : "");
-                setTouched((t) => ({ ...t, maxRate: true }));
-              }}
-              placeholder="0.0"
-              suffix="%"
-              format="percent"
-              className="text-[28px] font-bold text-primary"
-              inputClassName="text-[28px] font-bold text-primary w-20"
-              inputMode="decimal"
-              invalid={showRatesErr}
-            />
           </div>
         </div>
 
@@ -196,21 +166,20 @@ export function SavingField({ onChange }: SavingFieldProps) {
           )}
           <div className="mt-2 h-[64px] flex items-end">
             <select
-              className={`mt-3 w-full bg-transparent border-b-2 pb-1 text-[28px] font-bold outline-none ${
+              className={`mt-3 w-40 bg-transparent border-b-2 pb-1 text-[28px] font-bold outline-none ${
                 showRateTypeErr
                   ? "border-red-400 text-red"
                   : "border-primary text-primary"
               }`}
               value={rateType}
               onChange={(e) => {
-                setRateType(e.target.value as "단리" | "복리" | "any");
+                setRateType(e.target.value as "단리" | "복리");
                 setTouched((t) => ({ ...t, rateType: true }));
               }}
             >
               <option value="">선택</option>
               <option value="단리">단리</option>
               <option value="복리">복리</option>
-              <option value="any">상관없음</option>
             </select>
           </div>
         </div>
