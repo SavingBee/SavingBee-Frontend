@@ -43,7 +43,7 @@ export default function CompareSection({
 
   return (
     <div>
-      <div className="flex gap-6">
+      <div className="lg:flex gap-6">
         <CompareCard
           cardNum={0}
           item={left}
@@ -79,7 +79,7 @@ export default function CompareSection({
           type="button"
           variant="sm"
           styleVariant="bg"
-          className="bg-black6 mt-3 w-48 h-12"
+          className="bg-black6 mt-3 w-48 h-[50px]"
           onClick={onReset}
           disabled={items.length === 0}
         >
