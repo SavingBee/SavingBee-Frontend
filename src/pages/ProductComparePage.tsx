@@ -14,11 +14,13 @@ import {
   DepositFilter,
   CompareRequest,
   CompareResponseItem,
+  CompareListQuery,
 } from "@/types/compare";
 
 type Item = CompareListItem;
 
 const toApiRateType = (rt?: "단리" | "복리") => (rt === "복리" ? "M" : "S");
+
 const buildCompareBody = (
   kind: ProductType,
   plan: SavingsFilter | DepositFilter,
@@ -37,6 +39,29 @@ const buildCompareBody = (
     intrRateType: toApiRateType(plan.rateType),
   };
 };
+
+const buildListQuery = (
+  kind: ProductType,
+  plan: SavingsFilter | DepositFilter,
+  page: number,
+  size = 20,
+): CompareListQuery => {
+  const isSavings = kind === "savings";
+  const p = plan as SavingsFilter | DepositFilter;
+
+  return {
+    type: isSavings ? "S" : "D",
+    amount: isSavings
+      ? ((p as SavingsFilter).amount ?? 0)
+      : ((p as DepositFilter).principal ?? 0),
+    termMonth: (p.months ?? 12) as 6 | 12 | 24 | 36,
+    minRate: p.minRate ?? 0,
+    intrRateType: toApiRateType(p.rateType),
+    page: Math.max(0, page - 1),
+    size,
+  };
+};
+
 export default function ProductComparePage() {
   const [kind, setKind] = useState<ProductType>("deposit");
   const [planValid, setPlanValid] = useState(false);
@@ -49,10 +74,15 @@ export default function ProductComparePage() {
   });
 
   const [visibleItems, setVisibleItems] = useState<Item[]>([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
   const [selected, setSelected] = useState<Item[]>([]);
   const selectedIds = selected.map((x) => x.id);
+
   const [winnerId, setWinnerId] = useState<string | null>(null);
   const [compareItems, setCompareItems] = useState<CompareResponseItem[]>([]);
+
   const [openSections, setOpenSections] = useState<{ 2: boolean; 3: boolean }>({
     2: false,
     3: false,
@@ -64,8 +94,6 @@ export default function ProductComparePage() {
       ? planRateType
       : undefined;
 
-  // const [page, setPage] = useState(1);
-  // const [totalPages, setTotalPages] = useState(1);
   const handleTabChange = (v: ProductType) => {
     setKind(v);
     setPlanValid(false);
@@ -78,12 +106,10 @@ export default function ProductComparePage() {
     setSelected([]);
     setCompareItems([]);
     setVisibleItems([]);
-    // setPage(1);
-    // setTotalPages(1);
+    setPage(1);
+    setTotalPages(1);
     setOpenSections({ 2: false, 3: false });
   };
-
-  console.log(selected, "selecteddddddddddd");
 
   const toggleSelect = (id: string) => {
     setSelected((prev) => {
@@ -99,26 +125,22 @@ export default function ProductComparePage() {
     setSelected((prev) => prev.filter((x) => x.id !== id));
   const resetSelected = () => setSelected([]);
 
+  // 비교하기
   const submitCompare = async () => {
     if (selected.length < 2) return;
-
     try {
       const body = buildCompareBody(kind, plan, selectedIds);
       const res = await compareProduct(body);
-      console.log(res, "ressssssssss");
       setCompareItems(res.info);
       setWinnerId(res.winnerId);
       setOpenSections((s) => ({ ...s, 3: true }));
+      document
+        .getElementById("compare-anchor")
+        ?.scrollIntoView({ behavior: "smooth" });
     } catch (e) {
       console.error("비교하기 실패:", e);
     }
-
-    document
-      .getElementById("compare-anchor")
-      ?.scrollIntoView({ behavior: "smooth" });
   };
-
-  const resetCompare = () => setCompareItems([]);
 
   useEffect(() => {
     if (selected.length < 2) {
@@ -130,30 +152,34 @@ export default function ProductComparePage() {
   const handleApply = async () => {
     if (!planValid) return;
     try {
-      if (kind === "savings") {
-        const p = plan as SavingsFilter;
-        const data = await getCompareProduct({
-          type: "S",
-          amount: p.amount ?? 0,
-          termMonth: (p.months ?? 12) as 6 | 12 | 24 | 36,
-          minRate: p.minRate ?? 0,
-          intrRateType: toApiRateType(p.rateType),
-        });
-        setVisibleItems(data);
-      } else {
-        const p = plan as DepositFilter;
-        const data = await getCompareProduct({
-          type: "D",
-          amount: p.principal ?? 0,
-          termMonth: (p.months ?? 12) as 6 | 12 | 24 | 36,
-          minRate: p.minRate ?? 0,
-          intrRateType: toApiRateType(p.rateType),
-        });
-        setVisibleItems(data);
-      }
+      const params = buildListQuery(kind, plan, 1);
+      const {
+        items,
+        page: p,
+        totalPages: tp,
+      } = await getCompareProduct(params);
+      setVisibleItems(items);
+      setPage(p);
+      setTotalPages(tp);
       setOpenSections((s) => ({ ...s, 2: true }));
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const handleChangePage = async (next: number) => {
+    try {
+      const params = buildListQuery(kind, plan, next);
+      const {
+        items,
+        page: p,
+        totalPages: tp,
+      } = await getCompareProduct(params);
+      setVisibleItems(items);
+      setPage(p);
+      setTotalPages(tp);
+    } catch (e) {
+      console.error(e);
     }
   };
 
@@ -192,9 +218,9 @@ export default function ProductComparePage() {
             items={visibleItems}
             selectedIds={selectedIds}
             onToggleSelect={toggleSelect}
-            // currentPage={}
-            // totalPage={}
-            // onChangePage={}
+            currentPage={page}
+            totalPage={totalPages}
+            onChangePage={handleChangePage}
           />
           <CardSection
             selected={selected}
@@ -217,7 +243,7 @@ export default function ProductComparePage() {
             productType={kind}
             rateType={normalizedRateType}
             onReset={() => {
-              resetCompare();
+              setCompareItems([]);
               resetSelected();
             }}
           />

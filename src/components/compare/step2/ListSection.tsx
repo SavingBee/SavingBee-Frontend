@@ -1,4 +1,4 @@
-// import Pagination from "@/components/common/Pagination";
+import Pagination from "@/components/common/Pagination";
 import ProductList from "@/components/product/ProductList";
 
 import type { ProductListItemProps } from "@/components/product/ProductListItem";
@@ -8,7 +8,6 @@ type ViewItem = ProductListItemProps & { id: string };
 
 const toViewItem = (x: CompareListItem): ViewItem => ({
   id: x.id,
-  // logo_url: x.logoUrl,
   fin_prdt_cd: x.id,
   fin_prdt_nm: x.productName,
   kor_co_nm: x.bankName,
@@ -20,16 +19,16 @@ export default function ListSection({
   items,
   selectedIds,
   onToggleSelect,
-  // currentPage,
-  // totalPage,
-  // onChangePage,
+  currentPage,
+  totalPage,
+  onChangePage,
 }: {
   items: CompareListItem[];
   selectedIds: string[];
   onToggleSelect: (id: string) => void;
-  // currentPage: number;
-  // totalPage: number;
-  // onChangePage: (page: number) => void;
+  currentPage: number;
+  totalPage: number;
+  onChangePage: (page: number) => void;
 }) {
   const hasItems = items?.length > 0;
   const viewItems = hasItems ? items.map(toViewItem) : [];
@@ -61,11 +60,13 @@ export default function ListSection({
             조건에 맞는 상품이 없습니다.
           </div>
         )}
-        {/* <Pagination
-          currentPage={0}
-          totalPages={10}
-          onChange={()=> }
-        /> */}
+        <div className="mt-4">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPage}
+            onChange={onChangePage}
+          />
+        </div>
       </div>
     </div>
   );
