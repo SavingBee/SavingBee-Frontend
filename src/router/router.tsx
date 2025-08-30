@@ -12,6 +12,8 @@ import FindId from "@/pages/FindId";
 import FindPassword from "@/pages/FindPassword";
 // import SearchBox from "@/components/search/SearchBox";
 import Mypage from "@/pages/Mypage";
+import FindIdStep2 from "@/components/find/id/step/FindIdStep2";
+import FindPasswordStep2 from "@/components/find/password/step/FindPasswordStep2";
 
 const Router = () => {
   return (
@@ -29,7 +31,9 @@ const Router = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/find_id" element={<FindId />} />
-        <Route path="/find_password" element={<FindPassword />} />
+        <Route path="/find/password" element={<FindPassword />} />
+        <Route path="/find/id/result" element={<FindIdStep2 />} />
+        <Route path="/find/password/result" element={<FindPasswordStep2 />} />
       </Route>
     </Routes>
   );

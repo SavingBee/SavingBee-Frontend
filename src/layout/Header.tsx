@@ -2,12 +2,17 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import MobileMenu from "./MobileMenu";
 import { menuItems } from "@/constants/menuData";
+import useAuthHeader from "@/hooks/auth/useAuthHeader";
 
 import { BiMenu } from "react-icons/bi";
 import { GoPeople } from "react-icons/go";
+import { MdLogout } from "react-icons/md";
+import { logout } from "@/api/auth/logout";
 
 const Header = () => {
   const [open, setOpen] = useState(false);
+
+  const isLoggedIn = useAuthHeader();
 
   // 모바일 메뉴 열릴 때 body 스크롤 X
   useEffect(() => {
@@ -37,13 +42,23 @@ const Header = () => {
         </ul>
         {/* 우측 유틸 */}
         <div className="hidden md:flex items-center gap-[8px]">
-          <Link
-            to="/login"
-            className="flex items-center gap-1 text-sm font-medium"
-          >
-            <GoPeople size={17} color="#444" />
-            로그인/회원가입
-          </Link>
+          {isLoggedIn ? (
+            <button
+              className="flex items-center gap-1 text-sm font-medium"
+              onClick={logout}
+            >
+              <MdLogout size={17} color="#444" />
+              로그아웃
+            </button>
+          ) : (
+            <Link
+              to="/login"
+              className="flex items-center gap-1 text-sm font-medium"
+            >
+              <GoPeople size={17} color="#444" />
+              로그인/회원가입
+            </Link>
+          )}
         </div>
 
         {/* (모바일)햄버거 버튼 */}
