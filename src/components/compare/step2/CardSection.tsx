@@ -1,4 +1,4 @@
-import { CompareListItem } from "@/mocks/data/compareProduct";
+import { CompareListItem } from "@/types/compare";
 import EmptyCard from "./EmptyCard";
 import SelectedCard from "./SelectedCard";
 import Button from "@/components/common/button/Button";
