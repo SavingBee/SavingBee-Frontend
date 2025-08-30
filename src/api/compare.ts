@@ -5,7 +5,7 @@ import type {
   CompareListResponse,
   CompareRequest,
   CompareResponse,
-  // GetCompareResponse,
+  GetCompareResponse,
 } from "@/types/compare";
 
 const bankLogo = (bankName: string) =>
@@ -20,44 +20,31 @@ const mapResponseToItem = (r: CompareListResponse): CompareListItem => ({
   maxRate: r.intrRate2,
 });
 
-type CompareListPage = { content: CompareListResponse[] };
-
-export async function getCompareProduct(
-  params: CompareListQuery,
-): Promise<CompareListItem[]> {
-  const { data } = await api.get<CompareListPage>("/api/compare", {
+export async function getCompareProduct(params: CompareListQuery): Promise<{
+  items: CompareListItem[];
+  page: number;
+  size: number;
+  totalPages: number;
+  totalElements: number;
+}> {
+  const { data } = await api.get<GetCompareResponse>("/api/compare", {
     params,
   });
-  console.log(data, "data 가져온값");
-  const list = Array.isArray(data?.content) ? data.content : [];
-  return list.map(mapResponseToItem);
+
+  const items = (data?.content ?? []).map(mapResponseToItem);
+
+  const size = data?.size ?? params.size ?? 20;
+  const totalElements = data?.totalElements ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalElements / size));
+
+  return {
+    items,
+    page: (data?.page ?? 0) + 1,
+    size,
+    totalPages,
+    totalElements,
+  };
 }
-
-// export async function getCompareProduct(params: CompareListQuery): Promise<{
-//   items: CompareListItem[];
-//   page: number;
-//   size: number;
-//   totalPages: number;
-//   totalElements: number;
-// }> {
-//   const { data } = await api.get<GetCompareResponse>("/api/compare", {
-//     params,
-//   });
-
-//   const items = (data?.content ?? []).map(mapResponseToItem);
-
-//   const size = data?.size ?? params.size ?? 20;
-//   const totalElements = data?.totalElements ?? 0;
-//   const totalPages = Math.max(1, Math.ceil(totalElements / size));
-
-//   return {
-//     items,
-//     page: (data?.page ?? 0) + 1,
-//     size,
-//     totalPages,
-//     totalElements,
-//   };
-// }
 
 export async function compareProduct(
   products: CompareRequest,
