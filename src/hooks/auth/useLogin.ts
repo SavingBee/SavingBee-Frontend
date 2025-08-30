@@ -7,16 +7,15 @@ const useLogin = () => {
     const [error, setError] = useState<string | null>(null);
 
     const submit = async (loginData: {
-        userId: string;
-        userPassword: string;
+        username: string;
+        password: string;
     }) => {
         setLoading(true);
         setError(null);
         try {
-            const res = await login(loginData);
-
-            localStorage.setItem("accessToken", res.data.accessToken);
-            localStorage.setItem("refreshToken", res.data.refreshToken);
+            await login(loginData);
+            alert("로그인 성공");
+            window.location.href = "/"; //메인으로 이동
         } catch (err) {
             const axiosError = err as AxiosError<{ message: string }>;
             setError(axiosError.response?.data?.message || "로그인 실패");
