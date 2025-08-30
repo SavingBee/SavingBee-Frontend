@@ -10,17 +10,20 @@ const api = axios.create({
     },
 });
 
+const token = localStorage.getItem("accessToken");
+
+// Authorization 헤더 추가
+if (token) {
+    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+}
+
 // 요청 인터셉터 (토큰이 필요한지)
 api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem("accessToken");
 
-        // 토큰이 필요한 경로 지정
-        const needAuth = ["/mypage"].some((url) =>
-            config.url?.startsWith(url)
-        );
-
-        if (token && needAuth) {
+        // 모든 요청에 자동으로 Authorization 헤더 추가
+        if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
 

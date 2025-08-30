@@ -5,14 +5,14 @@ import { useState } from "react";
 import useLogin from "@/hooks/auth/useLogin";
 
 const LoginForm = () => {
-    const [userId, setUserId] = useState("");
-    const [userPassword, setUserPassword] = useState("");
+    const [username, setUserName] = useState("");
+    const [password, setPassword] = useState("");
 
     const { submit } = useLogin();
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        submit({ userId, userPassword });
+        submit({ username, password });
     }
 
     return (
@@ -23,7 +23,7 @@ const LoginForm = () => {
                 id="userId"
                 placeholder="아이디"
                 inputClassName="w-full mb-1"
-                onChange={(e) => setUserId(e.target.value)}
+                onChange={(e) => setUserName(e.target.value)}
             />
             <InputField1
                 type="password"
@@ -31,7 +31,7 @@ const LoginForm = () => {
                 id="userPassword"
                 placeholder="비밀번호"
                 inputClassName="w-full mb-1"
-                onChange={(e) => setUserPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
             />
             <Button
                 type="submit"
