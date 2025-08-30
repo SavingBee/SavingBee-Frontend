@@ -43,7 +43,7 @@ export default function CompareCard({
   return (
     <div
       className={[
-        "border rounded-lg md:w-96 lg:w-[450px] xl:w-[560px]",
+        "border rounded-lg md:w-[450px] xl:w-[560px] mb-10 lg:mb-5",
         border,
         isWinner ? "ring-2 ring-primary/40" : "",
       ].join(" ")}
@@ -53,7 +53,7 @@ export default function CompareCard({
       >
         <div className="text-white">
           <div className="text-sm opacity-90">{item.bankName}</div>
-          <div className="text-xl font-semibold flex items-center gap-2">
+          <div className="text-base lg:text-xl font-semibold flex items-center gap-2">
             {item.productName}
             {isWinner && (
               <span className="ml-1 rounded bg-white/15 px-2 py-0.5 text-xs">

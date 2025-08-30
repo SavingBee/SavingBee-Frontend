@@ -19,7 +19,7 @@ export default function SelectedCard({
 }: SelectedCardProps) {
   return (
     <div
-      className={`relative ${selectNum === 0 ? "bg-purple" : "bg-cyan"} rounded-lg w-[399px] h-[212px] m-2 flex justify-center items-center`}
+      className={`relative ${selectNum === 0 ? "bg-purple" : "bg-cyan"} rounded-lg w-80 md:w-[399px] h-[212px] m-2 flex justify-center items-center`}
     >
       <Button
         type="button"

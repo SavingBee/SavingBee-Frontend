@@ -36,7 +36,7 @@ export default function CardSection({
           );
         })}
 
-        <div className="flex w-[399px]">
+        <div className="flex w-80 md:w-[399px]">
           <Button
             type="button"
             styleVariant="bg"
