@@ -1,12 +1,17 @@
-/**
- * (POST) 로그인 API
- */
-
 import api from "../api";
 
-export const login = (loginData: {
-    userId: string;
-    userPassword: string;
+export const login = async (loginData: {
+    username: string;
+    password: string;
 }) => {
-    return api.post("/auth/login", loginData);
+    // 로그인 요청
+    const res = await api.post("/login", loginData);
+
+    const token = res.data.accessToken;
+
+    localStorage.setItem("accessToken", token);
+
+    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+    return res.data;
 }
