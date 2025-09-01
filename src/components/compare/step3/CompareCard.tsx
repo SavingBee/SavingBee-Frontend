@@ -56,7 +56,7 @@ export default function CompareCard({
           <div className="text-base lg:text-xl font-semibold flex items-center gap-2">
             {item.productName}
             {isWinner && (
-              <span className="ml-1 rounded bg-white/15 px-2 py-0.5 text-xs">
+              <span className="ml-1 rounded bg-white/20 px-4 py-2 text-base">
                 추천
               </span>
             )}
