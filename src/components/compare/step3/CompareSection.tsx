@@ -43,6 +43,10 @@ export default function CompareSection({
 
   return (
     <div>
+      <div className="mb-4 font-bold">
+        ※ 모든 이자 및 실수령액은 세후 이자율을 기준으로 계산됩니다.
+      </div>
+
       <div className="lg:flex gap-6">
         <CompareCard
           cardNum={0}
