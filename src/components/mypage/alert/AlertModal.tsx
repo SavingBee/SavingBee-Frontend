@@ -3,122 +3,444 @@ import Select from "@/components/common/button/Select";
 import Checkbox from "@/components/common/input/Checkbox";
 import InputField1 from "@/components/common/input/InputField1";
 import Radiobox from "@/components/common/input/Radiobox";
-import Modal from "@/components/common/modal/Modal"
-import { useMemo, useState } from "react";
+import Modal from "@/components/common/modal/Modal";
+import { useEffect, useMemo, useState } from "react";
 
-type AlertType = "EMAIL" | "SNS" | "PUSH";
+import { getAlert, createAlert, patchAlert } from "@/api/alert";
+import type { AlertSettingsBody, AlertSettingsResponse } from "@/types/alert";
+
+type AlertType = "EMAIL" | "SMS" | "PUSH";
 const ALLOWED_MONTHS = [6, 12, 24, 36] as const;
 type TermMonth = (typeof ALLOWED_MONTHS)[number] | "";
+type ProductKind = "deposit" | "savings";
+type InterestKind = "S" | "M";
+
+const MIN_RATE = 0;
+const MAX_RATE = 10;
+const MIN_AMOUNT = 10_000;
+const MAX_AMOUNT = 1_000_000_000;
+
+const onlyDigits = (s: string) => s.replace(/[^\d]/g, "");
+const formatWithCommas = (s: string) => (s ? Number(s).toLocaleString() : "");
+
+const normalizeRateInput = (s: string) => {
+  let t = s.replace(/[^\d.]/g, "");
+  const parts = t.split(".");
+  if (parts.length > 2) t = parts[0] + "." + parts.slice(1).join("");
+  const [intPart, decPart = ""] = t.split(".");
+  const dec2 = decPart.slice(0, 2);
+  return decPart !== undefined
+    ? `${intPart}${dec2 ? "." + dec2 : ""}`
+    : intPart;
+};
+
+const toNumber = (v: string | undefined) => {
+  if (!v?.trim()) return NaN;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : NaN;
+};
+
+const bodyFromState = (s: {
+  alertType: AlertType;
+  productKind: ProductKind | "";
+  interestKinds: InterestKind[];
+  rateNum: number;
+  term: Exclude<TermMonth, "">;
+  minAmountRaw: string;
+  maxLimitRaw: string;
+  validMinAmount: boolean;
+  validMaxLimit: boolean;
+}): AlertSettingsBody => ({
+  alertType: s.alertType,
+  productTypeDeposit: s.productKind === "deposit",
+  productTypeSaving: s.productKind === "savings",
+  minInterestRate: s.rateNum,
+  interestCalcSimple: s.interestKinds.includes("S"),
+  interestCalcCompound: s.interestKinds.includes("M"),
+  maxSaveTerm: s.term,
+  minAmount: s.validMinAmount && s.minAmountRaw ? Number(s.minAmountRaw) : null,
+  maxLimit: s.validMaxLimit && s.maxLimitRaw ? Number(s.maxLimitRaw) : null,
+});
+
+function setChange<K extends keyof AlertSettingsBody>(
+  target: Partial<AlertSettingsBody>,
+  key: K,
+  value: AlertSettingsBody[K],
+) {
+  target[key] = value;
+}
+
+const diffBody = (
+  prev: AlertSettingsResponse | null,
+  next: AlertSettingsBody,
+): Partial<AlertSettingsBody> => {
+  if (!prev) return next;
+
+  const prevMapped: AlertSettingsBody = {
+    alertType: prev.alertType,
+    productTypeDeposit: !!prev.productTypeDeposit,
+    productTypeSaving: !!prev.productTypeSaving,
+    minInterestRate: prev.minInterestRate,
+    interestCalcSimple: !!prev.interestCalcSimple,
+    interestCalcCompound: !!prev.interestCalcCompound,
+    maxSaveTerm: prev.maxSaveTerm,
+    minAmount: prev.minAmount ?? null,
+    maxLimit: prev.maxLimit ?? null,
+  };
+
+  const changes: Partial<AlertSettingsBody> = {};
+
+  (Object.keys(next) as (keyof AlertSettingsBody)[]).forEach((k) => {
+    const v = next[k];
+    if (prevMapped[k] !== v) {
+      setChange(changes, k, v);
+    }
+  });
+
+  return changes;
+};
 
 interface AlertModalProps {
-    isOpen: boolean;
-    onClose: () => void;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
-    const [alertType, setAlertType] = useState<AlertType>("EMAIL");
-    const [rate, setRate] = useState<string>("");
-    const [term, setTerm] = useState<TermMonth>("");
+  const [alertType, setAlertType] = useState<AlertType | "">("");
+  const [rate, setRate] = useState<string>("");
+  const [term, setTerm] = useState<TermMonth>("");
 
-    const rateNum = useMemo(() => {
-        const n = Number(rate);
-        return Number.isFinite(n) ? n : NaN;
-    }, [rate]);
+  const [productKind, setProductKind] = useState<ProductKind | "">("");
+  const [interestKinds, setInterestKinds] = useState<InterestKind[]>([]);
+  const [minAmountRaw, setMinAmountRaw] = useState<string>("");
+  const [maxLimitRaw, setMaxLimitRaw] = useState<string>("");
 
-    const validAlertType =
-        alertType === "EMAIL" || alertType === "SNS" || alertType === "PUSH";
-    const validRate = Number.isFinite(rateNum) && rateNum > 0;
-    const validTerm = term !== "";
+  const [initial, setInitial] = useState<AlertSettingsResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-    const isValid = validAlertType && validRate && validTerm;
+  const rateNum = useMemo(() => toNumber(rate), [rate]);
+  const minAmountNum = useMemo(
+    () => (minAmountRaw ? Number(minAmountRaw) : NaN),
+    [minAmountRaw],
+  );
+  const maxLimitNum = useMemo(
+    () => (maxLimitRaw ? Number(maxLimitRaw) : NaN),
+    [maxLimitRaw],
+  );
 
-    // 예치 기간 Select 옵션
-    const termOptions = ALLOWED_MONTHS.map((month) => ({
-        label: `${month}개월`,
-        value: String(month),
-    }));
+  const validAlertType =
+    alertType === "EMAIL" || alertType === "SMS" || alertType === "PUSH";
+  const validRate =
+    Number.isFinite(rateNum) && rateNum > MIN_RATE && rateNum <= MAX_RATE;
+  const validTerm = term !== "";
 
-    return (
-        <Modal isOpen={isOpen} onClose={onClose} modalTitle="상품 알림 설정">
-            <div>
-                <strong className="block font-bold text-sm text-black6 mb-1">알림방식</strong>
-                <div className="flex gap-5 mt-2">
-                    {(["EMAIL", "SNS", "PUSH"] as const).map((v) => (
-                        <Radiobox
-                            key={v}
-                            id={`alert_${v.toLowerCase()}`}
-                            name="alert_type"
-                            value={v}
-                            label={v === "EMAIL" ? "이메일" : v.toLowerCase()}
-                            checked={alertType === v}
-                            onChange={(e) => setAlertType(e.target.value as AlertType)}
-                            labelClassName="font-medium text-sm"
-                        />
-                    ))}
-                </div>
-            </div>
-            <InputField1
-                type="text"
-                label="연이율"
-                onChange={(e) => setRate(e.target.value)}
-                inputClassName="w-full"
-                labelClassName="block font-bold text-sm text-black6 mb-1 mt-4"
-                addonText="% 이상"
+  const validMinAmount =
+    !minAmountRaw ||
+    (Number.isFinite(minAmountNum) &&
+      minAmountNum >= MIN_AMOUNT &&
+      minAmountNum <= MAX_AMOUNT);
+
+  const validMaxLimit =
+    !maxLimitRaw ||
+    (Number.isFinite(maxLimitNum) &&
+      maxLimitNum >= MIN_AMOUNT &&
+      maxLimitNum <= MAX_AMOUNT &&
+      (!minAmountRaw || maxLimitNum >= minAmountNum));
+
+  const isValid = validAlertType && validRate && validTerm;
+
+  const termOptions = ALLOWED_MONTHS.map((m) => ({
+    label: `${m}개월`,
+    value: String(m),
+  }));
+
+  useEffect(() => {
+    if (!isOpen) return;
+    let mounted = true;
+    (async () => {
+      try {
+        setLoading(true);
+        const data = await getAlert();
+        const isSaved = !!(data.createdAt || data.updatedAt);
+
+        if (!mounted) return;
+
+        if (isSaved) {
+          setInitial(data);
+          setAlertType((data.alertType as AlertType) ?? "EMAIL");
+          setProductKind(
+            data.productTypeDeposit
+              ? "deposit"
+              : data.productTypeSaving
+                ? "savings"
+                : "",
+          );
+          setInterestKinds([
+            ...(data.interestCalcSimple ? (["S"] as const) : []),
+            ...(data.interestCalcCompound ? (["M"] as const) : []),
+          ]);
+          setRate(
+            typeof data.minInterestRate === "number"
+              ? String(data.minInterestRate)
+              : "",
+          );
+          setTerm(
+            [6, 12, 24, 36].includes(Number(data.maxSaveTerm))
+              ? (Number(data.maxSaveTerm) as TermMonth)
+              : "",
+          );
+          setMinAmountRaw(
+            Number.isFinite(data.minAmount as number)
+              ? String(Number(data.minAmount))
+              : "",
+          );
+          setMaxLimitRaw(
+            Number.isFinite(data.maxLimit as number)
+              ? String(Number(data.maxLimit))
+              : "",
+          );
+        } else {
+          setInitial(null);
+          setAlertType("EMAIL");
+          setProductKind("");
+          setInterestKinds([]);
+          setRate("");
+          setTerm("");
+          setMinAmountRaw("");
+          setMaxLimitRaw("");
+        }
+      } catch {
+        setInitial(null);
+        setAlertType("EMAIL");
+        setProductKind("");
+        setInterestKinds([]);
+        setRate("");
+        setTerm("");
+        setMinAmountRaw("");
+        setMaxLimitRaw("");
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [isOpen]);
+
+  const handleProductKindToggle = (next: ProductKind) => {
+    setProductKind((prev) => (prev === next ? "" : next));
+  };
+  const handleInterestToggle = (next: InterestKind) => {
+    setInterestKinds((prev) =>
+      prev.includes(next) ? prev.filter((k) => k !== next) : [...prev, next],
+    );
+  };
+
+  const handleSubmit = async () => {
+    if (!isValid || submitting) return;
+
+    const ui = {
+      alertType,
+      productKind,
+      interestKinds,
+      rateNum: rateNum as number,
+      term: term as Exclude<TermMonth, "">,
+      minAmountRaw,
+      maxLimitRaw,
+      validMinAmount,
+      validMaxLimit,
+    };
+    const body = bodyFromState(ui);
+
+    try {
+      setSubmitting(true);
+
+      if (!initial) {
+        await createAlert(body);
+      } else {
+        const delta = diffBody(initial, body);
+
+        const requiredForPatch = {
+          alertType: body.alertType,
+          minInterestRate: body.minInterestRate,
+          maxSaveTerm: body.maxSaveTerm,
+        } as const;
+
+        await patchAlert({ ...requiredForPatch, ...delta });
+      }
+
+      onClose();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} modalTitle="상품 알림 설정">
+      <div className="mx-8">
+        <div>
+          <strong className="block font-bold text-sm text-black6 mb-1">
+            알림방식
+          </strong>
+          <div className="flex gap-5 mt-2">
+            {(["EMAIL", "SMS", "PUSH"] as const).map((v) => (
+              <Radiobox
+                key={v}
+                id={`alert_${v.toLowerCase()}`}
+                name="alert_type"
+                value={v}
+                label={v === "EMAIL" ? "이메일" : v.toLowerCase()}
+                checked={alertType === v}
+                onChange={(e) => setAlertType(e.target.value as AlertType)}
+                labelClassName="font-medium text-sm"
+              />
+            ))}
+          </div>
+        </div>
+
+        <div className="my-4">
+          <strong className="block font-bold text-sm text-black6 mb-1 mt-4">
+            상품 유형
+          </strong>
+          <div className="flex gap-5 mt-2">
+            <Checkbox
+              id="kind_deposit"
+              name="product_kind_deposit"
+              label="예금"
+              labelClassName="text-sm"
+              checked={productKind === "deposit"}
+              onChange={() => handleProductKindToggle("deposit")}
             />
-            <div>
-                <strong className="block font-bold text-sm text-black6 mb-1 mt-4">이자 계산 방식</strong>
-                <div className="flex gap-5 mt-2">
-                    <Checkbox id="1" name="simple_interest" label="단리" labelClassName="text-sm" />
-                    <Checkbox id="2" name="compound_interest" label="복리" labelClassName="text-sm" />
-                </div>
-            </div>
-            <Select
-                label="예치 기간"
-                id="depositPeriod"
-                options={termOptions}
-                placeholder="기간 선택"
-                variant="lg"
-                onChange={(e) => {
-                    const v = e.target.value;
-                    setTerm(v === "" ? "" : (Number(v) as TermMonth));
-                }}
-                labelClassName="block font-bold text-sm text-black6 mb-1 mt-4"
-                selectClassName="w-full"
+            <Checkbox
+              id="kind_savings"
+              name="product_kind_savings"
+              label="적금"
+              labelClassName="text-sm"
+              checked={productKind === "savings"}
+              onChange={() => handleProductKindToggle("savings")}
             />
-            <InputField1
-                type="text"
-                label="최소 가입 금액"
-                inputClassName="w-full"
-                labelClassName="block font-bold text-sm text-black6 mb-1 mt-4"
-                addonText="원"
+          </div>
+        </div>
+
+        <div className="my-4">
+          <InputField1
+            type="text"
+            label="연이율"
+            value={rate}
+            onChange={(e) => setRate(normalizeRateInput(e.target.value))}
+            inputClassName="w-full"
+            labelClassName="block font-bold text-sm text-black6 mb-1 mt-4"
+            addonText="% 이상"
+          />
+          <p className="text-sm text-red mt-1 h-4">
+            {rate
+              ? validRate
+                ? ""
+                : `0보다 크고 ${MAX_RATE}% 이하로 입력하세요`
+              : "필수 입력"}
+          </p>
+        </div>
+
+        <div>
+          <strong className="block font-bold text-sm text-black6 mb-1">
+            이자 계산 방식
+          </strong>
+          <div className="flex gap-5 mt-2">
+            <Checkbox
+              id="interest_S"
+              name="interest_simple"
+              label="단리"
+              labelClassName="text-sm"
+              checked={interestKinds.includes("S")}
+              onChange={() => handleInterestToggle("S")}
             />
-            <InputField1
-                type="text"
-                label="최대 한도"
-                inputClassName="w-full"
-                labelClassName="block font-bold text-sm text-black6 mb-1 mt-4"
-                addonText="원"
+            <Checkbox
+              id="interest_M"
+              name="interest_compound"
+              label="복리"
+              labelClassName="text-sm"
+              checked={interestKinds.includes("M")}
+              onChange={() => handleInterestToggle("M")}
             />
-            <div>
-                <strong className="block font-bold text-sm text-black6 mb-1 mt-4">적립 방식</strong>
-                <div className="flex gap-5 mt-2">
-                    <Checkbox id="3" name="flexible" label="자유적립" labelClassName="text-sm" />
-                    <Checkbox id="4" name="fixed" label="정액적립" labelClassName="text-sm" />
-                </div>
-            </div>
-            <Button
-                type="submit"
-                styleVariant="bg"
-                variant="lg"
-                disabled={!isValid}
-                className={`rounded-md w-40 text-lg mt-4 ${isValid
-                    ? "bg-primary hover:bg-primary/90 text-white"
-                    : "bg-gray-300 cursor-not-allowed text-gray-500"
-                    }`}
-            >
-                설정
-            </Button>
-        </Modal>
-    )
-}
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <Select
+            label="예치 기간"
+            id="depositPeriod"
+            options={termOptions}
+            placeholder="기간 선택"
+            variant="lg"
+            onChange={(e) => {
+              const v = e.target.value;
+              setTerm(v === "" ? "" : (Number(v) as TermMonth));
+            }}
+            labelClassName="block font-bold text-sm text-black6 mb-1 mt-4"
+            selectClassName="w-full"
+            value={term === "" ? "" : String(term)}
+          />
+          <p className="text-sm text-red mt-1 h-4">
+            {validTerm ? "" : "필수 입력"}
+          </p>
+        </div>
+
+        <InputField1
+          type="text"
+          label="최소 가입 금액"
+          inputClassName="w-full"
+          labelClassName="block font-bold text-sm text-black6 mb-1 mt-4"
+          addonText="원"
+          value={formatWithCommas(minAmountRaw)}
+          onChange={(e) => setMinAmountRaw(onlyDigits(e.target.value))}
+        />
+        <p className="text-sm text-red mt-1 h-4">
+          {!minAmountRaw
+            ? ""
+            : validMinAmount
+              ? ""
+              : `${MIN_AMOUNT.toLocaleString()}원 이상 ${MAX_AMOUNT.toLocaleString()}원 이하로 입력하세요`}
+        </p>
+
+        <InputField1
+          type="text"
+          label="최대 한도"
+          inputClassName="w-full"
+          labelClassName="block font-bold text-sm text-black6 mb-1 mt-2"
+          addonText="원"
+          value={formatWithCommas(maxLimitRaw)}
+          onChange={(e) => setMaxLimitRaw(onlyDigits(e.target.value))}
+        />
+        <p className="text-sm text-red mt-1 h-4">
+          {!maxLimitRaw
+            ? ""
+            : maxLimitNum < MIN_AMOUNT || maxLimitNum > MAX_AMOUNT
+              ? `${MIN_AMOUNT.toLocaleString()}원 이상 ${MAX_AMOUNT.toLocaleString()}원 이하로 입력하세요`
+              : minAmountRaw && maxLimitNum < minAmountNum
+                ? `최대 한도는 최소 가입 금액 이상이어야 합니다`
+                : ""}
+        </p>
+
+        <Button
+          type="button"
+          styleVariant="bg"
+          variant="lg"
+          disabled={!isValid || loading || submitting}
+          className={`rounded-md w-40 text-lg mt-4 ${
+            isValid && !loading && !submitting
+              ? "bg-primary hover:bg-primary/90 text-white"
+              : "bg-gray-300 cursor-not-allowed text-gray-500"
+          }`}
+          onClick={handleSubmit}
+        >
+          {submitting ? "저장중..." : "저장"}
+        </Button>
+      </div>
+    </Modal>
+  );
+};
+
 export default AlertModal;
