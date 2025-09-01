@@ -1,56 +1,82 @@
-import api from "./api";
-import type {
-  CompareListItem,
-  CompareListQuery,
-  CompareListResponse,
-  CompareRequest,
-  CompareResponse,
-  GetCompareResponse,
-} from "@/types/compare";
+  import api from "./api";
+  import type {
+    CompareListItem,
+    CompareListQuery,
+    CompareListResponse,
+    CompareRequest,
+    CompareResponse,
+    GetCompareResponse,
+  } from "@/types/compare";
 
-const bankLogo = (bankName: string) =>
-  `/assets/banks/${encodeURIComponent(bankName)}.png`;
+  const bankLogo = (bankName: string) =>
+    `/assets/banks/${encodeURIComponent(bankName)}.png`;
 
-const mapResponseToItem = (r: CompareListResponse): CompareListItem => ({
-  id: r.productId,
-  logoUrl: bankLogo(r.bankName),
-  productName: r.productName,
-  bankName: r.bankName,
-  baseRate: r.intrRate,
-  maxRate: r.intrRate2,
-});
-
-export async function getCompareProduct(params: CompareListQuery): Promise<{
-  items: CompareListItem[];
-  page: number;
-  size: number;
-  totalPages: number;
-  totalElements: number;
-}> {
-  const { data } = await api.get<GetCompareResponse>("/api/compare", {
-    params,
+  const mapResponseToItem = (r: CompareListResponse): CompareListItem => ({
+    id: r.productId,
+    logoUrl: bankLogo(r.bankName),
+    productName: r.productName,
+    bankName: r.bankName,
+    baseRate: r.intrRate,
+    maxRate: r.intrRate2,
   });
 
-  const items = (data?.content ?? []).map(mapResponseToItem);
+  export async function getCompareProduct(params: CompareListQuery): Promise<{
+    items: CompareListItem[];
+    page: number;
+    size: number;
+    totalPages: number;
+    totalElements: number;
+  }> {
+    const { data } = await api.get<GetCompareResponse>("/api/compare", {
+      params,
+    });
 
-  const size = data?.size ?? params.size ?? 20;
-  const totalElements = data?.totalElements ?? 0;
-  const totalPages = Math.max(1, Math.ceil(totalElements / size));
+    const items = (data?.content ?? []).map(mapResponseToItem);
 
-  return {
-    items,
-    page: (data?.page ?? 0) + 1,
-    size,
-    totalPages,
-    totalElements,
-  };
-}
+    const size = data?.size ?? params.size ?? 20;
+    const totalElements = data?.totalElements ?? 0;
+    const totalPages = Math.max(1, Math.ceil(totalElements / size));
 
-export async function compareProduct(
-  products: CompareRequest,
-): Promise<CompareResponse> {
-  const { data } = await api.post("/api/compare", products, {
-    headers: { "Content-Type": "application/json" },
-  });
-  return data;
-}
+    return {
+      items,
+      page: (data?.page ?? 0) + 1,
+      size,
+      totalPages,
+      totalElements,
+    };
+  }
+
+  export async function compareProduct(
+    products: CompareRequest,
+  ): Promise<CompareResponse> {
+    const { data } = await api.post("/api/compare", products, {
+      headers: { "Content-Type": "application/json" },
+    });
+    return data;
+  }
+
+  export async function getFilterProduct(params: CompareListQuery): Promise<{
+    items: CompareListItem[];
+    page: number;
+    size: number;
+    totalPages: number;
+    totalElements: number;
+  }> {
+    const { data } = await api.get<GetCompareResponse>("/api/compare/filter", {
+      params,
+    });
+
+    const items = (data?.content ?? []).map(mapResponseToItem);
+
+    const size = data?.size ?? params.size ?? 20;
+    const totalElements = data?.totalElements ?? 0;
+    const totalPages = Math.max(1, Math.ceil(totalElements / size));
+
+    return {
+      items,
+      page: (data?.page ?? 0) + 1,
+      size,
+      totalPages,
+      totalElements,
+    };
+  }
