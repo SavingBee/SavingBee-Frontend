@@ -301,7 +301,7 @@ const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
           </div>
         </div>
 
-        <div>
+        <div className="my-4">
           <strong className="block font-bold text-sm text-black6 mb-1 mt-4">
             상품 유형
           </strong>
@@ -325,7 +325,7 @@ const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
           </div>
         </div>
 
-        <div className="my-6">
+        <div className="my-4">
           <InputField1
             type="text"
             label="연이율"
@@ -335,7 +335,7 @@ const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
             labelClassName="block font-bold text-sm text-black6 mb-1 mt-4"
             addonText="% 이상"
           />
-          <p className="text-xs text-red-500 mt-1 h-4">
+          <p className="text-sm text-red mt-1 h-4">
             {rate
               ? validRate
                 ? ""
@@ -345,7 +345,7 @@ const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
         </div>
 
         <div>
-          <strong className="block font-bold text-sm text-black6 mb-1 mt-4">
+          <strong className="block font-bold text-sm text-black6 mb-1">
             이자 계산 방식
           </strong>
           <div className="flex gap-5 mt-2">
@@ -368,7 +368,7 @@ const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
           </div>
         </div>
 
-        <div className="my-6">
+        <div className="mt-6">
           <Select
             label="예치 기간"
             id="depositPeriod"
@@ -383,7 +383,7 @@ const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
             selectClassName="w-full"
             value={term === "" ? "" : String(term)}
           />
-          <p className="text-xs text-red-500 mt-1 h-4">
+          <p className="text-sm text-red mt-1 h-4">
             {validTerm ? "" : "필수 입력"}
           </p>
         </div>
@@ -397,12 +397,12 @@ const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
           value={formatWithCommas(minAmountRaw)}
           onChange={(e) => setMinAmountRaw(onlyDigits(e.target.value))}
         />
-        <p className="text-xs text-red-500 mt-1 h-4">
+        <p className="text-sm text-red mt-1 h-4">
           {!minAmountRaw
             ? ""
             : validMinAmount
               ? ""
-              : `최소 가입 금액은 ${MIN_AMOUNT.toLocaleString()}원 이상 ${MAX_AMOUNT.toLocaleString()}원 이하로 입력하세요`}
+              : `${MIN_AMOUNT.toLocaleString()}원 이상 ${MAX_AMOUNT.toLocaleString()}원 이하로 입력하세요`}
         </p>
 
         <InputField1
@@ -414,11 +414,11 @@ const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
           value={formatWithCommas(maxLimitRaw)}
           onChange={(e) => setMaxLimitRaw(onlyDigits(e.target.value))}
         />
-        <p className="text-xs text-red-500 mt-1 h-4">
+        <p className="text-sm text-red mt-1 h-4">
           {!maxLimitRaw
             ? ""
             : maxLimitNum < MIN_AMOUNT || maxLimitNum > MAX_AMOUNT
-              ? `최대 한도는 ${MIN_AMOUNT.toLocaleString()}원 이상 ${MAX_AMOUNT.toLocaleString()}원 이하로 입력하세요`
+              ? `${MIN_AMOUNT.toLocaleString()}원 이상 ${MAX_AMOUNT.toLocaleString()}원 이하로 입력하세요`
               : minAmountRaw && maxLimitNum < minAmountNum
                 ? `최대 한도는 최소 가입 금액 이상이어야 합니다`
                 : ""}
@@ -436,7 +436,7 @@ const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
           }`}
           onClick={handleSubmit}
         >
-          {submitting ? "저장중..." : "설정"}
+          {submitting ? "저장중..." : "저장"}
         </Button>
       </div>
     </Modal>
