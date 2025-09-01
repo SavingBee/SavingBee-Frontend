@@ -34,6 +34,7 @@ export type CompareListQuery = {
   termMonth: 6 | 12 | 24 | 36;
   minRate: number;
   intrRateType: "S" | "M";
+  bankKeyword?: string;
   page?: number;
   size?: number;
 };
