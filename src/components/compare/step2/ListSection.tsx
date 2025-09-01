@@ -1,3 +1,5 @@
+import Button from "@/components/common/button/Button";
+import InputField1 from "@/components/common/input/InputField1";
 import Pagination from "@/components/common/Pagination";
 import ProductList from "@/components/product/ProductList";
 
@@ -22,6 +24,9 @@ export default function ListSection({
   currentPage,
   totalPage,
   onChangePage,
+  selectedBank,
+  onChangeBank,
+  onSubmitSearch,
 }: {
   items: CompareListItem[];
   selectedIds: string[];
@@ -29,22 +34,37 @@ export default function ListSection({
   currentPage: number;
   totalPage: number;
   onChangePage: (page: number) => void;
+  selectedBank: string;
+  onChangeBank: (bank: string) => void;
+  onSubmitSearch?: () => void;
 }) {
   const hasItems = items?.length > 0;
   const viewItems = hasItems ? items.map(toViewItem) : [];
 
   return (
-    <div className="w-full h-2/4">
-      <div className="flex justify-between m-2">
-        <div className="text-black4 font-bold text-base">추천 상품</div>
-        <select className="mr-5 p-1">
-          <option>은행 선택</option>
-          <option>신한은행</option>
-          <option>국민은행</option>
-          <option>농협은행</option>
-          <option>우리은행</option>
-          <option>하나은행</option>
-        </select>
+    <div className="w-full h-2/4 mb-16 md:mb-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 justify-between m-2">
+        <div className="text-black4 font-bold text-base p-3 pt-0">
+          추천 상품
+        </div>
+        <div className="flex mb-2">
+          <InputField1
+            type="text"
+            placeholder="은행명"
+            inputClassName="mr-2 p-1 md:w-64 outline-none"
+            value={selectedBank}
+            onChange={(e) => onChangeBank(e.target.value)}
+          />
+          <Button
+            type="button"
+            styleVariant="bg"
+            variant="sm"
+            className="bg-primary h-12 w-20"
+            onClick={onSubmitSearch}
+          >
+            검색
+          </Button>
+        </div>
       </div>
       <div className="relative mt-2 h-[520px] overflow-y-auto overscroll-contain pr-2">
         {hasItems ? (
