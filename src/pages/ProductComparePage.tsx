@@ -45,6 +45,7 @@ const buildListQuery = (
   plan: SavingsFilter | DepositFilter,
   page: number,
   size = 20,
+  bankKeyword?: string,
 ): CompareListQuery => {
   const isSavings = kind === "savings";
   const p = plan as SavingsFilter | DepositFilter;
@@ -59,6 +60,7 @@ const buildListQuery = (
     intrRateType: toApiRateType(p.rateType),
     page: Math.max(0, page - 1),
     size,
+    bankKeyword,
   };
 };
 
@@ -82,7 +84,7 @@ export default function ProductComparePage() {
 
   const [winnerId, setWinnerId] = useState<string | null>(null);
   const [compareItems, setCompareItems] = useState<CompareResponseItem[]>([]);
-
+  const [selectedBank, setSelectedBank] = useState("");
   const [openSections, setOpenSections] = useState<{ 2: boolean; 3: boolean }>({
     2: false,
     3: false,
@@ -125,7 +127,6 @@ export default function ProductComparePage() {
     setSelected((prev) => prev.filter((x) => x.id !== id));
   const resetSelected = () => setSelected([]);
 
-  // 비교하기
   const submitCompare = async () => {
     if (selected.length < 2) return;
     try {
@@ -167,9 +168,27 @@ export default function ProductComparePage() {
     }
   };
 
+  const handleBankApply = async () => {
+    if (!planValid) return;
+    try {
+      const params = buildListQuery(kind, plan, 1, 20, selectedBank);
+      const {
+        items,
+        page: p,
+        totalPages: tp,
+      } = await getCompareProduct(params);
+      setVisibleItems(items);
+      setPage(p);
+      setTotalPages(tp);
+      setOpenSections((s) => ({ ...s, 2: true }));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const handleChangePage = async (next: number) => {
     try {
-      const params = buildListQuery(kind, plan, next);
+      const params = buildListQuery(kind, plan, next, 20, selectedBank);
       const {
         items,
         page: p,
@@ -221,6 +240,9 @@ export default function ProductComparePage() {
             currentPage={page}
             totalPage={totalPages}
             onChangePage={handleChangePage}
+            selectedBank={selectedBank}
+            onChangeBank={setSelectedBank}
+            onSubmitSearch={handleBankApply}
           />
           <CardSection
             selected={selected}
