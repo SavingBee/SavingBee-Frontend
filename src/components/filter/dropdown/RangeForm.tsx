@@ -2,6 +2,7 @@
 import InputField1 from "@/components/common/input/InputField1";
 import { PiTilde } from "react-icons/pi";
 import type { ChangeEvent } from "react";
+import { formatNumber } from "@/utils/number";
 
 interface RangeFormProps {
   minValue?: number;
@@ -24,7 +25,7 @@ export default function RangeForm({
         type="text"
         variant="sm"
         placeholder="최저 값"
-        value={minValue}
+        value={formatNumber(minValue) ?? ""}
         onChange={onChangeMin}
         inputClassName="border border-graye5 rounded-md py-2 px-3 outline-none w-24"
       />
@@ -33,7 +34,7 @@ export default function RangeForm({
         type="text"
         variant="sm"
         placeholder="최고 값"
-        value={maxValue}
+        value={formatNumber(maxValue) ?? ""}
         onChange={onChangeMax}
         inputClassName="border border-graye5 rounded-md py-2 px-3 outline-none w-24"
       />

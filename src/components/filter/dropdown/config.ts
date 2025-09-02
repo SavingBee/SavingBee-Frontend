@@ -38,10 +38,10 @@ export const INTEREST_TYPE_OPTIONS: Option[] = [
 ];
 
 // 적립방식
-export const RSRV_TYPE_OPTIONS: Option[] = [
-  { id: "정액적립식", text: "정액적립식", category: "rsrvType" },
-  { id: "자유적립식", text: "자유적립식", category: "rsrvType" },
-];
+// export const RSRV_TYPE_OPTIONS: Option[] = [
+//   { id: "정액적립식", text: "정액적립식", category: "rsrvType" },
+//   { id: "자유적립식", text: "자유적립식", category: "rsrvType" },
+// ];
 
 export const OPTION_MAP: Record<ListCategory, Option[]> = {
   bankType: BANK_OPTIONS,
@@ -49,7 +49,7 @@ export const OPTION_MAP: Record<ListCategory, Option[]> = {
   target: TARGET_OPTIONS,
   term: TERM_OPTIONS,
   interestType: INTEREST_TYPE_OPTIONS,
-  rsrvType: RSRV_TYPE_OPTIONS,
+  // rsrvType: RSRV_TYPE_OPTIONS,
   // monthlyAmount, totalAmount → 숫자 입력/범위라서 옵션 없음
 };
 
@@ -131,35 +131,35 @@ export const SAVING_FILTERS: Filter[] = [
     fieldKey: "monthlyMaxLimit", // 적금전용 API key
     unit: "원",
     min: 0,
-    max: 10_000_000,
+    //max: 50_000,
     step: 10_000,
-    placeholder: "금액 입력",
+    placeholder: "월 저축금 한도",
     formatter: (v) => v.toLocaleString(),
     parser: (s) => Number(String(s).replace(/[^\d]/g, "")),
   },
-  {
-    id: "totalAmount",
-    filterLabel: "총 저축금",
-    kind: "amount",
-    // minKey: "totalMaxLimit",
-    // maxKey: "totalMaxLimit",
-    fieldKey: "totalMaxLimit",
-    unit: "원",
-    min: 0,
-    max: 1_000_000_000,
-    step: 10_000,
-    placeholder: "금액 입력",
-    formatter: (v) => v.toLocaleString(),
-    parser: (s) => Number(String(s).replace(/[^\d]/g, "")),
-  },
+  // {
+  //   id: "totalAmount",
+  //   filterLabel: "총 저축금",
+  //   kind: "amount",
+  //   // minKey: "totalMaxLimit",
+  //   // maxKey: "totalMaxLimit",
+  //   fieldKey: "totalMaxLimit",
+  //   unit: "원",
+  //   min: 0,
+  //   //max: 12_000_000,
+  //   step: 10_000,
+  //   placeholder: "총 저축금 한도",
+  //   formatter: (v) => v.toLocaleString(),
+  //   parser: (s) => Number(String(s).replace(/[^\d]/g, "")),
+  // },
 ];
 
 // 3-2) 예금 전용 필터 ------  공통 + 예금 특이사항
 export const DEPOSIT_FILTERS: Filter[] = [
   ...COMMON_FILTERS,
   {
-    // id:"amount"
-    id: "maxLimit",
+    // id: "maxLimit",
+    id: "totalAmount",
     filterLabel: "가입한도",
     kind: "range",
     // 전용 API key

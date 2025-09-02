@@ -2,8 +2,8 @@ import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 
 import { MdRefresh } from "react-icons/md";
 import Button from "../common/button/Button";
-import FilterButton from "./FilterButton";
-import { filterButtonStyle } from "./FilterButton";
+import FilterButton, { filterButtonStyle } from "./FilterButton";
+
 import MultiOption from "@/components/filter/dropdown/MultiOption";
 import AmountForm from "@/components/filter/dropdown/AmountForm";
 import RangeForm from "@/components/filter/dropdown/RangeForm";
@@ -20,6 +20,7 @@ import type {
   RangeFilter,
 } from "@/types/uiFilter";
 
+//list, amount, range 필터
 const isList = (f?: Filter): f is ListFilter =>
   !!f && (f.kind === "multi" || f.kind === "single");
 const isAmount = (f?: Filter): f is AmountFilter => !!f && f.kind === "amount";
@@ -27,6 +28,8 @@ const isRange = (f?: Filter): f is RangeFilter => !!f && f.kind === "range";
 
 // type Selected = Record<ListCategory, string[]>;
 type RangeState = { min?: number; max?: number };
+
+const EMPTY_RANGE: RangeState = { min: undefined, max: undefined };
 
 type Props = {
   //page 타입별 Filter 변경
@@ -62,22 +65,39 @@ type Props = {
   }) => void;
 };
 
-const parseNum = (e: ChangeEvent<HTMLInputElement>) => {
-  const raw = e.target.value;
-  const n = Number(String(raw).replace(/[^\d.-]/g, ""));
-  return raw === "" ? undefined : Number.isFinite(n) ? n : undefined;
-};
-
+//임시저장
 type DraftState = {
   amount?: number;
   baseRate?: RangeState;
   maxRate?: RangeState;
   monthlyAmount?: number;
   totalAmount?: RangeState;
-  lists?: Partial<Record<ListCategory, string[]>>; //체크박스 -- 임시 저장
+  lists?: Partial<Record<ListCategory, string[]>>;
 };
+
+const parseNum = (e: ChangeEvent<HTMLInputElement>) => {
+  const raw = e.target.value;
+  const n = Number(String(raw).replace(/[^\d.-]/g, ""));
+  return raw === "" ? undefined : Number.isFinite(n) ? n : undefined;
+};
+
 const isDesktop = () =>
   typeof window !== "undefined" && window.innerWidth >= 640;
+
+// 버튼 클릭 → 열기/닫기 + align 결정(마지막 열이면 end)
+
+function decideAlignByOverflow(
+  anchorEl: HTMLElement,
+  containerEl: HTMLElement,
+  preferredWidth = 360,
+  gutter = 16,
+): "start" | "end" {
+  const a = anchorEl.getBoundingClientRect();
+  const c = containerEl.getBoundingClientRect();
+  const containerRight = c.right - gutter;
+  // 버튼 왼쪽에서 시작해 선호 폭만큼 열었을 때 컨테이너 오른쪽을 넘치면 end 정렬
+  return a.left + preferredWidth > containerRight ? "end" : "start";
+}
 
 export default function FilterBar({
   filters,
@@ -123,21 +143,6 @@ export default function FilterBar({
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
-
-  // 버튼 클릭 → 열기/닫기 + align 결정(마지막 열이면 end)
-
-  function decideAlignByOverflow(
-    anchorEl: HTMLElement,
-    containerEl: HTMLElement,
-    preferredWidth = 360,
-    gutter = 16,
-  ): "start" | "end" {
-    const a = anchorEl.getBoundingClientRect();
-    const c = containerEl.getBoundingClientRect();
-    const containerRight = c.right - gutter;
-    // 버튼 왼쪽에서 시작해 선호 폭만큼 열었을 때 컨테이너 오른쪽을 넘치면 end 정렬
-    return a.left + preferredWidth > containerRight ? "end" : "start";
-  }
 
   const onToggle =
     (id: FilterCategory) => (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -190,7 +195,7 @@ export default function FilterBar({
       setSelected(nextLists);
     } else {
       if (id === "amount") {
-        const nextAmount = draft.amount ?? undefined;
+        nextAmount = draft.amount ?? undefined;
         setAmount?.(nextAmount);
       }
       if (id === "monthlyAmount") {
@@ -198,15 +203,15 @@ export default function FilterBar({
         setMonthlyAmount?.(nextMonthly);
       }
       if (id === "baseRate") {
-        nextBase = { ...(draft.baseRate ?? {}) };
+        nextBase = { ...(draft.baseRate ?? EMPTY_RANGE) };
         setBaseRate?.(nextBase);
       }
       if (id === "maxRate") {
-        nextMax = { ...(draft.maxRate ?? {}) };
+        nextMax = { ...(draft.maxRate ?? EMPTY_RANGE) };
         setMaxRate?.(nextMax);
       }
       if (id === "totalAmount") {
-        nextTotal = { ...(draft.totalAmount ?? {}) };
+        nextTotal = { ...(draft.totalAmount ?? EMPTY_RANGE) };
         setTotalAmount?.(nextTotal);
       }
     }
@@ -238,9 +243,12 @@ export default function FilterBar({
     } else if (id === "amount") setDraft((d) => ({ ...d, amount: undefined }));
     else if (id === "monthlyAmount")
       setDraft((d) => ({ ...d, monthlyAmount: undefined }));
-    else if (id === "baseRate") setDraft((d) => ({ ...d, baseRate: {} }));
-    else if (id === "maxRate") setDraft((d) => ({ ...d, maxRate: {} }));
-    else if (id === "totalAmount") setDraft((d) => ({ ...d, totalAmount: {} }));
+    else if (id === "baseRate")
+      setDraft((d) => ({ ...d, baseRate: EMPTY_RANGE }));
+    else if (id === "maxRate")
+      setDraft((d) => ({ ...d, maxRate: EMPTY_RANGE }));
+    else if (id === "totalAmount")
+      setDraft((d) => ({ ...d, totalAmount: EMPTY_RANGE }));
   };
 
   const resetAll = () => {
@@ -251,14 +259,23 @@ export default function FilterBar({
       term: [],
       interestType: [],
       // rsrvType: [],
-    } as Selected;
+    };
 
     setSelected(emptyLists);
     setAmount?.(undefined);
-    setBaseRate?.({});
-    setMaxRate?.({});
     setMonthlyAmount?.(undefined);
-    setTotalAmount?.({});
+    setBaseRate?.(EMPTY_RANGE);
+    setMaxRate?.(EMPTY_RANGE);
+    setTotalAmount?.(EMPTY_RANGE);
+
+    setDraft({
+      amount: undefined,
+      monthlyAmount: undefined,
+      baseRate: EMPTY_RANGE,
+      maxRate: EMPTY_RANGE,
+      totalAmount: EMPTY_RANGE,
+      lists: {}, // 팝업 열 때 현재 selected로 다시 살림
+    });
 
     // reset 직후 상위에 알림 -------  SavingsPage가 URL 갱신 ----- 리스트 재요청
     onConfirm?.({
@@ -433,7 +450,7 @@ export default function FilterBar({
         onClose={() => setOpenId(null)}
         preferredWidth={360}
       >
-        <div className="w-[max(360px))]">
+        <div className="w-[min(360px)]">
           {renderContent(currentFilter)}
           {/* 하단 푸터  */}
           {currentFilter && (

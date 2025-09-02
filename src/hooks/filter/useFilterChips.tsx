@@ -31,23 +31,32 @@ export function useFilterChips(params: {
   maxRate?: RangeState;
   setMaxRate?: Dispatch<SetStateAction<RangeState>>;
 
-  totalAmount?: RangeState; // saving: 총저축금, deposit: 가입한도(min/max)
-  setTotalAmount?: Dispatch<SetStateAction<RangeState>>;
+  totalAmount?: number; // saving: 총저축금, deposit: 가입한도(min/max)
+  setTotalAmount?: Dispatch<SetStateAction<number | undefined>>;
+
+  //예금전용 -가입한도
+  // maxLimit?: RangeState;
+  // setMaxLimit?: Dispatch<SetStateAction<RangeState>>;
 }) {
   const {
     mode,
     selected,
     setSelected,
-    amount,
-    setAmount,
+    // amount,
+    // setAmount,
     monthlyAmount,
     setMonthlyAmount,
     baseRate,
     setBaseRate,
     maxRate,
     setMaxRate,
+
     totalAmount,
     setTotalAmount,
+
+    //예금전용
+    // maxLimit,
+    // setMaxLimit,
   } = params;
 
   const navigate = useNavigate();
@@ -101,25 +110,25 @@ export function useFilterChips(params: {
     });
 
     // 금액/범위형 칩
-    if (typeof amount === "number") {
-      acc.push({
-        key: "amount",
-        label: `저축금: ${amount.toLocaleString()}원`,
-        onRemove: () => {
-          setAmount(undefined);
-          // amount는 URL에 쓰지 않는다면 URL 수정 불필요
-        },
-      });
-    }
+    // if (typeof amount === "number") {
+    //   acc.push({
+    //     key: "amount",
+    //     label: `저축금: ${amount.toLocaleString()}원`,
+    //     onRemove: () => {
+    //       setAmount(undefined);
+    //       // amount는 URL에 쓰지 않는다면 URL 수정 불필요
+    //     },
+    //   });
+    // }
 
-    if (baseRate.min !== undefined || baseRate.max !== undefined) {
-      const a = baseRate.min ?? "최저값";
-      const b = baseRate.max ?? "최고값";
+    if (baseRate?.min !== undefined || baseRate?.max !== undefined) {
+      const a = baseRate?.min ?? "최저값";
+      const b = baseRate?.max ?? "최고값";
       acc.push({
         key: "baseRate",
         label: `기본금리: ${a} ~ ${b}`,
         onRemove: () => {
-          setBaseRate({});
+          setBaseRate?.({});
           goReplace((next) => {
             next.delete("intrRateMin");
             next.delete("intrRateMax");
@@ -128,14 +137,14 @@ export function useFilterChips(params: {
       });
     }
 
-    if (maxRate.min !== undefined || maxRate.max !== undefined) {
-      const a = maxRate.min ?? "최저값";
-      const b = maxRate.max ?? "최고값";
+    if (maxRate?.min !== undefined || maxRate?.max !== undefined) {
+      const a = maxRate?.min ?? "최저값";
+      const b = maxRate?.max ?? "최고값";
       acc.push({
         key: "maxRate",
         label: `최고금리: ${a} ~ ${b}`,
         onRemove: () => {
-          setMaxRate({});
+          setMaxRate?.({});
           goReplace((next) => {
             next.delete("intrRate2Min");
             next.delete("intrRate2Max");
@@ -151,12 +160,12 @@ export function useFilterChips(params: {
           key: "monthlyAmount",
           label: `월저축금: ${monthlyAmount.toLocaleString()}원`,
           onRemove: () => {
-            setMonthlyAmount(undefined);
+            setMonthlyAmount?.(undefined);
             goReplace((next) => next.delete("monthlyMaxLimit"));
           },
         });
       }
-      if (totalAmount.max !== undefined || totalAmount.min !== undefined) {
+      if (totalAmount?.max !== undefined || totalAmount?.min !== undefined) {
         const a =
           totalAmount.min !== undefined
             ? `${totalAmount.min.toLocaleString()}원`
@@ -169,14 +178,14 @@ export function useFilterChips(params: {
           key: "totalAmount",
           label: `총저축금: ${a} ~ ${b}`,
           onRemove: () => {
-            setTotalAmount({});
+            setTotalAmount?.({});
             goReplace((next) => next.delete("totalMaxLimit")); // saving: 최대만 사용
           },
         });
       }
     } else {
       // deposit: 가입한도 범위 칩
-      if (totalAmount.min !== undefined || totalAmount.max !== undefined) {
+      if (totalAmount?.min !== undefined || totalAmount?.max !== undefined) {
         const a =
           totalAmount.min !== undefined
             ? `${totalAmount.min.toLocaleString()}원`
@@ -189,7 +198,7 @@ export function useFilterChips(params: {
           key: "limitRange",
           label: `가입한도: ${a} ~ ${b}`,
           onRemove: () => {
-            setTotalAmount({});
+            setTotalAmount?.({});
             goReplace((next) => {
               next.delete("maxLimitMin");
               next.delete("maxLimitMax");
@@ -203,11 +212,15 @@ export function useFilterChips(params: {
   }, [
     mode,
     selected,
-    amount,
+    // amount,
     monthlyAmount,
     baseRate,
     maxRate,
+    //가입한도
     totalAmount,
+
+    //예금전용 - 가입한도
+    // maxLimit,
     sp, // URL 기준도 의존
   ]);
 
