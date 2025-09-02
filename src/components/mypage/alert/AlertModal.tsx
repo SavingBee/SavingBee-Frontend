@@ -42,7 +42,7 @@ const toNumber = (v: string | undefined) => {
 
 const bodyFromState = (s: {
   alertType: AlertType;
-  productKind: ProductKind | "";
+  productKinds: ProductKind[];
   interestKinds: InterestKind[];
   rateNum: number;
   term: Exclude<TermMonth, "">;
@@ -52,8 +52,8 @@ const bodyFromState = (s: {
   validMaxLimit: boolean;
 }): AlertSettingsBody => ({
   alertType: s.alertType,
-  productTypeDeposit: s.productKind === "deposit",
-  productTypeSaving: s.productKind === "savings",
+  productTypeDeposit: s.productKinds.includes("deposit"),
+  productTypeSaving: s.productKinds.includes("savings"),
   minInterestRate: s.rateNum,
   interestCalcSimple: s.interestKinds.includes("S"),
   interestCalcCompound: s.interestKinds.includes("M"),
@@ -89,14 +89,12 @@ const diffBody = (
   };
 
   const changes: Partial<AlertSettingsBody> = {};
-
   (Object.keys(next) as (keyof AlertSettingsBody)[]).forEach((k) => {
     const v = next[k];
     if (prevMapped[k] !== v) {
       setChange(changes, k, v);
     }
   });
-
   return changes;
 };
 
@@ -110,7 +108,7 @@ const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
   const [rate, setRate] = useState<string>("");
   const [term, setTerm] = useState<TermMonth>("");
 
-  const [productKind, setProductKind] = useState<ProductKind | "">("");
+  const [productKinds, setProductKinds] = useState<ProductKind[]>([]);
   const [interestKinds, setInterestKinds] = useState<InterestKind[]>([]);
   const [minAmountRaw, setMinAmountRaw] = useState<string>("");
   const [maxLimitRaw, setMaxLimitRaw] = useState<string>("");
@@ -150,11 +148,6 @@ const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
 
   const isValid = validAlertType && validRate && validTerm;
 
-  const termOptions = ALLOWED_MONTHS.map((m) => ({
-    label: `${m}개월`,
-    value: String(m),
-  }));
-
   useEffect(() => {
     if (!isOpen) return;
     let mounted = true;
@@ -169,13 +162,10 @@ const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
         if (isSaved) {
           setInitial(data);
           setAlertType((data.alertType as AlertType) ?? "EMAIL");
-          setProductKind(
-            data.productTypeDeposit
-              ? "deposit"
-              : data.productTypeSaving
-                ? "savings"
-                : "",
-          );
+          setProductKinds([
+            ...(data.productTypeDeposit ? (["deposit"] as const) : []),
+            ...(data.productTypeSaving ? (["savings"] as const) : []),
+          ]);
           setInterestKinds([
             ...(data.interestCalcSimple ? (["S"] as const) : []),
             ...(data.interestCalcCompound ? (["M"] as const) : []),
@@ -203,7 +193,7 @@ const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
         } else {
           setInitial(null);
           setAlertType("EMAIL");
-          setProductKind("");
+          setProductKinds([]);
           setInterestKinds([]);
           setRate("");
           setTerm("");
@@ -213,7 +203,7 @@ const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
       } catch {
         setInitial(null);
         setAlertType("EMAIL");
-        setProductKind("");
+        setProductKinds([]);
         setInterestKinds([]);
         setRate("");
         setTerm("");
@@ -229,7 +219,9 @@ const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
   }, [isOpen]);
 
   const handleProductKindToggle = (next: ProductKind) => {
-    setProductKind((prev) => (prev === next ? "" : next));
+    setProductKinds((prev) =>
+      prev.includes(next) ? prev.filter((k) => k !== next) : [...prev, next],
+    );
   };
   const handleInterestToggle = (next: InterestKind) => {
     setInterestKinds((prev) =>
@@ -242,7 +234,7 @@ const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
 
     const ui = {
       alertType,
-      productKind,
+      productKinds,
       interestKinds,
       rateNum: rateNum as number,
       term: term as Exclude<TermMonth, "">,
@@ -260,13 +252,11 @@ const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
         await createAlert(body);
       } else {
         const delta = diffBody(initial, body);
-
         const requiredForPatch = {
           alertType: body.alertType,
           minInterestRate: body.minInterestRate,
           maxSaveTerm: body.maxSaveTerm,
         } as const;
-
         await patchAlert({ ...requiredForPatch, ...delta });
       }
 
@@ -311,7 +301,7 @@ const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
               name="product_kind_deposit"
               label="예금"
               labelClassName="text-sm"
-              checked={productKind === "deposit"}
+              checked={productKinds.includes("deposit")}
               onChange={() => handleProductKindToggle("deposit")}
             />
             <Checkbox
@@ -319,7 +309,7 @@ const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
               name="product_kind_savings"
               label="적금"
               labelClassName="text-sm"
-              checked={productKind === "savings"}
+              checked={productKinds.includes("savings")}
               onChange={() => handleProductKindToggle("savings")}
             />
           </div>
@@ -372,7 +362,10 @@ const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
           <Select
             label="예치 기간"
             id="depositPeriod"
-            options={termOptions}
+            options={ALLOWED_MONTHS.map((m) => ({
+              label: `${m}개월`,
+              value: String(m),
+            }))}
             placeholder="기간 선택"
             variant="lg"
             onChange={(e) => {
@@ -424,20 +417,31 @@ const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
                 : ""}
         </p>
 
-        <Button
-          type="button"
-          styleVariant="bg"
-          variant="lg"
-          disabled={!isValid || loading || submitting}
-          className={`rounded-md w-40 text-lg mt-4 ${
-            isValid && !loading && !submitting
-              ? "bg-primary hover:bg-primary/90 text-white"
-              : "bg-gray-300 cursor-not-allowed text-gray-500"
-          }`}
-          onClick={handleSubmit}
-        >
-          {submitting ? "저장중..." : "저장"}
-        </Button>
+        <div className="flex gap-4">
+          <Button
+            type="button"
+            styleVariant="bg"
+            variant="lg"
+            className="rounded-md w-40 text-lg mt-4 bg-gray7"
+            onClick={onClose}
+          >
+            취소
+          </Button>
+          <Button
+            type="button"
+            styleVariant="bg"
+            variant="lg"
+            disabled={!isValid || loading || submitting}
+            className={`rounded-md w-40 text-lg mt-4 ${
+              isValid && !loading && !submitting
+                ? "bg-primary hover:bg-primary/90 text-white"
+                : "bg-gray-300 cursor-not-allowed text-gray-500"
+            }`}
+            onClick={handleSubmit}
+          >
+            {submitting ? "저장중..." : "저장"}
+          </Button>
+        </div>
       </div>
     </Modal>
   );
