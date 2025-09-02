@@ -156,28 +156,36 @@ const DepositPage = () => {
   const {
     selected,
     setSelected,
-    amount,
-    setAmount,
+    // amount,
+    // setAmount,
     baseRate,
     setBaseRate,
     maxRate,
     setMaxRate,
+
     totalAmount,
     setTotalAmount,
+    // maxLimit,
+    // setMaxLimit,
   } = useDepositFilterState();
   const filterState = {
     selected,
-    amount,
+    // amount,
     baseRate,
     maxRate,
+
     totalAmount,
+    //가입한도
+    // maxLimit,
   };
   const filterSetters = {
     setSelected,
-    setAmount,
+    // setAmount,
     setBaseRate,
     setMaxRate,
     setTotalAmount,
+    //가입한도
+    // setMaxLimit,
   };
 
   /**
@@ -188,13 +196,16 @@ const DepositPage = () => {
     mode: "deposit",
     selected,
     setSelected,
-    amount,
-    setAmount,
+    // amount,
+    // setAmount,
 
     baseRate,
     setBaseRate,
     maxRate,
     setMaxRate,
+    //가입한도
+    // maxLimit,
+    // setMaxLimit,
     totalAmount,
     setTotalAmount,
   });
