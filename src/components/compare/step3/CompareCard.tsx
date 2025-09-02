@@ -2,6 +2,7 @@ import Button from "@/components/common/button/Button";
 import { CompareResponseItem } from "@/types/compare";
 import type { ProductType } from "@/types/product";
 import { PiNotePencil } from "react-icons/pi";
+import { Link } from "react-router-dom";
 
 export default function CompareCard({
   cardNum,
@@ -64,10 +65,12 @@ export default function CompareCard({
         </div>
         <div>
           <Button type="button" className="text-white hover:underline">
-            <div className="flex gap-2">
-              <PiNotePencil size={17} />
-              <span className="text-sm">자세히보기</span>
-            </div>
+            <Link to={`/products/${item.productId}`}>
+              <div className="flex gap-2">
+                <PiNotePencil size={17} />
+                <span className="text-sm">자세히보기</span>
+              </div>
+            </Link>
           </Button>
         </div>
       </div>
