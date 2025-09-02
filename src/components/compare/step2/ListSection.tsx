@@ -54,12 +54,16 @@ export default function ListSection({
             inputClassName="mr-2 p-1 md:w-64 outline-none"
             value={selectedBank}
             onChange={(e) => onChangeBank(e.target.value)}
+            onBlur={onSubmitSearch}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") onSubmitSearch?.();
+            }}
           />
           <Button
             type="button"
             styleVariant="bg"
-            variant="sm"
-            className="bg-primary h-12 w-20"
+            variant="lg"
+            className="bg-primary h-12 w-16"
             onClick={onSubmitSearch}
           >
             검색
