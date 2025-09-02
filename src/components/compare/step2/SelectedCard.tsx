@@ -2,10 +2,12 @@ import Button from "@/components/common/button/Button";
 import { IoClose } from "react-icons/io5";
 
 import { PiNotePencil } from "react-icons/pi";
+import { Link } from "react-router-dom";
 
 interface SelectedCardProps {
   selectNum: number;
   item: {
+    id: string;
     bankName: string;
     productName: string;
   };
@@ -35,10 +37,14 @@ export default function SelectedCard({
         <div className="text-white text-bold text-sm">{item.bankName}</div>
         <div className="text-white text-bold text-lg">{item.productName}</div>
         <Button type="button" variant="sm" styleVariant="bg">
-          <div className="flex leading-none">
-            <PiNotePencil size={17} />
-            <span className="ml-2 text-sm">자세히 보기</span>
-          </div>
+          <Link to={`/products/${item.id}`}>
+            <div className="flex leading-none">
+              <PiNotePencil size={17} />
+              <div className="hover:underline">
+                <span className="ml-2 text-sm">자세히 보기</span>
+              </div>
+            </div>
+          </Link>
         </Button>
       </div>
     </div>

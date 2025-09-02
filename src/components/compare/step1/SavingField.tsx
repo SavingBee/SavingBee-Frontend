@@ -5,7 +5,6 @@ import { SavingsFilter } from "@/types/compare";
 const MIN_SAVINGS_AMOUNT = 10_000;
 const MAX_SAVINGS_AMOUNT = 3_000_000;
 const MIN_SAVINGS_RATE = 0.1;
-const MAX_SAVINGS_RATE = 5;
 
 const ALLOWED_MONTHS = [6, 12, 24, 36] as const;
 
@@ -36,17 +35,9 @@ export function SavingField({ onChange }: SavingFieldProps) {
     ALLOWED_MONTHS.includes(months as (typeof ALLOWED_MONTHS)[number]);
 
   const validMinRate =
-    typeof minRate === "number" &&
-    minRate >= MIN_SAVINGS_RATE &&
-    minRate <= MAX_SAVINGS_RATE;
+    typeof minRate === "number" && minRate >= MIN_SAVINGS_RATE;
 
-  const validMaxRate =
-    typeof minRate === "number" &&
-    minRate >= MIN_SAVINGS_RATE &&
-    minRate <= MAX_SAVINGS_RATE;
-
-  const validRates = validMinRate && validMaxRate;
-
+  const validRates = validMinRate;
   const validRateType = rateType === "단리" || rateType === "복리";
 
   const valid = validAmount && validMonths && validRates && validRateType;
@@ -133,10 +124,9 @@ export function SavingField({ onChange }: SavingFieldProps) {
           <div className="text-base text-gray6">최소 이자율</div>
           {showRatesErr && (
             <div className="mt-1 space-y-1">
-              {(!validMinRate || !validMaxRate) && (
+              {!validMinRate && (
                 <p className="text-base text-red">
-                  이자율은 {MIN_SAVINGS_RATE}% ~ {MAX_SAVINGS_RATE}% 사이로
-                  입력하세요.
+                  이자율은 {MIN_SAVINGS_RATE}% 이상 입력해주세요.
                 </p>
               )}
             </div>
