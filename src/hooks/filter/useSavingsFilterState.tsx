@@ -10,7 +10,7 @@ export function useSavingsFilterState() {
     target: [],
     term: [],
     interestType: [],
-    rsrvType: [],
+    // rsrvType: [],
   });
 
   // 숫자/범위형
@@ -20,7 +20,7 @@ export function useSavingsFilterState() {
   );
   const [baseRate, setBaseRate] = useState<RangeState>({});
   const [maxRate, setMaxRate] = useState<RangeState>({});
-  const [totalAmount, setTotalAmount] = useState<RangeState>({});
+  const [totalAmount, setTotalAmount] = useState<number | undefined>(undefined);
 
   return {
     selected,
