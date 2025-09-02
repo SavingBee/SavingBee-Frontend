@@ -19,6 +19,9 @@ import {
 
 type Item = CompareListItem;
 
+const uniqBy = <T, K>(arr: T[], key: (t: T) => K) =>
+  Array.from(new Map(arr.map((x) => [key(x), x])).values());
+
 const toApiRateType = (rt?: "단리" | "복리") => (rt === "복리" ? "M" : "S");
 
 const buildCompareBody = (
@@ -111,6 +114,7 @@ export default function ProductComparePage() {
     setPage(1);
     setTotalPages(1);
     setOpenSections({ 2: false, 3: false });
+    setSelectedBank("");
   };
 
   const toggleSelect = (id: string) => {
@@ -159,7 +163,9 @@ export default function ProductComparePage() {
         page: p,
         totalPages: tp,
       } = await getCompareProduct(params);
-      setVisibleItems(items);
+
+      const deduped = uniqBy(items, (x) => x.id);
+      setVisibleItems(deduped);
       setPage(p);
       setTotalPages(tp);
       setOpenSections((s) => ({ ...s, 2: true }));
@@ -171,13 +177,16 @@ export default function ProductComparePage() {
   const handleBankApply = async () => {
     if (!planValid) return;
     try {
-      const params = buildListQuery(kind, plan, 1, 20, selectedBank);
+      const bankKw = selectedBank.trim() || undefined;
+      const params = buildListQuery(kind, plan, 1, 20, bankKw);
       const {
         items,
         page: p,
         totalPages: tp,
       } = await getCompareProduct(params);
-      setVisibleItems(items);
+
+      const deduped = uniqBy(items, (x) => x.id);
+      setVisibleItems(deduped);
       setPage(p);
       setTotalPages(tp);
       setOpenSections((s) => ({ ...s, 2: true }));
@@ -188,13 +197,16 @@ export default function ProductComparePage() {
 
   const handleChangePage = async (next: number) => {
     try {
-      const params = buildListQuery(kind, plan, next, 20, selectedBank);
+      const bankKw = selectedBank.trim() || undefined;
+      const params = buildListQuery(kind, plan, next, 20, bankKw);
       const {
         items,
         page: p,
         totalPages: tp,
       } = await getCompareProduct(params);
-      setVisibleItems(items);
+
+      const deduped = uniqBy(items, (x) => x.id);
+      setVisibleItems(deduped);
       setPage(p);
       setTotalPages(tp);
     } catch (e) {

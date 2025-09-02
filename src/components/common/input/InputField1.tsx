@@ -12,11 +12,12 @@ interface InputFieldProps {
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
     disabled?: boolean;
     required?: boolean; // 필수 필드인지
-
+    onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
+    onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
     addonText?: React.ReactNode;
 }
 
-const InputField1 = ({ type = "text", label, id, name, placeholder, value, className = "", labelClassName = "", inputClassName = "", variant = "lg", onChange, disabled, required, addonText }: InputFieldProps) => {
+const InputField1 = ({ type = "text", label, id, name, placeholder, value, className = "", labelClassName = "", inputClassName = "", variant = "lg", onChange, disabled, required, addonText, onBlur, onKeyDown }: InputFieldProps) => {
     const variantClass = variant === "lg"
         ? "h-[50px] p-[15px]" // lg style
         : "h-[34px] p-[12px]"; // sm style 
@@ -33,6 +34,8 @@ const InputField1 = ({ type = "text", label, id, name, placeholder, value, class
                     value={value}
                     onChange={onChange}
                     disabled={disabled}
+                    onBlur={onBlur}
+                    onKeyDown={onKeyDown}   
                     className={`text-sm border border-graye5 rounded-md ${variantClass} ${inputClassName}`}
                 />
                 {addonText && (
