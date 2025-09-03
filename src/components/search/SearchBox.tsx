@@ -221,6 +221,7 @@ export default function SearchBox() {
                     navigate(`/products/${item.fin_prdt_cd}`);
                   }}
                   onClose={() => setOpen(false)}
+                  variant="search"
                 />
               )}
             </>

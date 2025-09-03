@@ -49,10 +49,74 @@ export interface BaseRate {
   rateType?: "단리" | "복리";
 }
 
-export interface DepositRate extends BaseRate {}
+export interface DepositRate extends BaseRate { }
 
 export interface SavingsRate extends BaseRate {
   rsrvType: RsrvType;
   monthlyLimitMin?: number;
   monthlyLimitMax?: number;
+}
+
+
+export interface UserProduct {
+  userProductId: number;
+  userId: number;
+  bankName: string;
+  productName: string;
+  productType: string;
+  interestRate: number;
+  depositAmount: number;
+  depositMonths: number;
+  joinDate: string;
+  maturityDate: string;
+  specialConditions?: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  daysToMaturity: number;
+  expectedInterest: number;
+  maturityStatus: "NEAR_MATURITY" | "NORMAL" | string;
+}
+export interface UserProductResponse {
+  content: UserProduct[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+  first: boolean;
+  last: boolean;
+}
+
+// 내 상품 등록
+export interface AddMyProductRequest {
+  bankName: string;
+  productName: string;
+  productType: string;
+  depositAmount: number;
+  interestRate: number;
+  termMonths: number;
+  joinDate: string;
+  maturityDate: string;
+}
+
+
+// 내 상품 상세
+export interface UserProductDetail {
+  userProductId: number;
+  userId: number;
+  bankName: string;
+  productName: string;
+  productType: string;
+  interestRate: number;
+  depositAmount: number;
+  termMonths: number;
+  joinDate: string;
+  maturityDate: string;
+  specialConditions?: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  daysToMaturity: number;
+  expectedInterest: number;
+  maturityStatus: string;
 }
