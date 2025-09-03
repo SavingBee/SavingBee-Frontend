@@ -20,7 +20,7 @@ const FindIdStep2 = ({ username }: Props) => {
             </p>
             <div className="flex gap-2 mt-4">
                 <Link
-                    to="/find_password"
+                    to="/find/password"
                     className="flex items-center justify-center w-full h-[50px] font-bold text-base rounded-md text-white bg-black6"
                 >
                     비밀번호 찾기

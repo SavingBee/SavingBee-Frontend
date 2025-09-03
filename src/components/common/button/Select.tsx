@@ -16,13 +16,20 @@ interface SelectFieldProps {
     labelClassName?: string;
     variant: "lg" | "sm";
     disabled?: boolean;
-    onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    // onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    onChange?: (value: string) => void;
 }
 
 const Select = ({ label, id, name, value, placeholder, options, className = "", selectClassName = "", labelClassName = "", variant = "lg", disabled, onChange }: SelectFieldProps) => {
     const variantClass = variant === "lg"
         ? "h-[50px] p-[15px]" // lg style
         : "h-[34px] pr-[10px] pl-[10px]"; // sm style 
+
+    const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        if (onChange) {
+            onChange(e.target.value);
+        }
+    };
 
     return (
         <div className={className}>
@@ -36,7 +43,7 @@ const Select = ({ label, id, name, value, placeholder, options, className = "", 
                     id={id}
                     name={name}
                     value={value}
-                    onChange={onChange}
+                    onChange={handleChange}
                     disabled={disabled}
                     className={`text-sm border border-graye5 rounded-md appearance-none min-h-0 ${variantClass} ${selectClassName}`}
                 >

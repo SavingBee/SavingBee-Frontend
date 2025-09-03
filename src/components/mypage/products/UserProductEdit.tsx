@@ -1,11 +1,15 @@
-import Button from "@/components/common/button/Button";
+import { useNavigate, useParams } from "react-router-dom";
+import useMyProduct from "@/hooks/mypage/product/useMyProduct";
+import { useUpdateMyProduct } from "@/hooks/mypage/product/useUpdateMyProduct";
 import Select from "@/components/common/button/Select";
-import DatePickerInput from "@/components/common/input/DatePickerInput";
 import InputField1 from "@/components/common/input/InputField1";
-import { useAddMyProduct } from "@/hooks/mypage/product/useAddMyProduct";
-import { useState } from "react";
+import DatePickerInput from "@/components/common/input/DatePickerInput";
+import Button from "@/components/common/button/Button";
+import { useEffect, useState } from "react";
 
-const UserProductForm = () => {
+const UserProductEdit = () => {
+    const navigate = useNavigate();
+
     const [bankName, setBankName] = useState("");
     const [productType, setProductType] = useState("");
     const [productName, setProductName] = useState("");
@@ -15,7 +19,9 @@ const UserProductForm = () => {
     const [joinDate, setJoinDate] = useState<Date | null>(new Date());
     const [maturityDate, setMaturityDate] = useState<Date | null>(new Date());
 
-    const { addProduct } = useAddMyProduct();
+    const { userProductId } = useParams();
+    const { data, reload } = useMyProduct();
+    const { update } = useUpdateMyProduct();
 
     // 가입 금액 쉼표
     const formatNumber = (value: string) => {
@@ -42,23 +48,35 @@ const UserProductForm = () => {
         return sanitized;
     };
 
+    useEffect(() => {
+        if (userProductId) {
+            reload(userProductId);
+        }
+    }, [userProductId]);
+
+    useEffect(() => {
+        if (data) {
+            setBankName(data.bankName);
+            setProductType(data.productType);
+            setProductName(data.productName);
+            setInterestRate(data.interestRate.toString());
+            setDepositAmount(data.depositAmount.toString());
+            setTermMonths(data.termMonths.toString());
+            setJoinDate(new Date(data.joinDate));
+            setMaturityDate(new Date(data.maturityDate));
+        }
+    }, [data]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // 빈 값 검사
-        if (
-            !bankName ||
-            !productType ||
-            !productName ||
-            !interestRate ||
-            !depositAmount ||
-            !termMonths ||
-            !joinDate ||
-            !maturityDate
-        ) {
-            alert("모든 항목을 입력해주세요.");
+        if (!userProductId) {
+            alert("userProductId가 없습니다.");
             return;
         }
+
+        const confirmed = window.confirm("정말 수정하시겠습니까?");
+        if (!confirmed) return;
 
         const payload = {
             bankName,
@@ -71,13 +89,12 @@ const UserProductForm = () => {
             maturityDate: maturityDate?.toISOString().split("T")[0] || "",
         };
 
-        await addProduct(payload);
+        await update(Number(userProductId), payload);
 
-        const confirmed = window.confirm("등록하시겠습니까?");
-        if (!confirmed) return;
-
+        alert("수정이 완료되었습니다.");
         window.location.href = "/mypage";
     };
+
 
     return (
         <form onSubmit={handleSubmit} className="border-t border-gray9">
@@ -121,6 +138,7 @@ const UserProductForm = () => {
                     label="상품명"
                     id="productName"
                     name="productName"
+                    value={productName}
                     onChange={(e) => setProductName(e.target.value)}
                     placeholder="상품명을 입력해주세요. 예) KB Star 정기예금"
                     inputClassName="w-full"
@@ -214,6 +232,7 @@ const UserProductForm = () => {
                 <Button
                     type="button"
                     className="flex items-center justify-center w-full h-[50px] font-bold text-base rounded-md text-white bg-black6"
+                    onClick={() => navigate(-1)}
                 >
                     이전
                 </Button>
@@ -221,10 +240,10 @@ const UserProductForm = () => {
                     type="submit"
                     className="text-white bg-primary"
                 >
-                    다음
+                    수정하기
                 </Button>
             </div>
         </form>
-    )
-}
-export default UserProductForm;
+    );
+};
+export default UserProductEdit;
