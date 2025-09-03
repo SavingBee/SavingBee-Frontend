@@ -82,6 +82,11 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
     }
   }
 
+  // 검색 리스트 상세로 이동
+  function handleProductDetail() {
+    navigate(`/products/${encodeURIComponent(fin_prdt_cd)}`);
+  }
+
 
   const containerClass = [
     "w-full bg-white transition-all cursor-pointer",
@@ -116,9 +121,14 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
 
     console.log("[addCart] payload:", payload);
 
-    add({
-      productCode: String(fin_prdt_cd),
-      productType: (product_type === "deposit" ? "DEPOSIT" : "SAVINGS") as "DEPOSIT" | "SAVINGS",
+    // add({
+    //   productCode: String(fin_prdt_cd),
+    //   productType: (product_type === "deposit" ? "DEPOSIT" : "SAVINGS") as "DEPOSIT" | "SAVINGS",
+
+    // });
+    add(payload, () => {
+      alert("보관함에 추가되었습니다.");
+      window.location.reload();
     });
   };
 
@@ -256,10 +266,7 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
                   {/* 돋보기 버튼 */}
                   <IcnButton
                     type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      console.log("상세보기 클릭");
-                    }}
+                    onClick={handleProductDetail}
                     icon={<FaSearch size={10} color="#fff" />}
                     className="text-primary"
                     iconClassName="bg-primary"

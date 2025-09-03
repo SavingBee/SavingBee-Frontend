@@ -17,4 +17,5 @@ export type CartListResponse = {
     totalPages: number;
     first: boolean;
     last: boolean;
+    message?: string;
 };

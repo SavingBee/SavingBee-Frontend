@@ -368,8 +368,7 @@ const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
             }))}
             placeholder="기간 선택"
             variant="lg"
-            onChange={(e) => {
-              const v = e.target.value;
+            onChange={(v) => {
               setTerm(v === "" ? "" : (Number(v) as TermMonth));
             }}
             labelClassName="block font-bold text-sm text-black6 mb-1 mt-4"
@@ -432,11 +431,10 @@ const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
             styleVariant="bg"
             variant="lg"
             disabled={!isValid || loading || submitting}
-            className={`rounded-md w-40 text-lg mt-4 ${
-              isValid && !loading && !submitting
+            className={`rounded-md w-40 text-lg mt-4 ${isValid && !loading && !submitting
                 ? "bg-primary hover:bg-primary/90 text-white"
                 : "bg-gray-300 cursor-not-allowed text-gray-500"
-            }`}
+              }`}
             onClick={handleSubmit}
           >
             {submitting ? "저장중..." : "저장"}

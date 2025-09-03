@@ -327,7 +327,7 @@ export default function FilterBar({
           aFilter={f}
           value={draft.amount}
           onChange={(e) => setDraft((d) => ({ ...d, amount: parseNum(e) }))}
-          // onApply={() => applyById("amount")}
+        // onApply={() => applyById("amount")}
         />
       );
     }
@@ -339,7 +339,7 @@ export default function FilterBar({
           onChange={(e) =>
             setDraft((d) => ({ ...d, monthlyAmount: parseNum(e) }))
           }
-          // onApply={() => applyById("monthlyAmount")}
+        // onApply={() => applyById("monthlyAmount")}
         />
       );
     }
@@ -360,7 +360,7 @@ export default function FilterBar({
               baseRate: { ...d.baseRate, max: parseNum(e) },
             }))
           }
-          // onApply={() => applyById("baseRate")}
+        // onApply={() => applyById("baseRate")}
         />
       );
     }
@@ -381,7 +381,7 @@ export default function FilterBar({
               maxRate: { ...d.maxRate, max: parseNum(e) },
             }))
           }
-          // onApply={() => applyById("maxRate")}
+        // onApply={() => applyById("maxRate")}
         />
       );
     }
@@ -402,7 +402,7 @@ export default function FilterBar({
               totalAmount: { ...d.totalAmount, max: parseNum(e) },
             }))
           }
-          // onApply={() => applyById("totalAmount")}
+        // onApply={() => applyById("totalAmount")}
         />
       );
     }
