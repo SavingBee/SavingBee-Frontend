@@ -1,5 +1,5 @@
-import { savingsHandlers } from "./savings";
-// import { depositHandlers } from "./deposit";
+// import { savingsHandler } from "./savings";
+// // import { depositHandlers } from "./deposit";
 
-export const handlers = [...savingsHandlers];
-// export const handlers = [...savingsHandlers, depositHandlers];
+// export const handlers = [...savingsHandler];
+// // export const handlers = [...savingsHandlers, depositHandlers];

@@ -18,7 +18,7 @@ export default function SearchForm({
   onChange,
   onSubmit,
   placeholder,
-  className = "",
+  // className = "",
 }: Props) {
   //   const [search, setSearch] = useState("");
 

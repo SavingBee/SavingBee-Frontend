@@ -31,8 +31,8 @@ export function useFilterChips(params: {
   maxRate?: RangeState;
   setMaxRate?: Dispatch<SetStateAction<RangeState>>;
 
-  totalAmount?: number; // saving: 총저축금, deposit: 가입한도(min/max)
-  setTotalAmount?: Dispatch<SetStateAction<number | undefined>>;
+  totalAmount?: RangeState; // saving: 총저축금, deposit: 가입한도(min/max)
+  setTotalAmount?: Dispatch<SetStateAction<RangeState>>;
 
   //예금전용 -가입한도
   // maxLimit?: RangeState;
@@ -45,7 +45,8 @@ export function useFilterChips(params: {
     // amount,
     // setAmount,
     monthlyAmount,
-    setMonthlyAmount,
+    //********************** 에러  ******************/
+    // setMonthlyAmount,
     baseRate,
     setBaseRate,
     maxRate,
@@ -155,34 +156,34 @@ export function useFilterChips(params: {
 
     // 저축, 예금 분리
     if (mode === "savings") {
-      if (typeof monthlyAmount === "number") {
-        acc.push({
-          key: "monthlyAmount",
-          label: `월저축금: ${monthlyAmount.toLocaleString()}원`,
-          onRemove: () => {
-            setMonthlyAmount?.(undefined);
-            goReplace((next) => next.delete("monthlyMaxLimit"));
-          },
-        });
-      }
-      if (totalAmount?.max !== undefined || totalAmount?.min !== undefined) {
-        const a =
-          totalAmount.min !== undefined
-            ? `${totalAmount.min.toLocaleString()}원`
-            : "최저값";
-        const b =
-          totalAmount.max !== undefined
-            ? `${totalAmount.max.toLocaleString()}원`
-            : "최고값";
-        acc.push({
-          key: "totalAmount",
-          label: `총저축금: ${a} ~ ${b}`,
-          onRemove: () => {
-            setTotalAmount?.({});
-            goReplace((next) => next.delete("totalMaxLimit")); // saving: 최대만 사용
-          },
-        });
-      }
+      // if (typeof monthlyAmount === "number") {
+      //   acc.push({
+      //     key: "monthlyAmount",
+      //     label: `월저축금: ${monthlyAmount.toLocaleString()}원`,
+      //     onRemove: () => {
+      //       setMonthlyAmount?.(undefined);
+      //       goReplace((next) => next.delete("monthlyMaxLimit"));
+      //     },
+      //   });
+      // }
+      // if (totalAmount !== undefined || totalAmount !== undefined) {
+      //   const a =
+      //     totalAmount !== undefined
+      //       ? `${totalAmount.toLocaleString()}원`
+      //       : "최저값";
+      //   const b =
+      //     totalAmount !== undefined
+      //       ? `${totalAmount.toLocaleString()}원`
+      //       : "최고값";
+      //   acc.push({
+      //     key: "totalAmount",
+      //     label: `총저축금: ${a} ~ ${b}`,
+      //     onRemove: () => {
+      //       setTotalAmount?.({});
+      //       goReplace((next) => next.delete("totalMaxLimit")); // saving: 최대만 사용
+      //     },
+      //   });
+      // }
     } else {
       // deposit: 가입한도 범위 칩
       if (totalAmount?.min !== undefined || totalAmount?.max !== undefined) {

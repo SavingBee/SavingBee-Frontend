@@ -35,7 +35,7 @@ type Props = {
   //page 타입별 Filter 변경
   filters: readonly Filter[];
   state: {
-    selected: Selected;
+    selected?: Selected;
     amount?: number;
     monthlyAmount?: number;
     baseRate?: RangeState;
@@ -105,8 +105,14 @@ export default function FilterBar({
   actions,
   onConfirm,
 }: Props) {
-  const { selected, amount, monthlyAmount, baseRate, maxRate, totalAmount } =
-    state;
+  const {
+    selected = {} as Selected,
+    amount,
+    monthlyAmount,
+    baseRate = EMPTY_RANGE,
+    maxRate = EMPTY_RANGE,
+    totalAmount = EMPTY_RANGE,
+  } = state;
   const {
     setSelected,
     setAmount,
@@ -154,7 +160,7 @@ export default function FilterBar({
 
       const a = decideAlignByOverflow(anchor, rowRef.current!, 360, 16); // 360은 Popover 선호 폭과 동일
       setAlign(a);
-      const currentListVals = selected[id as ListCategory] ?? [];
+      const currentListVals = selected?.[id as ListCategory] ?? [];
 
       setAnchorEl(anchor);
       setDraft({
@@ -327,7 +333,7 @@ export default function FilterBar({
           aFilter={f}
           value={draft.amount}
           onChange={(e) => setDraft((d) => ({ ...d, amount: parseNum(e) }))}
-        // onApply={() => applyById("amount")}
+          // onApply={() => applyById("amount")}
         />
       );
     }
@@ -339,7 +345,7 @@ export default function FilterBar({
           onChange={(e) =>
             setDraft((d) => ({ ...d, monthlyAmount: parseNum(e) }))
           }
-        // onApply={() => applyById("monthlyAmount")}
+          // onApply={() => applyById("monthlyAmount")}
         />
       );
     }
@@ -360,7 +366,7 @@ export default function FilterBar({
               baseRate: { ...d.baseRate, max: parseNum(e) },
             }))
           }
-        // onApply={() => applyById("baseRate")}
+          // onApply={() => applyById("baseRate")}
         />
       );
     }
@@ -381,7 +387,7 @@ export default function FilterBar({
               maxRate: { ...d.maxRate, max: parseNum(e) },
             }))
           }
-        // onApply={() => applyById("maxRate")}
+          // onApply={() => applyById("maxRate")}
         />
       );
     }
@@ -402,7 +408,7 @@ export default function FilterBar({
               totalAmount: { ...d.totalAmount, max: parseNum(e) },
             }))
           }
-        // onApply={() => applyById("totalAmount")}
+          // onApply={() => applyById("totalAmount")}
         />
       );
     }

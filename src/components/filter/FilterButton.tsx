@@ -1,6 +1,6 @@
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import Button from "../common/button/Button";
-import React, { type ForwardedRef } from "react";
+import React, { forwardRef } from "react";
 
 // FilterButton - 공통
 export const filterButtonStyle = [
@@ -15,28 +15,34 @@ interface FilterButtonProps {
   filterText: string;
   isActive?: boolean;
   // clickFilter?: () => void;
-  clickFilter?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  clickFilter?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
-export default function FilterButton(
-  { filterText, isActive, clickFilter }: FilterButtonProps,
-  ref: ForwardedRef<HTMLButtonElement>,
-) {
-  return (
-    <Button
-      ref={ref}
-      type="button"
-      variant="sm"
-      styleVariant="border"
-      className={`${filterButtonStyle} ${isActive ? "border-primary" : "border-graye5"}`}
-      onClick={clickFilter}
-    >
-      <span
-        className={`${isActive ? "text-primary" : "text-gray7"} inline-flex leading-none gap-2`}
+const FilterButton = forwardRef<HTMLButtonElement, FilterButtonProps>(
+  ({ filterText, isActive = false, clickFilter }, _ref) => {
+    const handleClick = (clickFilter as unknown as () => void) || undefined;
+
+    return (
+      <Button
+        type="button"
+        variant="sm"
+        styleVariant="border"
+        className={`${filterButtonStyle} ${isActive ? "border-primary" : "border-graye5"}`}
+        onClick={handleClick}
       >
-        {filterText}
-        {isActive ? <FaChevronUp /> : <FaChevronDown className="text-gray7 " />}
-      </span>
-    </Button>
-  );
-}
+        <span
+          className={`${isActive ? "text-primary" : "text-gray7"} inline-flex leading-none gap-2`}
+        >
+          {filterText}
+          {isActive ? (
+            <FaChevronUp />
+          ) : (
+            <FaChevronDown className="text-gray7" />
+          )}
+        </span>
+      </Button>
+    );
+  },
+);
+FilterButton.displayName = "FilterButton";
+export default FilterButton;

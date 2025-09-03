@@ -1,13 +1,19 @@
-interface ButtonProps {
+type ButtonProps = Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  "type" | "onClick" | "onSubmit"
+> & {
   type: "button" | "submit";
   children: React.ReactNode;
   disabled?: boolean;
-  onClick?: () => void;
-  onSubmit?: (event: React.FormEvent) => void;
+  // onClick?: () => void;
+  // onSubmit?: (event: React.FormEvent) => void;
+  // *********** 버튼 타입 확장
+  onClick?: React.MouseEventHandler<HTMLButtonElement> | (() => void);
+  onSubmit?: (event: React.FormEvent<HTMLButtonElement>) => void;
   className?: string;
   variant?: "lg" | "sm";
   styleVariant?: "bg" | "border";
-}
+};
 
 const Button = ({
   type,
@@ -26,9 +32,14 @@ const Button = ({
 
   const stylevariantClass = styleVariant === "bg" ? "text-white" : "border";
 
-  const handleSubmit = (event: React.FormEvent) => {
-    if (onSubmit) {
-      onSubmit(event); // onSubmit이 있을 경우 호출
+  // const handleSubmit = (event: React.FormEvent) => {
+  //   if (onSubmit) {
+  //     onSubmit?.(event); // onSubmit이 있을 경우 호출
+  //   }
+  // };
+  const handleSubmit: React.MouseEventHandler<HTMLButtonElement> = (e) => {
+    if (type === "submit") {
+      onSubmit?.(e as unknown as React.FormEvent<HTMLButtonElement>);
     }
   };
 
