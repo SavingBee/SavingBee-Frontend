@@ -1,10 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaSearch, FaPlus } from "react-icons/fa";
 import Checkbox from "@/components/common/input/Checkbox";
 import IcnButton from "@/components/common/button/IcnButton";
 import { LuDot } from "react-icons/lu";
 import BankLogo from "@/components/product/BankLogo";
+import { useDeleteMyProduct } from "@/hooks/mypage/product/useDeleteMyProduct";
+import { useAddCart } from "@/hooks/cart/useAddCartItem";
+import { AddCartRequest } from "@/api/cart/addCartItem";
+import { CartItem } from "@/types/cart";
+import { format } from "date-fns";
+import useAuthHeader from "@/hooks/auth/useAuthHeader";
 
 /**
  * #34A853, #1976D3
@@ -19,7 +25,7 @@ export type ProductListItemProps = {
   product_type?: "deposit" | "savings"; // 필요시 분기 처리
 
   onCompare?: () => void;
-  variant?: "search" | "compare" | "mylist" | "recommend";
+  variant?: "search" | "compare" | "mylist" | "recommend" | "productSearch";
   selected?: boolean;
   //검색 드롭다운 활용위해 확장
   disableActions?: boolean;
@@ -45,7 +51,7 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
   selected = false,
   variant = "search",
   disableActions,
-  onItemClick,
+  // onItemClick,
 
   recommendReason,
   ownedProductName,
@@ -56,21 +62,26 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const isCompare = variant === "compare";
 
+  // 로그인 여부 확인
+  const isLoggedIn = useAuthHeader();
+
   function handleClick() {
     if (isCompare) {
       onCompare?.();
       return;
     }
-    if (disableActions) {
-      // 드롭다운 모드일 때는 바로 외부 콜백만 실행
-      onItemClick?.();
-      return;
+
+    // 드롭다운은 compare, mylist일 때 열기
+    if (["compare", "mylist", "productSearch"].includes(variant as string)) {
+      setIsOpen((v) => !v);
     }
-    // 기본 모드일 때만 버튼 토글 유지 , 상세페이지 이동
-    setIsOpen((v) => !v);
-    navigate(`/products/${encodeURIComponent(fin_prdt_cd)}`);
-    // console.log(fin_prdt_cd);
+
+    // 이동은 나머지일 때만
+    if (!["compare", "mylist", "productSearch"].includes(variant as string) && !disableActions) {
+      navigate(`/products/${encodeURIComponent(fin_prdt_cd)}`);
+    }
   }
+
 
   const containerClass = [
     "w-full bg-white transition-all cursor-pointer",
@@ -81,6 +92,78 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
         : "border-gray-200 hover:border-primary/60"
       : "border-gray-200 hover:border-gray-300 hover:shadow-sm",
   ].join(" ");
+
+  // (마이페이지 보유 상품) 삭제
+  const { remove: myProductDelete } = useDeleteMyProduct();
+
+  // 보관함 넣기
+  const { add, error: cartError } = useAddCart();
+  useEffect(() => {
+    if (cartError) {
+      alert(cartError);
+    }
+  }, [cartError]);
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    const productType: "DEPOSIT" | "SAVINGS" =
+      product_type === "deposit" ? "DEPOSIT" : "SAVINGS";
+
+    const payload: AddCartRequest = {
+      productCode: String(fin_prdt_cd),
+      productType,
+    };
+
+    console.log("[addCart] payload:", payload);
+
+    add({
+      productCode: String(fin_prdt_cd),
+      productType: (product_type === "deposit" ? "DEPOSIT" : "SAVINGS") as "DEPOSIT" | "SAVINGS",
+    });
+  };
+
+  const handleAddToCartToLocalStorage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    const productType: "DEPOSIT" | "SAVINGS" =
+      product_type === "deposit" ? "DEPOSIT" : "SAVINGS";
+
+    const cartItem: CartItem = {
+      cartId: Date.now(), // 임시 ID
+      productCode: fin_prdt_cd,
+      productType,
+      bankName: kor_co_nm,
+      productName: fin_prdt_nm,
+      maxInterestRate: max_intr_rate,
+      termMonths: 0, // termMonths 정보가 없다면 0 또는 입력 받는 곳에서 설정
+      createdAt: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
+    };
+
+    // 기존 localStorage에서 데이터 가져오기
+    const existing = localStorage.getItem("compareCart");
+    const parsed: CartItem[] = existing ? JSON.parse(existing) : [];
+
+    // 중복 체크
+    const isDuplicate = parsed.some(
+      (item) =>
+        item.productCode === cartItem.productCode &&
+        item.productType === cartItem.productType
+    );
+    if (isDuplicate) {
+      alert("이미 비교함에 담긴 상품입니다.");
+      return;
+    }
+
+    // 추가 후 저장
+    const updated = [...parsed, cartItem];
+    localStorage.setItem("compareCart", JSON.stringify(updated));
+    alert("비교함에 담겼습니다!");
+
+    window.location.reload();
+  };
+
+
+
 
   return (
     <li onClick={handleClick} className={containerClass}>
@@ -115,6 +198,7 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
           {/* 상품명 */}
           <h3 className="truncate text-base md:text-lg font-bold">
             {fin_prdt_nm}
+
           </h3>
           {/* 은행명 */}
           <p className="text-sm">{kor_co_nm}</p>
@@ -160,14 +244,14 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
         </div>
       )}
 
-      {["search", "mylist", "recommend"].includes(variant) &&
+      {["productSearch", "mylist", "recommend"].includes(variant) &&
         !disableActions && (
           <div
             className="overflow-hidden transition-[max-height] duration-300 ease-in-out bg-[#f9f9f9] text-sm text-gray-700 rounded-xl rounded-t-none"
             style={{ maxHeight: isOpen ? "50px" : "0px" }}
           >
-            <div className="flex items-center justify-between h-[50px] px-4">
-              {variant === "search" && (
+            <div className="flex items-center justify-between h-[50px] px-5">
+              {variant === "productSearch" && (
                 <>
                   {/* 돋보기 버튼 */}
                   <IcnButton
@@ -186,10 +270,7 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
                   {/* 비교함 담기 버튼 */}
                   <IcnButton
                     type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onCompare?.();
-                    }}
+                    onClick={isLoggedIn === true ? handleAddToCart : handleAddToCartToLocalStorage}
                     icon={<FaPlus size={10} color="#fff" />}
                     className="text-green"
                     iconClassName="bg-green"
@@ -206,7 +287,7 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      console.log("상세보기 클릭");
+                      navigate(`/mypage/product/${encodeURIComponent(fin_prdt_cd)}`);
                     }}
                     icon={<FaSearch size={10} color="#fff" />}
                     className="text-primary"
@@ -214,12 +295,16 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
                   >
                     상세보기
                   </IcnButton>
-                  <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center justify-between gap-4">
                     <IcnButton
                       type="button"
                       className="text-green"
                       iconClassName="bg-green"
                       icon={<FaSearch size={10} color="#fff" />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/mypage/product/edit/${encodeURIComponent(fin_prdt_cd)}`);
+                      }}
                     >
                       수정
                     </IcnButton>
@@ -228,6 +313,16 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
                       className="text-red"
                       iconClassName="bg-red"
                       icon={<FaSearch size={10} color="#fff" />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const confirmed = window.confirm("정말 삭제하시겠습니까?");
+                        if (!confirmed) return;
+
+                        myProductDelete(fin_prdt_cd, () => {
+                          alert("삭제 완료!");
+                          window.location.reload(); // 페이지 새로고침
+                        });
+                      }}
                     >
                       삭제
                     </IcnButton>
@@ -270,50 +365,6 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
             </div>
           </div>
         )}
-
-      {/* 아코디언  --- disableActions 일때, 렌더 막기 */}
-      {/* {variant === "search" && !disableActions && (
-        <div
-          className="overflow-hidden transition-[max-height] duration-300 ease-in-out bg-[#f9f9f9] text-sm text-gray-700 rounded-xl"
-          style={{ maxHeight: isOpen ? "50px" : "0px" }}
-        >
-          <div className="flex items-center justify-between h-[50px] px-4"> */}
-      {/* 돋보기 버튼 */}
-      {/* <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                console.log("상세보기 클릭");
-              }}
-              className="flex items-center gap-1 text-[#1976D3] hover:underline"
-            >
-              <span className="flex items-center justify-center w-5 h-5 rounded-full bg-[#1976D3]">
-                <FaSearch size={10} color="#fff" />
-              </span>
-
-              <span>상세보기</span>
-            </button> */}
-
-      {/*  + 버튼 */}
-      {/* <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onCompare?.();
-              }}
-              className="flex items-center gap-1 px-4 py-2 font-bold text-[#34A853] transition-colors hover:underline"
-            >
-              <span className="flex items-center justify-center w-5 h-5 rounded-full bg-[#34A853]">
-                <FaPlus size={10} color="#fff" />
-              </span>
-
-              <span>비교함 담기</span>
-            </button> */}
-
-      {/* 
-          </div>
-        </div>
-      )} */}
     </li>
   );
 };

@@ -5,7 +5,7 @@ type ProductListProps = {
   items: Item[];
   onCompare?: (id: string) => void;
   listClassName?: string;
-  variant?: "search" | "compare";
+  variant?: "search" | "compare" | "productSearch";
   selectedIds?: string[]; // fin_prdt_cd
   disableItemActions?: boolean;
   onSelect?: (item: Item) => void;
@@ -16,7 +16,7 @@ const ProductList: React.FC<ProductListProps> = ({
   items,
   onCompare,
   listClassName,
-  variant = "search",
+  variant = "productSearch",
   selectedIds = [],
   disableItemActions,
   onSelect,

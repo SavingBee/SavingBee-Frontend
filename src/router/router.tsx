@@ -12,8 +12,9 @@ import FindId from "@/pages/FindId";
 import FindPassword from "@/pages/FindPassword";
 // import SearchBox from "@/components/search/SearchBox";
 import Mypage from "@/pages/Mypage";
-import FindIdStep2 from "@/components/find/id/step/FindIdStep2";
-import FindPasswordStep2 from "@/components/find/password/step/FindPasswordStep2";
+import UserProductForm from "@/components/mypage/products/UserProductForm";
+import UserProductDetail from "@/components/mypage/products/UserProductDetail";
+import UserProductEdit from "@/components/mypage/products/UserProductEdit";
 
 const Router = () => {
   return (
@@ -26,14 +27,15 @@ const Router = () => {
         <Route path="/product/compare" element={<ProductComparePage />} />
         {/* <Route path="/search-test" element={<SearchBox />} /> */}
         <Route path="/mypage" element={<Mypage />} />
+        <Route path="/mypage/product/form" element={<UserProductForm />} />
+        <Route path="/mypage/product/edit/:userProductId" element={<UserProductEdit />} />
+        <Route path="/mypage/product/:userProductId" element={<UserProductDetail />} />
       </Route>
       <Route element={<LoginLayout />}>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/find_id" element={<FindId />} />
         <Route path="/find/password" element={<FindPassword />} />
-        <Route path="/find/id/result" element={<FindIdStep2 />} />
-        <Route path="/find/password/result" element={<FindPasswordStep2 />} />
       </Route>
     </Routes>
   );

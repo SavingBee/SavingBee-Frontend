@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import Footer from "./Footer";
 import Header from "./Header";
+import CartFixContainer from "@/components/cart/CartFixContainer";
 
 const Layout = () => {
     return (
@@ -10,6 +11,7 @@ const Layout = () => {
                 <Outlet />
             </div>
             <Footer />
+            <CartFixContainer />
         </div>
     )
 }
