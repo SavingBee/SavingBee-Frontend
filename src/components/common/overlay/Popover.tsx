@@ -22,7 +22,7 @@ export default function Popover({
   align = "start",
   offset = 8,
   onClose,
-  preferredWidth,
+  // preferredWidth,
   children,
 }: Props) {
   const boxRef = useRef<HTMLDivElement>(null);
@@ -32,7 +32,7 @@ export default function Popover({
   useEffect(() => {
     if (!open || !anchorEl) return;
     function place() {
-      const rect = anchorEl.getBoundingClientRect();
+      const rect = anchorEl!.getBoundingClientRect();
       const vw = window.innerWidth;
 
       // 고정 폭 기반 배치: 초기 레이아웃 전 34px 이슈 방지
