@@ -10,7 +10,7 @@ type Props = {
   offset?: number;
   onClose: () => void;
   children: React.ReactNode;
-  // preferredWidth: number;
+  preferredWidth: number;
 };
 
 const clamp = (v: number, min: number, max: number) =>
@@ -22,7 +22,7 @@ export default function Popover({
   align = "start",
   offset = 8,
   onClose,
-  // preferredWidth = 400,
+  preferredWidth,
   children,
 }: Props) {
   const boxRef = useRef<HTMLDivElement>(null);

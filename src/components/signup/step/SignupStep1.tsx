@@ -8,7 +8,7 @@ interface SignupStep1Props {
 }
 
 const SignupStep1 = ({ onNext }: SignupStep1Props) => {
-    const [ agreeTerms, setAgreeTerms ] = useState({
+    const [agreeTerms, setAgreeTerms] = useState({
         all: false,
         required: false,
         optional: false,
@@ -52,7 +52,7 @@ const SignupStep1 = ({ onNext }: SignupStep1Props) => {
                     label="전체 동의"
                     labelClassName="font-semibold text-black4"
                     checked={agreeTerms.all}
-                    onChange={handleAllCheck}
+                    onChange={(e) => handleAllCheck(e.target.checked)}
                 />
             </div>
             <div className="mt-6">
@@ -63,7 +63,7 @@ const SignupStep1 = ({ onNext }: SignupStep1Props) => {
                         label="이용약관"
                         labelClassName="font-medium text-black6"
                         checked={agreeTerms.required}
-                        onChange={handleRequiredCheck}
+                        onChange={(e) => handleRequiredCheck(e.target.checked)}
                     />
                     <span className="text-primary font-bold">(필수)</span>
                 </div>
@@ -79,7 +79,7 @@ const SignupStep1 = ({ onNext }: SignupStep1Props) => {
                         label="이용약관"
                         labelClassName="font-medium text-black6"
                         checked={agreeTerms.optional}
-                        onChange={handleOptionalCheck}
+                        onChange={(e) => handleOptionalCheck(e.target.checked)}
                     />
                     <span className="text-gray9 font-bold">(선택)</span>
                 </div>
