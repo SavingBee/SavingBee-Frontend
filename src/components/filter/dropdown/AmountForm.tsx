@@ -2,6 +2,7 @@
 import InputField1 from "@/components/common/input/InputField1";
 import type { AmountFilter } from "@/types/uiFilter";
 import type { ChangeEvent } from "react";
+import { formatNumber } from "@/utils/number";
 
 type AmountFormProps = {
   aFilter: AmountFilter;
@@ -20,13 +21,13 @@ export default function AmountForm({
     <div className="flex items-center gap-2 pb-4 rounded-md">
       <InputField1
         type="text"
-        variant="sm"
+        variant="lg"
         inputClassName="border-gray5 rounded-md py-3 outline-none pr-10"
         placeholder={
           aFilter.placeholder ??
           (aFilter.unit ? `금액 입력 (${aFilter.unit})` : "금액 입력")
         }
-        value={value}
+        value={formatNumber(value) ?? ""}
         onChange={onChange}
       />
       {/* <Button

@@ -1,5 +1,5 @@
 import Checkbox from "@/components/common/input/Checkbox";
-import type { Option } from "@/types/searchFilter";
+import { Option } from "@/types/uiFilter";
 
 interface MultiOptionProps {
   options: Option[];

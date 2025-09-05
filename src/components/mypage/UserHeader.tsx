@@ -7,10 +7,17 @@ import { GoPerson } from "react-icons/go";
 import { HiMiniBell } from "react-icons/hi2";
 import { IoMdPerson } from "react-icons/io";
 import AlertModal from "./alert/AlertModal.tsx";
+import UserRemoveModal from "./UserRemoveModal.tsx";
+import { MyProfile } from "@/types/user.ts";
+import { UserProductResponse } from "@/types/product.ts";
 
-type ActiveModal = "none" | "alert" | "edit";
+type ActiveModal = "none" | "alert" | "edit" | "remove";
+interface UserHeaderProps {
+    profile?: MyProfile | null;
+    products?: UserProductResponse | null;
+}
 
-const UserHeader = () => {
+const UserHeader = ({ profile, products }: UserHeaderProps) => {
     const [activeModal, setActiveModal] = useState<ActiveModal>("none");
 
     const open = (m: ActiveModal) => setActiveModal(m);
@@ -25,10 +32,10 @@ const UserHeader = () => {
                     </div>
                     <div>
                         <strong className="block text-lg font-bold">
-                            닉네임
+                            {profile?.nickname}
                         </strong>
                         <p className="text-sm text-black6">
-                            email@gmail.com
+                            {profile?.email}
                         </p>
                     </div>
                 </div>
@@ -41,7 +48,7 @@ const UserHeader = () => {
                             현재 <br />보유 상품
                         </strong>
                         <span className="block font-bold  text-primary text-2xl underline">
-                            4
+                            {products?.totalElements}
                         </span>
                     </div>
                 </div>
@@ -57,11 +64,6 @@ const UserHeader = () => {
                     알림설정
                 </button>
                 <AlertModal isOpen={activeModal === "alert"} onClose={close} />
-
-                {/* {openAlert && (
-                    <AlertModal closeAlert={() => setOpenAlert((prev) => !prev)} />
-                )} */}
-
                 {/* 회원정보수정 */}
                 <button
                     type="button"
@@ -72,15 +74,16 @@ const UserHeader = () => {
                     회원정보수정
                 </button>
                 <UserEditModal isOpen={activeModal === "edit"} onClose={close} />
-
                 {/* 회원탈퇴 */}
                 <button
                     type="button"
+                    onClick={() => open("remove")}
                     className="flex items-center justify-center gap-1 flex-auto py-3 font-medium text-sm text-black6"
                 >
                     <IoMdPerson color="#666" />
                     회원탈퇴
                 </button>
+                <UserRemoveModal isOpen={activeModal === "remove"} onClose={close} />
             </div>
         </div>
     )

@@ -45,13 +45,13 @@ const SavingsPage = () => {
   // 화면 상태
   const [keyword, setKeyword] = useState("");
   const [items, setItems] = useState<any[]>([]);
-  const [isPopular, _setIsPopular] = useState(false);
+  const [isPopular] = useState(false);
   const [page, setPage] = useState(1);
 
   const [totalPages, setTotalPages] = useState(1);
   const [totalData, setTotalData] = useState(0);
-  const [_loading, setLoading] = useState(false);
-  const [_error, setError] = useState("");
+  const [, setLoading] = useState(false);
+  const [, setError] = useState("");
 
   //새로고침 - url 리셋
   useEffect(() => {
@@ -164,8 +164,8 @@ const SavingsPage = () => {
     setBaseRate,
     maxRate,
     setMaxRate,
-    totalAmount,
-    setTotalAmount,
+    // totalAmount,
+    // setTotalAmount,
   } = useSavingsFilterState();
   const filterState = {
     selected,
@@ -173,7 +173,7 @@ const SavingsPage = () => {
     monthlyAmount,
     baseRate,
     maxRate,
-    totalAmount,
+    // totalAmount,
   };
   const filterSetters = {
     setSelected,
@@ -181,7 +181,7 @@ const SavingsPage = () => {
     setMonthlyAmount,
     setBaseRate,
     setMaxRate,
-    setTotalAmount,
+    // setTotalAmount,
   };
 
   /**
@@ -200,8 +200,8 @@ const SavingsPage = () => {
     setBaseRate,
     maxRate,
     setMaxRate,
-    totalAmount,
-    setTotalAmount,
+    // totalAmount,
+    // setTotalAmount,
   });
   /**
    * *** 레이아웃

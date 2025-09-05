@@ -1,6 +1,6 @@
 //모바일시트(FilterButtomSheet) 열릴 때
 import { useEffect } from "react";
-export function useScrollLock(locked) {
+export function useScrollLock(locked: any) {
   useEffect(() => {
     const root = document.documentElement;
     const prev = root.style.overflow;

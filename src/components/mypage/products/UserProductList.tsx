@@ -1,17 +1,31 @@
 import ProductListItem from "@/components/product/ProductListItem";
+import { UserProductResponse } from "@/types/product";
 
-const UserProductList = () => {
+interface Props {
+    products?: UserProductResponse | null;
+}
+
+const UserProductList = ({ products }: Props) => {
     return (
-        <ul>
-            <ProductListItem
-                fin_prdt_cd="SH00001"
-                fin_prdt_nm="Sh첫만남우대예금"
-                kor_co_nm="SH수협은행"
-                max_intr_rate={2.9}
-                base_intr_rate={1.85}
-                variant="mylist"
-            />
-        </ul>
+        <div>
+            <ul>
+                {products?.content.length === 0 ? (
+                    <li className="w-full py-10 text-center text-sm text-black6">등록된 상품이 없습니다.</li>
+                ) : (
+                    products?.content.map((item) => (
+                        <ProductListItem
+                            key={item.userProductId}
+                            fin_prdt_cd={String(item.userProductId)}
+                            fin_prdt_nm={item.productName}
+                            kor_co_nm={item.bankName}
+                            max_intr_rate={item.interestRate}
+                            base_intr_rate={item.interestRate}
+                            variant="mylist"
+                        />
+                    ))
+                )}
+            </ul>
+        </div>
     )
 }
 export default UserProductList;

@@ -22,39 +22,53 @@ export default function Popover({
   align = "start",
   offset = 8,
   onClose,
-  preferredWidth = 360,
+  // preferredWidth,
   children,
 }: Props) {
   const boxRef = useRef<HTMLDivElement>(null);
   // useOnClickOutside(boxRef, onClose, open);
-  const [pos, setPos] = useState({ top: 0, left: 0, width: preferredWidth });
+  const [pos, setPos] = useState({ top: 0, left: 0 });
 
   useEffect(() => {
     if (!open || !anchorEl) return;
     function place() {
-      const rect = anchorEl.getBoundingClientRect();
+      const rect = anchorEl!.getBoundingClientRect();
       const vw = window.innerWidth;
 
       // 고정 폭 기반 배치: 초기 레이아웃 전 34px 이슈 방지
-      const pw = Math.min(preferredWidth, vw - 32); // 좌우 16px 여백
+      const box = boxRef.current;
+      const contentWidth = Math.min(box?.offsetWidth ?? 0, vw - 32); // 좌우 16px 여백 확보
       const top = Math.round(rect.bottom + offset);
       const rawLeft =
-        align === "end" ? Math.round(rect.right - pw) : Math.round(rect.left);
-      const left = clamp(rawLeft, 16, vw - pw - 16);
+        align === "end"
+          ? Math.round(rect.right - contentWidth) //fix: pw → contentWidth
+          : Math.round(rect.left);
 
-      setPos({ top, left, width: pw });
+      const maxLeft = Math.max(16, vw - contentWidth - 16); //fix: 작은 뷰포트에서도 최소 16px 여백 보장
+      const left = clamp(rawLeft, 16, maxLeft);
+
+      setPos({ top, left }); //fix: width 주입 제거
     }
     place();
-    const ro = new ResizeObserver(place);
-    ro.observe(document.documentElement);
+    //fix: 콘텐츠 폭 변동에도 재계산되도록 boxRef도 관찰
+    const roDoc = new ResizeObserver(place);
+    roDoc.observe(document.documentElement);
+    let roBox: ResizeObserver | undefined;
+    if (boxRef.current) {
+      roBox = new ResizeObserver(place);
+      roBox.observe(boxRef.current);
+    }
+
     window.addEventListener("scroll", place, true);
     window.addEventListener("resize", place);
+
     return () => {
-      ro.disconnect();
+      roDoc.disconnect();
+      roBox?.disconnect(); //fix
       window.removeEventListener("scroll", place, true);
       window.removeEventListener("resize", place);
     };
-  }, [open, anchorEl, align, offset, preferredWidth]);
+  }, [open, anchorEl, align, offset]);
 
   // ************ 바깥 클릭(문서 캡처 단계)에서만 닫기
   useEffect(() => {
@@ -99,10 +113,10 @@ export default function Popover({
         position: "fixed",
         top: pos.top,
         left: pos.left,
-        width: pos.width,
+        // width: pos.width,
         transition: "opacity 200ms, transform 200ms",
       }}
-      className="hidden sm:block rounded-xl bg-white border border-black2/10 p-4 shadow-lg z-50 max-w-[min(360px,calc(100vw-32px))] opacity-100"
+      className="hidden sm:block rounded-xl bg-white border border-black2/10 p-4 shadow-lg z-50  opacity-100"
     >
       {children}
     </div>,

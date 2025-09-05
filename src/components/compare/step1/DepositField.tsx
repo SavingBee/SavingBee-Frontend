@@ -8,7 +8,6 @@ interface DepositFieldProps {
 
 const MIN_DEPOSIT_PRINCIPAL = 100_000;
 const MIN_DEPOSIT_RATE = 0.1;
-const MAX_DEPOSIT_RATE = 5;
 
 const ALLOWED_MONTHS = [6, 12, 24, 36] as const;
 
@@ -33,9 +32,7 @@ export function DepositField({ onChange }: DepositFieldProps) {
     ALLOWED_MONTHS.includes(months as (typeof ALLOWED_MONTHS)[number]);
 
   const validMinRate =
-    typeof minRate === "number" &&
-    minRate >= MIN_DEPOSIT_RATE &&
-    minRate <= MAX_DEPOSIT_RATE;
+    typeof minRate === "number" && minRate >= MIN_DEPOSIT_RATE;
 
   const validRateType = rateType === "단리" || rateType === "복리";
 
@@ -120,7 +117,7 @@ export function DepositField({ onChange }: DepositFieldProps) {
           <div className="text-base text-gray6">최소 이자율</div>
           {showRateError && (
             <p className="mt-1 text-sm text-red">
-              이자율은 {MIN_DEPOSIT_RATE}% ~ {MAX_DEPOSIT_RATE}% 사이로 입력
+              이자율은 {MIN_DEPOSIT_RATE}% 이상 입력해주세요.
             </p>
           )}
           <div className="mt-3">
