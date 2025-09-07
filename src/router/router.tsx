@@ -15,6 +15,7 @@ import Mypage from "@/pages/Mypage";
 import UserProductForm from "@/components/mypage/products/UserProductForm";
 import UserProductDetail from "@/components/mypage/products/UserProductDetail";
 import UserProductEdit from "@/components/mypage/products/UserProductEdit";
+import Cookie from "@/pages/cookie/Cookie";
 
 const Router = () => {
   return (
@@ -30,6 +31,7 @@ const Router = () => {
         <Route path="/mypage/product/form" element={<UserProductForm />} />
         <Route path="/mypage/product/edit/:userProductId" element={<UserProductEdit />} />
         <Route path="/mypage/product/:userProductId" element={<UserProductDetail />} />
+        <Route path="/cookie" element={<Cookie />} />
       </Route>
       <Route element={<LoginLayout />}>
         <Route path="/login" element={<Login />} />

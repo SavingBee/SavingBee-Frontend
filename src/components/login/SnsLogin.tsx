@@ -2,7 +2,7 @@ import { FaGoogle } from "react-icons/fa";
 import { SiNaver } from "react-icons/si";
 
 const NAVER_CLIENT_ID = import.meta.env.VITE_NAVER_CLIENT_ID;
-const REDIRECT_URI = "http://34.64.73.53:8080/login/oauth2/code/naver"; // 등록한 callback URL
+const REDIRECT_URI = "https://savingbee.monster/login/oauth2/code/naver"; // 등록한 callback URL
 
 const SnsLogin = () => {
     const handleNaverLogin = () => {
