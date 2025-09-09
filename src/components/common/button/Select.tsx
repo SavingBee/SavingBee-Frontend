@@ -18,9 +18,10 @@ interface SelectFieldProps {
     disabled?: boolean;
     // onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
     onChange?: (value: string) => void;
+    required?: boolean; // 필수 필드인지
 }
 
-const Select = ({ label, id, name, value, placeholder, options, className = "", selectClassName = "", labelClassName = "", variant = "lg", disabled, onChange }: SelectFieldProps) => {
+const Select = ({ label, id, name, value, placeholder, options, className = "", selectClassName = "", labelClassName = "", variant = "lg", disabled, onChange, required }: SelectFieldProps) => {
     const variantClass = variant === "lg"
         ? "h-[50px] p-[15px]" // lg style
         : "h-[34px] pr-[10px] pl-[10px]"; // sm style 
@@ -36,6 +37,7 @@ const Select = ({ label, id, name, value, placeholder, options, className = "", 
             {label && (
                 <label htmlFor={id} className={labelClassName}>
                     {label}
+                    {required && <span className="text-red font-bold">*</span>}
                 </label>
             )}
             <div className="relative">

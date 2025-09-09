@@ -191,7 +191,7 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
           />
         )}
         {/* 은행 로고 */}
-        <div className="h-10 w-10 rounded-full overflow-hidden border border-graye5">
+        <div className="h-10 w-10 rounded-full overflow-hidden">
           <BankLogo
             korCoName={kor_co_nm}
             className="object-cover ring-1 ring-gray-200 w-10 h-10 rounded"

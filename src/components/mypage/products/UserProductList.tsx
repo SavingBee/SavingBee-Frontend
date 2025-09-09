@@ -8,7 +8,7 @@ interface Props {
 const UserProductList = ({ products }: Props) => {
     return (
         <div>
-            <ul>
+            <ul className="space-y-3">
                 {products?.content.length === 0 ? (
                     <li className="w-full py-10 text-center text-sm text-black6">등록된 상품이 없습니다.</li>
                 ) : (

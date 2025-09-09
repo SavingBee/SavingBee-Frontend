@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import MainHeader from "./MainHeader";
 const Carousel = () => {
   return (
@@ -22,9 +23,12 @@ const Carousel = () => {
               contentTxt="복잡한 검색 없이 금리·기간·조건별로 손쉽게 비교하고, 나에게 가장 유리한 상품을 바로 찾아보세요."
               titleClassName="!text-[#34A853]"
             />
-            <button type="button" className="border px-4 py-1 cursor-pointer">
+            <Link
+              to="/product/compare"
+              className="block w-40 py-3 font-bold border cursor-pointer text-center"
+            >
               자세히 보기
-            </button>
+            </Link>
           </div>
         </div>
       </div>

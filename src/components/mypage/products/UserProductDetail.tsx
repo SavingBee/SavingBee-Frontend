@@ -1,4 +1,5 @@
 import Button from "@/components/common/button/Button";
+import PageHeader from "@/components/common/pageHeader/PageHeader";
 import { useDeleteMyProduct } from "@/hooks/mypage/product/useDeleteMyProduct";
 import useMyProduct from "@/hooks/mypage/product/useMyProduct";
 import { useEffect } from "react";
@@ -56,6 +57,14 @@ const UserProductDetail = () => {
 
     return (
         <>
+            <PageHeader
+                title={data?.productName}
+                breadcrumb={[
+                    { label: "홈", to: "/" },
+                    { label: "마이페이지", to: "/mypage" },
+                    { label: "보유 상품 상세", to: `/mypage/product/${userProductId}` },
+                ]}
+            />
             <div className="pb-4 border-t border-t-gray9 border-b border-graye5">
                 <strong className="block py-7 mb-5 gmarket font-bold text-2xl border-b border-graye5">
                     {data?.productName}

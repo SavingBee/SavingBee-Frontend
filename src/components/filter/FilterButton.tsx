@@ -1,5 +1,4 @@
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
-import Button from "../common/button/Button";
 import React, { forwardRef } from "react";
 
 // FilterButton - 공통
@@ -23,24 +22,22 @@ const FilterButton = forwardRef<HTMLButtonElement, FilterButtonProps>(
     const handleClick = (clickFilter as unknown as () => void) || undefined;
 
     return (
-      <Button
+      <button
         type="button"
-        variant="sm"
-        styleVariant="border"
-        className={`${filterButtonStyle} ${isActive ? "border-primary" : "border-graye5"}`}
+        className={`h-[38px] px-3 font-medium text-sm rounded-md border ${isActive ? "border-primary" : "border-graye5"}`}
         onClick={handleClick}
       >
         <span
-          className={`${isActive ? "text-primary" : "text-gray7"} inline-flex leading-none gap-2`}
+          className={`${isActive ? "text-primary" : "text-gray7"} flex items-center gap-2`}
         >
           {filterText}
           {isActive ? (
-            <FaChevronUp />
+            <FaChevronUp size={11} />
           ) : (
-            <FaChevronDown className="text-gray7" />
+            <FaChevronDown size={11} className="text-gray7" />
           )}
         </span>
-      </Button>
+      </button>
     );
   },
 );

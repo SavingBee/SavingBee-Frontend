@@ -270,7 +270,7 @@ const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} modalTitle="상품 알림 설정">
-      <div className="mx-8">
+      <div>
         <div>
           <strong className="block font-bold text-sm text-black6 mb-1">
             알림방식
@@ -324,14 +324,13 @@ const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
             inputClassName="w-full"
             labelClassName="block font-bold text-sm text-black6 mb-1 mt-4"
             addonText="% 이상"
+            required
           />
-          <p className="text-sm text-red mt-1 h-4">
-            {rate
-              ? validRate
-                ? ""
-                : `0보다 크고 ${MAX_RATE}% 이하로 입력하세요`
-              : "필수 입력"}
-          </p>
+          {rate && !validRate && (
+            <p className="font-medium text-xs text-red mt-1">
+              {`0보다 크고 ${MAX_RATE}% 이하로 입력하세요`}
+            </p>
+          )}
         </div>
 
         <div>
@@ -374,10 +373,8 @@ const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
             labelClassName="block font-bold text-sm text-black6 mb-1 mt-4"
             selectClassName="w-full"
             value={term === "" ? "" : String(term)}
+            required
           />
-          <p className="text-sm text-red mt-1 h-4">
-            {validTerm ? "" : "필수 입력"}
-          </p>
         </div>
 
         <InputField1
@@ -389,34 +386,61 @@ const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
           value={formatWithCommas(minAmountRaw)}
           onChange={(e) => setMinAmountRaw(onlyDigits(e.target.value))}
         />
-        <p className="text-sm text-red mt-1 h-4">
-          {!minAmountRaw
-            ? ""
-            : validMinAmount
-              ? ""
-              : `${MIN_AMOUNT.toLocaleString()}원 이상 ${MAX_AMOUNT.toLocaleString()}원 이하로 입력하세요`}
-        </p>
+        {
+          minAmountRaw && !validMinAmount && (
+            <p className="font-medium text-xs text-red mt-1">
+              {`${MIN_AMOUNT.toLocaleString()}원 이상 ${MAX_AMOUNT.toLocaleString()}원 이하로 입력하세요`}
+            </p>
+          )
+        }
 
         <InputField1
           type="text"
           label="최대 한도"
           inputClassName="w-full"
-          labelClassName="block font-bold text-sm text-black6 mb-1 mt-2"
+          labelClassName="block font-bold text-sm text-black6 mb-1 mt-4"
           addonText="원"
           value={formatWithCommas(maxLimitRaw)}
           onChange={(e) => setMaxLimitRaw(onlyDigits(e.target.value))}
         />
-        <p className="text-sm text-red mt-1 h-4">
-          {!maxLimitRaw
-            ? ""
-            : maxLimitNum < MIN_AMOUNT || maxLimitNum > MAX_AMOUNT
-              ? `${MIN_AMOUNT.toLocaleString()}원 이상 ${MAX_AMOUNT.toLocaleString()}원 이하로 입력하세요`
-              : minAmountRaw && maxLimitNum < minAmountNum
-                ? `최대 한도는 최소 가입 금액 이상이어야 합니다`
-                : ""}
-        </p>
+        {
+          maxLimitRaw &&
+          (
+            (maxLimitNum < MIN_AMOUNT || maxLimitNum > MAX_AMOUNT) ||
+            (minAmountRaw && maxLimitNum < minAmountNum)
+          ) && (
+            <p className="font-medium text-xs text-red mt-1">
+              {
+                maxLimitNum < MIN_AMOUNT || maxLimitNum > MAX_AMOUNT
+                  ? `${MIN_AMOUNT.toLocaleString()}원 이상 ${MAX_AMOUNT.toLocaleString()}원 이하로 입력하세요`
+                  : `최대 한도는 최소 가입 금액 이상이어야 합니다`
+              }
+            </p>
+          )
+        }
 
-        <div className="flex gap-4">
+        <div className="flex gap-2 mt-4">
+          <Button
+            type="button"
+            onClick={onClose}
+            className="flex items-center justify-center w-full h-[50px] font-bold text-base rounded-md text-white bg-black6"
+          >
+            닫기
+          </Button>
+          <Button
+            type="button"
+            className={`flex items-center justify-center w-full h-[50px] font-bold text-base rounded-md ${isValid && !loading && !submitting
+              ? "bg-primary hover:bg-primary/90 text-white"
+              : "bg-gray-300 cursor-not-allowed text-gray-500"
+              }`}
+            disabled={!isValid || loading || submitting}
+            onClick={handleSubmit}
+          >
+            {submitting ? "저장중..." : "저장"}
+          </Button>
+        </div>
+
+        {/* <div className="flex gap-4">
           <Button
             type="button"
             styleVariant="bg"
@@ -432,14 +456,14 @@ const AlertModal = ({ isOpen, onClose }: AlertModalProps) => {
             variant="lg"
             disabled={!isValid || loading || submitting}
             className={`rounded-md w-40 text-lg mt-4 ${isValid && !loading && !submitting
-                ? "bg-primary hover:bg-primary/90 text-white"
-                : "bg-gray-300 cursor-not-allowed text-gray-500"
+              ? "bg-primary hover:bg-primary/90 text-white"
+              : "bg-gray-300 cursor-not-allowed text-gray-500"
               }`}
             onClick={handleSubmit}
           >
             {submitting ? "저장중..." : "저장"}
           </Button>
-        </div>
+        </div> */}
       </div>
     </Modal>
   );

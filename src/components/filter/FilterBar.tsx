@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 
 import { MdRefresh } from "react-icons/md";
-import Button from "../common/button/Button";
-import FilterButton, { filterButtonStyle } from "./FilterButton";
+import FilterButton from "./FilterButton";
 
 import MultiOption from "@/components/filter/dropdown/MultiOption";
 import AmountForm from "@/components/filter/dropdown/AmountForm";
@@ -333,7 +332,7 @@ export default function FilterBar({
           aFilter={f}
           value={draft.amount}
           onChange={(e) => setDraft((d) => ({ ...d, amount: parseNum(e) }))}
-          // onApply={() => applyById("amount")}
+        // onApply={() => applyById("amount")}
         />
       );
     }
@@ -345,7 +344,7 @@ export default function FilterBar({
           onChange={(e) =>
             setDraft((d) => ({ ...d, monthlyAmount: parseNum(e) }))
           }
-          // onApply={() => applyById("monthlyAmount")}
+        // onApply={() => applyById("monthlyAmount")}
         />
       );
     }
@@ -366,7 +365,7 @@ export default function FilterBar({
               baseRate: { ...d.baseRate, max: parseNum(e) },
             }))
           }
-          // onApply={() => applyById("baseRate")}
+        // onApply={() => applyById("baseRate")}
         />
       );
     }
@@ -387,7 +386,7 @@ export default function FilterBar({
               maxRate: { ...d.maxRate, max: parseNum(e) },
             }))
           }
-          // onApply={() => applyById("maxRate")}
+        // onApply={() => applyById("maxRate")}
         />
       );
     }
@@ -408,7 +407,7 @@ export default function FilterBar({
               totalAmount: { ...d.totalAmount, max: parseNum(e) },
             }))
           }
-          // onApply={() => applyById("totalAmount")}
+        // onApply={() => applyById("totalAmount")}
         />
       );
     }
@@ -420,7 +419,7 @@ export default function FilterBar({
       {/* 버튼그리드 -> 플렉스 변경*/}
       <div
         ref={rowRef}
-        className="flex flex-wrap items-center gap-2 sm:gap-3 flex-1 min-w-0"
+        className="flex flex-wrap items-center gap-2 sm:gap-1 flex-1 min-w-0"
       >
         {filters.map((f) => {
           const isActive = openId === f.id;
@@ -435,18 +434,14 @@ export default function FilterBar({
           );
         })}
       </div>
-      <Button
+      <button
         type="button"
-        styleVariant="bg"
-        variant="sm"
-        className={`${filterButtonStyle} !bg-black6 !text-white !w-auto `}
         onClick={resetAll}
+        className="flex items-center gap-1 h-[38px] px-3 font-bold text-sm text-white bg-black6 rounded-md"
       >
-        <span className="flex gap-1">
-          <MdRefresh />
-          필터 초기화
-        </span>
-      </Button>
+        <MdRefresh />
+        필터 초기화
+      </button>
 
       {/* PC Popover: 버튼 바로 아래, 마지막 열이면 end 정렬 */}
       <Popover
