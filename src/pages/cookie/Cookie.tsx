@@ -11,7 +11,7 @@ const Cookie = () => {
             ?.split("=")[1];
 
         if (refreshToken) {
-            fetch("/api/auth/refresh", {
+            fetch("/jwt/refresh", {
                 method: "POST",
                 credentials: "include", // 쿠키 포함
             })
