@@ -7,7 +7,6 @@ const useAuthHeader = () => {
     useEffect(() => {
         const checkHeader = () => {
             const authHeader = api.defaults.headers.common["Authorization"];
-            console.log("🔍 현재 Axios 헤더 Authorization:", authHeader);
             setHasAuthHeader(!!authHeader);
         };
 

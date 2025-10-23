@@ -15,7 +15,7 @@ const useLogin = () => {
         try {
             await login(loginData);
             alert("로그인 성공");
-            window.location.href = "/"; //메인으로 이동
+            window.location.href = "/";
         } catch (err) {
             const axiosError = err as AxiosError<{ message: string }>;
             setError(axiosError.response?.data?.message || "로그인 실패");

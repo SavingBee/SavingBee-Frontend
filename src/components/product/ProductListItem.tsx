@@ -119,13 +119,6 @@ const ProductListItem: React.FC<ProductListItemProps> = ({
       productType,
     };
 
-    console.log("[addCart] payload:", payload);
-
-    // add({
-    //   productCode: String(fin_prdt_cd),
-    //   productType: (product_type === "deposit" ? "DEPOSIT" : "SAVINGS") as "DEPOSIT" | "SAVINGS",
-
-    // });
     add(payload, () => {
       alert("보관함에 추가되었습니다.");
       window.location.reload();

@@ -2,17 +2,23 @@ import useMyProfile from "@/hooks/mypage/useMyProfile";
 import PageHeader from "../common/pageHeader/PageHeader";
 import UserHeader from "./UserHeader";
 import UserProductList from "./products/UserProductList";
-import useMyProducts from "@/hooks/mypage/product/useMyProducts";
 
 import { HiPlusSm } from "react-icons/hi";
 import { Link } from "react-router-dom";
-
+import { useProductStore } from "@/store/useMyProductStore";
+import { useEffect } from "react";
 const MypageContainer = () => {
   // 회원정보 가져오기
   const { data: profile } = useMyProfile();
 
-  // 보유 상품 목록 가져오기
-  const { data: productsData } = useMyProducts();
+  // Zustand 상태 가져오기
+  const products = useProductStore((state) => state.products);
+  const fetchProducts = useProductStore((state) => state.fetchProducts);
+
+  // 최초 1회 상품 데이터 가져오기
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
   return (
     <div>
@@ -23,7 +29,7 @@ const MypageContainer = () => {
           { label: "마이페이지", to: "/mypage" },
         ]}
       />
-      <UserHeader profile={profile} products={productsData} />
+      <UserHeader profile={profile} products={products} />
       <div className="flex justify-between items-center mt-9">
         <strong className="gmarket font-bold text-2xl">
           <span className="text-primary">{profile?.nickname}</span>님의 보유상품
@@ -37,7 +43,7 @@ const MypageContainer = () => {
         </Link>
       </div>
       <div className="mt-3">
-        <UserProductList products={productsData} />
+        <UserProductList products={products} />
       </div>
     </div>
   );

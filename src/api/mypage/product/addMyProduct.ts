@@ -5,7 +5,7 @@ import axios from "axios";
 export const addMyProduct = async (data: AddMyProductRequest) => {
     const token = localStorage.getItem("accessToken");
 
-    return axios.post("http://34.64.73.53:8080/api/mypage/products", data, {
+    return axios.post("https://savingbee.monster/api/mypage/products", data, {
         headers: {
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",

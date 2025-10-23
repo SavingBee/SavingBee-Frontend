@@ -9,12 +9,12 @@ import { IoMdPerson } from "react-icons/io";
 import AlertModal from "./alert/AlertModal.tsx";
 import UserRemoveModal from "./UserRemoveModal.tsx";
 import { MyProfile } from "@/types/user.ts";
-import { UserProductResponse } from "@/types/product.ts";
+import { Product } from "@/store/useMyProductStore.ts";
 
 type ActiveModal = "none" | "alert" | "edit" | "remove";
 interface UserHeaderProps {
     profile?: MyProfile | null;
-    products?: UserProductResponse | null;
+    products?: Product[] | null;
 }
 
 const UserHeader = ({ profile, products }: UserHeaderProps) => {
@@ -48,7 +48,7 @@ const UserHeader = ({ profile, products }: UserHeaderProps) => {
                             현재 <br />보유 상품
                         </strong>
                         <span className="block font-bold  text-primary text-2xl underline">
-                            {products?.totalElements}
+                            {products?.length}
                         </span>
                     </div>
                 </div>
